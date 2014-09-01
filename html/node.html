@@ -1,0 +1,7 @@
+<button ng-hide="data.expanded" ng-click="data.expand()">+</button>
+<button ng-show="data.expanded" ng-click="data.contract()">-</button>
+<a href="" ng-click="data.meAsRoot()">{{data.name}}</a>
+        {{data.properties}}
+    <ul>
+    <li style="background: {{data.color}}" ng-repeat="data in data.edges" ng-include="'html/node.html'"></li>
+</ul>
