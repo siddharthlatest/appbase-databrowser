@@ -18,7 +18,17 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       .otherwise({ redirectTo: '/' });
   })
   .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation) {
-    data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
+    var appName;
+    if((appName = stringManipulation.parseURL(stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).appName) === undefined){
+      console.log('not a proper url')
+      return
+    }
+
+    if(!data.isInitComplete() || data.init(appName)){
+      console.log('not allowed')
+      return
+    }
+
     $scope.goUp = function() {
       $location.path(stringManipulation.parentUrl($scope.url))
     }
@@ -42,6 +52,21 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
     var data = {};
     var appName;
     var secret;
+
+    data.isInitComplete = function(){
+      return appName !== undefined
+    }
+
+    data.init = function(appName){
+      var app_creds = sessionStorage.getItem('app_creds')
+      var secret = app_creds !== undefined? app_creds[appName] : undefined
+      if(secret !== undefined){
+        data.setAppCredentials(appName, secret)
+        return true
+      } else {
+        return false
+      }
+    }
 
     data.bindAsRoot = function($scope) {
       var root = {}
@@ -236,10 +261,11 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
     }
 
     stringManipulation.parseURL = function(url) {
-      var intermediate
-      intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/)
-      var appname = intermediate[0]
-      var path = intermediate[1].split(/\/(.+)?/)[1]
+      var intermediate = url;
+      intermediate = intermediate === undefined? undefined: url.split(/\/\/(.+)?/)[1]
+      intermediate = intermediate === undefined? undefined: intermediate.split(/\.(.+)?/)
+      var appname = intermediate === undefined? undefined: intermediate[0]
+      var path = intermediate === undefined? undefined: intermediate[1].split(/\/(.+)?/)[1]
       return {
         appName: appname,
         path: path
