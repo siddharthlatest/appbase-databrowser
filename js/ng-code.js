@@ -24,7 +24,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       return
     }
 
-    if(!data.isInitComplete() || data.init(appName)){
+    if(!data.isInitComplete() && !data.init(appName)) {
       console.log('not allowed')
       return
     }
@@ -57,15 +57,22 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       return appName !== undefined
     }
 
+    /*
     data.init = function(appName){
       var app_creds = sessionStorage.getItem('app_creds')
       var secret = app_creds !== undefined? app_creds[appName] : undefined
-      if(secret !== undefined){
+      if(secret !== undefined) {
         data.setAppCredentials(appName, secret)
         return true
       } else {
         return false
       }
+    }
+    */
+
+    data.init = function() {
+      data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
+      return true
     }
 
     data.bindAsRoot = function($scope) {
@@ -273,6 +280,9 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
     }
 
     stringManipulation.cutLeadingTrailingSlashes = function(input) {
+      if(typeof input !== 'string')
+        return
+
       while(input.charAt(input.length - 1) === '/') {
         input = input.slice(0,-1);
       }
