@@ -1,3 +1,5 @@
-<button class="btn btn-sm btn-primary" ng-click="goUp()">Go Up</button>
-url: {{url}}
-<div class="tree" ng-include="'html/node.html'"></div>
+<div ng-show='alert && alert !== "" ' class="alert alert-{{alertType}}" role="alert" style="opacity: 0.6;">{{alert}}</div>
+
+<button ng-show="node" class="btn btn-sm btn-primary" ng-click="goUp()">Go Up</button>
+<span ng-show="node">URL: {{url}} </span>
+<div ng-show="node" class="tree" ng-include="'html/node.html'"></div>

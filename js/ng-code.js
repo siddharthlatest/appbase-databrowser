@@ -18,14 +18,16 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       .otherwise({ redirectTo: '/' });
   })
   .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation) {
+    $scope.alertType = 'danger'
+
     var appName;
     if((appName = stringManipulation.parseURL(stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).appName) === undefined){
-      console.log('not a proper url')
+      $scope.alert = 'The URL is not proper.'
       return
     }
 
     if(!data.isInitComplete() && !data.init(appName)) {
-      console.log('not allowed')
+      $scope.alert = 'You are not allowed to browse this data. Go to the developer page and try logging in again.'
       return
     }
 
