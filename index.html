@@ -2,16 +2,25 @@
 <html ng-app="abDataBrowser">
 <head>
     <title>Appbase Databrowser</title>
-    <link href="http://hooli.io/css/bootstrap.min.css" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://appbase.io/css/bootstrap.min.css" media="screen"/>
+    <link rel="stylesheet" href="http://appbase.io/css/style.css" media="screen"/>
+    <link rel="stylesheet" href="http://appbase.io/css/dev-style.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://appbase.io/css/navbar-blue.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://appbase.io/css/footer.css" media="screen">
     <style>
         body {
             background:white;
             font-family:Segoe,"Segoe UI",Calibri,Arial,Sans-Serif;
-            padding:50px;
+            padding-top:10vh;
         }
 
         /* Framework start from here */
-        div.tree,
+        div.tree {
+            margin:8vh;
+            border: 1px groove;
+            border-radius: 5px;
+        }
         div.tree ul.node {
             list-style:none;
             margin:0;
@@ -63,12 +72,76 @@
         }
     </style>
 </head>
-<body>
+<body data-spy="scroll" data-target=".navbar">
+
+<nav id="topnav"  class="navbar navbar-fixed-top navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <div>
+                <a class="navbar-brand" href="index.html"><img src="http://appbase.io/images/appbase.png" style="width:60px;padding-left:15px;"></a>
+            </div>
+            <div>
+                <a class="navbar-brand" href="index.html"><img src="http://appbase.io/images/logoblue.png" style="position;padding-left:0px;"></a>
+            </div>
+            <div style="padding-right: 15px">
+                <button type="button" class="navbar-toggle" id="developer-access-icon" data-toggle="modal" data-target="#mainModal">
+                    <img src="http://appbase.io/images/key.svg" id="keySvg">
+                </button>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse" id="collapse-list">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://appbase.io/"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                <li><a href="http://appbase.io/tutorial.html"><span class="glyphicon glyphicon-cog"></span> Tutorial</a></li>
+                <li><a href="http://appbase.io/docs/"><span class="glyphicon glyphicon-book"></span> Learn</a></li>
+                <li class="active"><a href="#"><span class="glyphicon glyphicon-log-in"></span> Developers</a></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
 <div ng-view></div>
+
+<footer>
+    <div class="container">
+        <div class="row" style="font-size: 0.8em !important;">
+            <div class="col-xs-1">
+                <a href="about.html">About</a>
+            </div>
+            <div class="col-xs-1">
+                <a href="#">Blog</a>
+            </div>
+            <div class="col-xs-1">
+                <a href="#">Terms</a>
+            </div>
+            <div class="col-xs-1">
+                <a href="#">Privacy</a>
+            </div>
+            <div class="col-xs-1">
+                <a href="appbase-apidoc.htm">Documentation</a>
+            </div>
+            <div class="col-xs-1">
+                <a href="#">info@appbase.io</a>
+            </div>
+        </div>
+    </div>
+</footer>
 
 <script src="js/lib/angular.min.js" type="application/javascript" ></script>
 <script src="js/lib/angular-route.min.js" type="application/javascript"></script>
 <script src="js/lib/atomic.js"></script>
+
+<script type="text/javascript" src="http://appbase.io/js/jquery.js"></script>
+<script src="http://appbase.io/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="http://appbase.io/js/main.js"></script>
 <script src="http://cdn.appbase.io/appbase.min.js"></script>
 <script src="http://cdn.appbase.io/ng-appbase-ref.js"></script>
 <script src="js/ng-code.js"></script>
