@@ -20,20 +20,25 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
   .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation) {
     data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
     $scope.goUp = function() {
-      $location.path(stringManipulation.parentPath($scope.path))
+      $location.path(stringManipulation.parentUrl($scope.url))
     }
 
-    if($routeParams.path === undefined) {
+    var path
+
+    if((path = stringManipulation.urlToPath($scope.url = stringManipulation.cutLeadingTrailingSlashes($routeParams.path))) === undefined) {
+      console.log('root', path, $scope.url)
       $scope.node = data.bindAsRoot($scope)
-    } else if(($scope.path = stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).indexOf('/') === -1){
-      $scope.node = data.bindAsNamespace($scope, $scope.path)
+    } else if(path.indexOf('/') === -1) {
+      console.log('ns', path, $scope.url)
+      $scope.node = data.bindAsNamespace($scope, path)
     } else {
-      $scope.node = data.bindAsVertex($scope ,$scope.path)
+      console.log('v', path, $scope.url)
+      $scope.node = data.bindAsVertex($scope , path)
     }
 
     $scope.node.expand()
   })
-  .factory('data', function($timeout, $location, $appbaseRef) {
+  .factory('data', function($timeout, $location, $appbaseRef, stringManipulation) {
     var data = {};
     var appName;
     var secret;
@@ -42,7 +47,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       var root = {}
       root.name = appName
       root.meAsRoot = function() {
-        $location.path('')
+        $location.path(stringManipulation.pathToUrl(''))
       }
       root.expand = function() {
         root.children = []
@@ -65,7 +70,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
     data.bindAsNamespace = function($scope, namespace) {
       var ns =  {name: namespace}
       ns.meAsRoot = function() {
-        $location.path('/'+ namespace)
+        $location.path(stringManipulation.pathToUrl(namespace))
       }
       ns.expand = function(){
         ns.children = []
@@ -99,7 +104,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
               edgeData.$ref.$unbindEdges()
             }
             edgeData.meAsRoot = function() {
-              $location.path(edgeRef.path())
+              $location.path(stringManipulation.pathToUrl(edgeRef.path()))
             }
 
             edgeData.color = 'green'
@@ -142,7 +147,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       }
 
       vertex.meAsRoot = function() {
-        $location.path(path)
+        $location.path(stringManipulation.pathToUrl(path))
       }
 
       vertex.contract = function() {
@@ -171,6 +176,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       Appbase.credentials(app, s);
       appName = app;
       secret = s;
+      stringManipulation.setBaseUrl('http://'+ appName + '.' + 'api1.appbase.io/')
     };
 
     data.getAppname = function() {
@@ -212,6 +218,33 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
   })
 .factory('stringManipulation', function() {
     var stringManipulation = {}
+    var baseUrl
+    stringManipulation.setBaseUrl = function(bUrl){
+      baseUrl = bUrl
+    }
+
+    stringManipulation.urlToAppname = function(url) {
+      return stringManipulation.parseURL(url).appName
+    }
+
+    stringManipulation.urlToPath = function(url) {
+      return stringManipulation.parseURL(url).path
+    }
+
+    stringManipulation.pathToUrl = function(path) {
+      return baseUrl + path
+    }
+
+    stringManipulation.parseURL = function(url) {
+      var intermediate
+      intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/)
+      var appname = intermediate[0]
+      var path = intermediate[1].split(/\/(.+)?/)[1]
+      return {
+        appName: appname,
+        path: path
+      }
+    }
 
     stringManipulation.cutLeadingTrailingSlashes = function(input) {
       while(input.charAt(input.length - 1) === '/') {
@@ -221,6 +254,10 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         input = input.slice(1);
       }
       return input;
+    }
+
+    stringManipulation.parentUrl = function(url) {
+      return stringManipulation.pathToUrl(stringManipulation.parentPath(stringManipulation.urlToPath(url)))
     }
 
     stringManipulation.parentPath = function(path) {
