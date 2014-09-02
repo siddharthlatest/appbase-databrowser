@@ -57,10 +57,9 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       return appName !== undefined
     }
 
-    /*
-    data.init = function(appName){
-      var app_creds = sessionStorage.getItem('app_creds')
-      var secret = app_creds !== undefined? app_creds[appName] : undefined
+    data.init = function(appName) {
+      var app_creds = JSON.parse(sessionStorage.getItem('app_creds'))
+      var secret = app_creds !== undefined && app_creds !== null ? app_creds[appName] : undefined
       if(secret !== undefined) {
         data.setAppCredentials(appName, secret)
         return true
@@ -68,16 +67,10 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         return false
       }
     }
-    */
-
-    data.init = function() {
-      data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
-      return true
-    }
 
     data.bindAsRoot = function($scope) {
       var root = {}
-      root.name = appName
+      root.name = stringManipulation.getBaseUrl()
       root.meAsRoot = function() {
         $location.path(stringManipulation.pathToUrl(''))
       }
@@ -253,6 +246,10 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
     var baseUrl
     stringManipulation.setBaseUrl = function(bUrl){
       baseUrl = bUrl
+    }
+
+    stringManipulation.getBaseUrl = function(bUrl){
+      return baseUrl
     }
 
     stringManipulation.urlToAppname = function(url) {
