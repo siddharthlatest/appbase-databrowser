@@ -18,20 +18,20 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       .otherwise({ redirectTo: '/' });
   })
   .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation) {
-    data.setAppCredentials("oppio_2", "6b4553972cafeda7a95c90c1b6dcfd65")
+    data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
     $scope.goUp = function() {
       $location.path(stringManipulation.parentPath($scope.path))
     }
 
     if($routeParams.path === undefined) {
-      $scope.data = data.bindAsRoot($scope)
+      $scope.node = data.bindAsRoot($scope)
     } else if(($scope.path = stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).indexOf('/') === -1){
-      $scope.data = data.bindAsNamespace($scope, $scope.path)
+      $scope.node = data.bindAsNamespace($scope, $scope.path)
     } else {
-      $scope.data = data.bindAsVertex($scope ,$scope.path)
+      $scope.node = data.bindAsVertex($scope ,$scope.path)
     }
 
-    $scope.data.expand()
+    $scope.node.expand()
   })
   .factory('data', function($timeout, $location, $appbaseRef) {
     var data = {};
@@ -45,19 +45,19 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         $location.path('')
       }
       root.expand = function() {
-        root.edges = []
+        root.children = []
         root.expanded = true
         data.getNamespaces(function(namespaces) {
           $timeout(function(){
             namespaces.forEach(function(namespace) {
-              root.edges.push(data.bindAsNamespace($scope, namespace))
+              root.children.push(data.bindAsNamespace($scope, namespace))
             })
           })
         })
       }
       root.contract = function(){
         root.expanded = false
-        root.edges = []
+        root.children = []
       }
       return root
     }
@@ -68,19 +68,19 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         $location.path('/'+ namespace)
       }
       ns.expand = function(){
-        ns.edges = []
+        ns.children = []
         ns.expanded = true
         data.getVerticesOfNamespace(namespace, function(vertices) {
           $timeout(function() {
             vertices.forEach(function(vertexPath) {
-              ns.edges.push(data.bindAsVertex($scope, vertexPath))
+              ns.children.push(data.bindAsVertex($scope, vertexPath))
             })
           })
         })
       }
       ns.contract = function() {
         ns.expanded = false
-        ns.edges = []
+        ns.children = []
       }
       return ns
     }
@@ -92,7 +92,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
             edgeData.$ref = $appbaseRef(edgeRef)
             edgeData.expand = function() {
               edgeData.expanded = true
-              edgeData.edges = bindEdges(edgeData.$ref)
+              edgeData.children = bindEdges(edgeData.$ref)
             }
             edgeData.contract = function() {
               edgeData.expanded = false
@@ -132,39 +132,39 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         })
       }
 
-      var node = {
+      var vertex = {
         $ref: $appbaseRef(path)
       }
 
-      node.expand = function() {
-        node.expanded = true
-        node.edges = bindEdges(node.$ref)
+      vertex.expand = function() {
+        vertex.expanded = true
+        vertex.children = bindEdges(vertex.$ref)
       }
 
-      node.meAsRoot = function() {
+      vertex.meAsRoot = function() {
         $location.path(path)
       }
 
-      node.contract = function() {
-        node.expanded = false
-        node.$ref.$unbindEdges()
+      vertex.contract = function() {
+        vertex.expanded = false
+        vertex.$ref.$unbindEdges()
       }
 
-      node.properties = node.$ref.$bindProperties($scope, {
+      vertex.properties = vertex.$ref.$bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
-          if(node.color == 'white')
-            node.color = 'yellow'
-          else node.color = 'green'
+          if(vertex.color == 'white')
+            vertex.color = 'yellow'
+          else vertex.color = 'green'
           done()
 
           $timeout(function() {
-            node.color = 'white'
+            vertex.color = 'white'
           }, 500)
         }
       })
-      node.name = path.slice(path.lastIndexOf('/') + 1)
+      vertex.name = path.slice(path.lastIndexOf('/') + 1)
 
-      return node
+      return vertex
     }
 
     data.setAppCredentials = function(app, s) {

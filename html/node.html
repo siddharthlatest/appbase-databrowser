@@ -1,7 +1,11 @@
-<button ng-hide="data.expanded" ng-click="data.expand()">+</button>
-<button ng-show="data.expanded" ng-click="data.contract()">-</button>
-<a href="" ng-click="data.meAsRoot()">{{data.name}}</a>
-        {{data.properties}}
-    <ul>
-    <li style="background: {{data.color}}" ng-repeat="data in data.edges" ng-include="'html/node.html'"></li>
+<button class="btn btn-xs" ng-hide="node.expanded" ng-click="node.expand()">+</button>
+<button class="btn btn-xs" ng-show="node.expanded" ng-click="node.contract()">-</button>
+<a href="" style="background-color: {{node.color}}" ng-click="node.meAsRoot()">{{node.name}}</a>
+<ul ng-show="node.properties" style="margin:1vh; width: 30%; max-height: 10%; overflow: auto; border: 1px dashed;">
+    <li ng-repeat="(prop, val) in node.properties">
+        {{prop}}: {{val}}
+    </li>
+</ul>
+<ul class="node">
+    <li class="node" ng-repeat="node in node.children" ng-include="'html/node.html'"></li>
 </ul>
