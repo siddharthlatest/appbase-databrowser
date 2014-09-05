@@ -10,7 +10,7 @@ div.tree { /* the box containing the tree */
 }
 
 div.tree div.node { /* every node */
-
+    margin: 0.5vh;
 }
 
 div.tree div.content { /* content of the node- name, properties etc. doesn't include children */
