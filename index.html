@@ -8,65 +8,10 @@
     <link rel="stylesheet" href="/css/dev-style.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/css/navbar-blue.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/css/footer.css" media="screen">
+    <link rel="stylesheet" href="css/tree.css" media="screen">
     <style>
         body {
             padding-top:10vh;
-        }
-
-        /* Framework start from here */
-        div.tree {
-            margin:8vh;
-            border: 1px groove;
-            border-radius: 5px;
-        }
-        div.tree ul.node {
-            list-style:none;
-            margin:0;
-            padding:0;
-        }
-
-        div.tree ul.node {
-            margin-left:10px; /* indentation */
-            position:relative;
-        }
-
-        div.tree ul.node:before {
-            content:"";
-            display:block;
-            width:0;
-            position:absolute;
-            top:0;
-            bottom:0;
-            left:0;
-            border-left:1px solid;
-        }
-
-        div.tree li.node {
-            margin:0;
-            padding:0 32px; /* indentation + 2 */
-            font-size:14px;
-            line-height:20px; /* default list item `line-height` */
-            color:#369;
-            font-weight:bold;
-            position:relative;
-        }
-
-        div.tree ul.node li.node:before {
-            content:"";
-            display:block;
-            width:30px; /* same with indentation */
-            height:0;
-            border-top:1px solid;
-            position:absolute;
-            top:10px;
-            left:0;
-        }
-
-        div.tree ul.node li.node:last-child:before {
-            background:white; /* same with body background */
-            height:auto;
-            top:10px; /* (line-height/2) */
-            bottom:0;
         }
     </style>
 </head>

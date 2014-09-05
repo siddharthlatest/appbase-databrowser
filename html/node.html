@@ -1,11 +1,13 @@
-<button class="btn btn-xs" ng-hide="!node || node.expanded" ng-click="node.expand()">+</button>
-<button class="btn btn-xs" ng-show="node.expanded" ng-click="node.contract()">-</button>
-<a href="" style="background-color: {{node.color}}" ng-click="node.meAsRoot()">{{node.name}}</a>
-<ul ng-show="node.properties" style="white-space: nowrap; margin:0.5vh; padding: 1vh; list-style-type: square; width: 50%; max-height: 10%; overflow: auto; border: 1px dashed; !important">
-    <li style="list-style: square inside;" ng-repeat="(prop, val) in node.properties">
-        {{prop}}: {{val}}
-    </li>
-</ul>
-<ul class="node">
-    <li class="node" ng-repeat="node in node.children" ng-include="'html/node.html'"></li>
-</ul>
+<div class="node">
+    <button class="btn btn-xs" ng-hide="!node || node.expanded" ng-click="node.expand()">+</button>
+    <button class="btn btn-xs" ng-show="node.expanded" ng-click="node.contract()">-</button>
+    <a href="" style="background-color: {{node.color}}" ng-click="node.meAsRoot()">{{node.name}}</a>
+    <ul class="propertiesBox" ng-show="node.properties">
+        <li class="property" ng-repeat="(prop, val) in node.properties">
+            {{prop}}: {{val}}
+        </li>
+    </ul>
+    <ul class="children">
+        <li class="child" ng-repeat="node in node.children" ng-include="'html/node.html'"></li>
+    </ul>
+</div>
