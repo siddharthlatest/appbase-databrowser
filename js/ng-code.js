@@ -90,11 +90,6 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       }
     }
 
-    data.init = function() {
-      data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
-      return true
-    }
-
     data.bindAsRoot = function($scope) {
       var root = {}
       root.name = stringManipulation.getBaseUrl()
