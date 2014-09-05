@@ -8,20 +8,19 @@
         <a ng-if="!$last" ng-href="#{{ baseUrl + breadcrumb.path }}" ng-bind="breadcrumb.label" class="margin-right-xs"></a>
         <span ng-if="$last" ng-bind="breadcrumb.label"></span>
     </li>
+
+    <div class="form-group form-inline pull-right">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="modifyEnabled"> Enable modifications
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="showPriorities"> Show Priorities
+            </label>
+        </div>
+    </div>
 </ol>
 
-<div class="form-group">
-    <div class="checkbox">
-        <label>
-            <input type="checkbox" ng-model="modifyEnabled"> Enable modifications
-        </label>
-    </div>
-    <div class="checkbox">
-        <label>
-            <input type="checkbox" ng-model="showPriorities"> Show Priorities
-        </label>
-    </div>
-</div>
-<button ng-show="false" class="btn btn-sm btn-primary" ng-click="goUp()">Go Up</button>
-<span ng-show="false">URL: {{url}} </span>
 <div ng-show="node" class="tree" ng-include="'html/node.html'"></div>

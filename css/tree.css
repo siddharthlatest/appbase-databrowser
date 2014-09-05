@@ -1,10 +1,12 @@
 
 /* Framework start from here */
 div.tree { /* the box containing the tree */
-    margin:8vh;
+    margin:2vh;
     padding: 2vh;
     border: 1px groove;
     border-radius: 5px;
+    height: 63vh;
+    overflow: auto
 }
 
 div.tree div.node { /* every node */
