@@ -42,6 +42,8 @@ div.tree li.property { /* every property */
     font-size:1em;
     font-weight: normal;
     color: #706a65;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
 div.tree ul.children:before { /* draws the lines */

@@ -117,24 +117,12 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       return ns
     }
 
-    data.bindAsVertex = function($scope, path) {
+    data.bindAsVertex = function($scope, path, useThisVertex) {
       var bindEdges = function($ref) {
         return $ref.$bindEdges($scope, true, false, {
           onAdd :function(scope, edgeData, edgeRef, done) {
             edgeData.$ref = $appbaseRef(edgeRef)
-            edgeData.expand = function() {
-              edgeData.expanded = true
-              edgeData.children = bindEdges(edgeData.$ref)
-            }
-            edgeData.contract = function() {
-              edgeData.expanded = false
-              edgeData.$ref.$unbindEdges()
-            }
-            edgeData.meAsRoot = function() {
-              $location.path(stringManipulation.pathToUrl(edgeRef.path()))
-            }
-
-            edgeData.color = 'green'
+            data.bindAsVertex($scope, edgeRef.path(), edgeData)
             done()
 
             $timeout(function() {
@@ -164,7 +152,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         })
       }
 
-      var vertex = {
+      var vertex = useThisVertex || {
         $ref: $appbaseRef(path)
       }
 
@@ -177,24 +165,38 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         $location.path(stringManipulation.pathToUrl(path))
       }
 
+      vertex.color = 'green'
+
       vertex.contract = function() {
         vertex.expanded = false
         vertex.$ref.$unbindEdges()
       }
 
-      vertex.properties = vertex.$ref.$bindProperties($scope, {
-        onProperties : function(scope, properties, ref, done) {
-          if(vertex.color == 'white')
-            vertex.color = 'yellow'
-          else vertex.color = 'green'
-          done()
+      vertex.removeProperty = function(prop) {
+        vertex.$ref.$removeData([prop])
+      }
 
-          $timeout(function() {
-            vertex.color = 'white'
-          }, 500)
-        }
-      })
-      vertex.name = path.slice(path.lastIndexOf('/') + 1)
+      vertex.addProperty = function(prop, value) {
+        console.log('add', prop, value)
+        var data = {}
+        data[prop] = value
+        vertex.$ref.$setData(data)
+      }
+
+      if(useThisVertex === undefined) {
+        vertex.properties = vertex.$ref.$bindProperties($scope, {
+          onProperties : function(scope, properties, ref, done) {
+            if(vertex.color == 'white')
+              vertex.color = 'yellow'
+            done()
+
+            $timeout(function() {
+              vertex.color = 'white'
+            }, 500)
+          }
+        })
+        vertex.name = path.slice(path.lastIndexOf('/') + 1)
+      }
 
       return vertex
     }
