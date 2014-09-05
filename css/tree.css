@@ -8,8 +8,14 @@ div.tree { /* the box containing the tree */
 }
 
 div.tree div.node { /* every node */
+
+}
+
+div.tree div.content { /* content of the node- name, properties etc. doesn't include children */
     color:#369;
     font-weight:bold;
+    width: 60vh;
+    overflow-x: auto;
 }
 
 div.tree ul.children { /* container for children */
@@ -31,14 +37,13 @@ div.tree ul.propertiesBox { /* box containig properties */
     white-space: nowrap;
     margin:0.5vh;
     padding: 1vh;
-    width: 50%;
-    max-height: 10%;
-    overflow: auto;
+    max-height: 30vh;
+    overflow-y: auto;
     border: 1px dashed;
 }
 
 div.tree li.property { /* every property */
-    list-style: square inside;
+    list-style: none;
     font-size:1em;
     font-weight: normal;
     color: #706a65;

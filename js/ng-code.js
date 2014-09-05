@@ -1,9 +1,8 @@
 /**
  * Created by Sagar on 30/8/14.
  */
-angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
+angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs'])
   .config(function($routeProvider) {
-
     $routeProvider
       .when('/',
       {
@@ -14,10 +13,10 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       {
         controller:'browser',
         templateUrl:'html/browser.html'
-      })
-      .otherwise({ redirectTo: '/' });
+      }
+    ).otherwise({ redirectTo: '/' });
   })
-  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation) {
+  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs) {
     $scope.alertType = 'danger'
 
     var appName;
@@ -48,6 +47,9 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       $scope.node = data.bindAsVertex($scope , path)
     }
 
+    $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
+    $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
+
     $scope.node.expand()
   })
   .factory('data', function($timeout, $location, $appbaseRef, stringManipulation) {
@@ -68,6 +70,11 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
       } else {
         return false
       }
+    }
+
+    data.init = function() {
+      data.setAppCredentials("twitter_2", "57e11a4b959241d8d9c3a69c31c63391")
+      return true
     }
 
     data.bindAsRoot = function($scope) {
@@ -134,7 +141,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
           },
           onRemove : function(scope, edgeData, edgeRef, done) {
             $timeout(function() {
-              edgeData.color = 'red'
+              edgeData.color = 'tomato'
             })
 
             $timeout(function() {
@@ -142,7 +149,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
             }, 500)
           },
           onChange : function(scope, edgeData, edgeRef, done) {
-            edgeData.color = 'yellow'
+            edgeData.color = 'gold'
             done()
 
             $timeout(function() {
@@ -165,7 +172,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         $location.path(stringManipulation.pathToUrl(path))
       }
 
-      vertex.color = 'green'
+      vertex.color = 'yellowgreen'
 
       vertex.contract = function() {
         vertex.expanded = false
@@ -176,8 +183,12 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         vertex.$ref.$removeData([prop])
       }
 
+      vertex.removeSelfEdge = function() {
+        console.log('removing self edge', vertex.name)
+        vertex.$ref.$inVertex().$removeEdge(vertex.name)
+      }
+
       vertex.addProperty = function(prop, value) {
-        console.log('add', prop, value)
         var data = {}
         data[prop] = value
         vertex.$ref.$setData(data)
@@ -187,7 +198,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute'])
         vertex.properties = vertex.$ref.$bindProperties($scope, {
           onProperties : function(scope, properties, ref, done) {
             if(vertex.color == 'white')
-              vertex.color = 'yellow'
+              vertex.color = 'gold'
             done()
 
             $timeout(function() {
