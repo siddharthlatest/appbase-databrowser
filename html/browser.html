@@ -10,6 +10,18 @@
     </li>
 </ol>
 
+<div class="form-group">
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" ng-model="modifyEnabled"> Enable modifications
+        </label>
+    </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" ng-model="showPriorities"> Show Priorities
+        </label>
+    </div>
+</div>
 <button ng-show="false" class="btn btn-sm btn-primary" ng-click="goUp()">Go Up</button>
 <span ng-show="false">URL: {{url}} </span>
 <div ng-show="node" class="tree" ng-include="'html/node.html'"></div>

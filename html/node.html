@@ -1,10 +1,10 @@
 <div class="node">
-    <div class="content" style="background-color: {{node.color}}">
+    <div class="content" style="background-color: {{node.color}}" ng-mouseover="node.mouse = true;" ng-mouseleave="node.mouse = false;">
         <button class="btn btn-xs" ng-hide="!node || node.expanded" ng-click="node.expand()">+</button>
         <button class="btn btn-xs" ng-show="node.expanded" ng-click="node.contract()">-</button>
-        <a href="" ng-click="node.meAsRoot()">{{node.name}}</a> <span ng-click="node.removeSelfEdge()" style="color: red;font-weight: bolder; cursor: pointer;" title="Remove edge '{{node.name}}'" class="glyphicon glyphicon-remove"></span>
+        <a href="" ng-click="node.meAsRoot()">{{node.name}}</a> <span ng-show="showPriorities && node.priority" class="badge">Priority: {{node.priority}}</span> <span ng-show="modifyEnabled && node.mouse" ng-click="node.removeSelfEdge()" style="color: red;font-weight: bolder; cursor: pointer;" title="Remove edge '{{node.name}}'" class="glyphicon glyphicon-remove"></span>
         <ul class="propertiesBox" ng-show="node.properties">
-            <form ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''" class="form" style="position: relative">
+            <form ng-show="modifyEnabled && node.mouse" ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''" class="form" style="position: relative">
                 <div class="row form-group" style="width: 100%;">
                     <div class="col-xs-4">
                         <input ng-required="true" type="text" class="input-sm form-control" ng-model="newProp" placeholder="New Property">
@@ -24,7 +24,7 @@
                 <div class="col-xs-11">
                     &#8226;  {{prop}}: {{val}}
                 </div>
-                <div class="col-xs-1">
+                <div ng-show="modifyEnabled && node.mouse" class="col-xs-1">
                     <span ng-click="node.removeProperty(prop)" style="color: red;font-weight: bolder; cursor: pointer;" title="Remove '{{prop}}'" class="glyphicon glyphicon-remove pull-right"></span>
                 </div>
             </li>
