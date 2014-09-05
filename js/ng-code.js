@@ -1,7 +1,7 @@
 /**
  * Created by Sagar on 30/8/14.
  */
-angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs'])
+angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog'])
   .config(function($routeProvider) {
     $routeProvider
       .when('/',
@@ -16,7 +16,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs'])
       }
     ).otherwise({ redirectTo: '/' });
   })
-  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs) {
+  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog) {
     $scope.alertType = 'danger'
 
     var appName;
@@ -46,11 +46,29 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs'])
       console.log('v', path, $scope.url)
       $scope.node = data.bindAsVertex($scope , path)
     }
+    $scope.node.expand()
 
     $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
 
-    $scope.node.expand()
+    $scope.addEdgeInto = function(node) {
+      ngDialog.open({
+        template: 'html/dialog-small.html',
+        controller: function($scope) {
+          $scope.title = "Add edge"
+          $scope.text = "in " + node.name
+
+          $scope.yes = function() {
+          }
+
+          $scope.no = function() {
+          }
+        },
+        className: 'ngdialog-theme-dialog-small',
+        showClose: false
+      })
+    }
+
   })
   .factory('data', function($timeout, $location, $appbaseRef, stringManipulation) {
     var data = {};
