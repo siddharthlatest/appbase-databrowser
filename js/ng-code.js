@@ -23,7 +23,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
 
     var appName;
     if((appName = stringManipulation.parseURL(stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).appName) === undefined){
-      $scope.alert = 'The URL is not proper.'
+      $scope.alert = 'The URL is not proper, or, you are not logged in.'
       return
     }
 
