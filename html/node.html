@@ -1,7 +1,7 @@
-<div class="node">
+<div class="node" xmlns="http://www.w3.org/1999/html">
     <div class="content" style="background-color: {{node.color}}" ng-mouseover="node.mouse = true;" ng-mouseleave="node.mouse = false;">
-        <button class="btn btn-xs" ng-hide="!node || node.expanded" ng-click="node.expand()">+</button>
-        <button class="btn btn-xs btn-primary" ng-show="node.expanded" ng-click="node.contract()">-</button>
+        <span class="glyphicon glyphicon-plus-sign" ng-hide="!node || node.expanded" ng-click="node.expand()" style="cursor: pointer; color: seagreen"></span>
+        <span class="glyphicon glyphicon-minus-sign" ng-show="node.expanded" ng-click="node.contract()" style="cursor: pointer; color: coral"></span>
         <a href="" ng-click="node.meAsRoot()">{{node.name}}</a> <span ng-show="showPriorities && node.priority" class="badge">Priority: {{node.priority}}</span> <span ng-show="modifyEnabled && node.mouse && node.removeSelfEdge" ng-click="node.removeSelfEdge()" style="color: red;font-weight: bolder; cursor: pointer;" title="Remove edge '{{node.name}}'" class="glyphicon glyphicon-remove"></span>
         <ul class="propertiesBox" ng-show="node.properties">
             <form ng-show="modifyEnabled && node.mouse" ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''" class="form" style="position: relative">

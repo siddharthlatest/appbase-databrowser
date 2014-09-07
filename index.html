@@ -51,33 +51,16 @@
         </div>
     </div>
 </nav>
-
-<div ng-view style="margin: 2vh"></div>
-
-<footer>
-    <div class="container">
-        <div class="row" style="font-size: 0.8em !important;">
-            <div class="col-xs-1">
-                <a href="about.html">About</a>
-            </div>
-            <div class="col-xs-1">
-                <a href="#">Blog</a>
-            </div>
-            <div class="col-xs-1">
-                <a href="#">Terms</a>
-            </div>
-            <div class="col-xs-1">
-                <a href="#">Privacy</a>
-            </div>
-            <div class="col-xs-1">
-                <a href="appbase-apidoc.htm">Documentation</a>
-            </div>
-            <div class="col-xs-1">
-                <a href="#">info@appbase.io</a>
-            </div>
-        </div>
+<div class="row" style="margin-top: 2vh;width: 100%">
+    <div class="col-lg-1">
+        <ul class="nav nav-pills nav-stacked">
+            <li style="padding: 15px"><span style="font-weight: bolder;">Developer Console</span></li>
+            <li><a href="/developer.html">My Apps</a></li>
+            <li class="active"><a href="">Data Browser</a></li>
+        </ul>
     </div>
-</footer>
+    <div ng-view class="col-lg-11" style="border-left: solid 2px"></div>
+</div>
 
 <script src="./js/lib/angular.min.js" type="application/javascript" ></script>
 <script src="./js/lib/angular-route.min.js" type="application/javascript"></script>
