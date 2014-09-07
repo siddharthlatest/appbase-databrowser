@@ -1,12 +1,22 @@
 <div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title" style="text-align: center;">{{title}}</h3>
+        <h2 class="panel-title" style="text-align: center;">{{title}}</h2>
     </div>
+    <form name="edgeForm" ng-submit="done()" class="form">
     <div class="panel-body form-group">
-        <h3>{{text}}</h3>
+        <label class="control-label">Vertex Type:</label> <select ng-required="true" class="form-control small" ng-model="vType" ng-options="vT for vT in vTypeOptions"></select>
+        <label ng-show="vType === vTypeOptions[0]" class="control-label">Vertex Namespace:</label> <select ng-show="vType === vTypeOptions[0]" class="form-control small" ng-model="namespaceSelected" ng-options="ns for ns in namespaces"><option value="">-Type in-</option></select>
+        <input name="ns" ng-show='vType === vTypeOptions[0] && !namespaceSelected' ng-required="vType === vTypeOptions[0] && !namespaceSelected" pattern="^[a-zA-Z0-9_]*$" class="form-control small" ng-model="namespaceNew" placeholder="eg. user, post, tweet">
+        <label ng-show="vType === vTypeOptions[0]" class="control-label">Vertex ID:</label> <input  ng-show="vType === vTypeOptions[0]" name="vi" type="text" pattern="^[a-zA-Z0-9_]*$" class="form-control small" ng-model="vId" placeholder="(optional)">
+        <label ng-show="vType === vTypeOptions[1]" class="control-label">Vertex Path:</label> <input  ng-show="vType === vTypeOptions[1]" ng-required="vType === vTypeOptions[1]" name="vp" type="text" pattern="^[a-zA-Z0-9_\/]*$" class="form-control small" ng-model="vPath" placeholder="eg. user/john/tweets">
+        <label class="control-label">Edge name:</label> <input name="en" type="text" pattern="^[a-zA-Z0-9_]*$" class="form-control small" ng-model="eName" placeholder="(optional)">
+        <label class="control-label">Priority:</label> <input name="pr" type="number" class="form-control small" ng-model="pR" placeholder="(optional)">
     </div>
     <div class="panel-footer">
-        <button class="btn btn-danger" ng-click="yes()">Yes</button>
-        <button class="btn btn-info" ng-click="no()">No</button>
+        <input type="submit" class="btn btn-success" value="Add">
+        <input type="reset" class="btn btn-danger" ng-click="no()" value="Cancel">
+        <span class="text-info">Please use only letters (a-z, A-Z), numbers, and underscore.</span>
+        <br/>
     </div>
+    </form>
 </div>

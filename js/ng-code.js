@@ -2,6 +2,8 @@
  * Created by Sagar on 30/8/14.
  */
 angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog'])
+  .run(function($rootScope) {
+  })
   .config(function($routeProvider) {
     $routeProvider
       .when('/',
@@ -55,13 +57,51 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       ngDialog.open({
         template: 'html/dialog-small.html',
         controller: function($scope) {
-          $scope.title = "Add edge"
+          $scope.title = "Add Out-vertex at path: " + node.$ref.$path();
           $scope.text = "in " + node.name
+          $scope.vTypeOptions = ['New Vertex', 'Existing Vertex']
+          $scope.vType = $scope.vTypeOptions[0]
+          $scope.namespaceN = 'asdkj'
 
-          $scope.yes = function() {
+          $scope.namespaces = ['Loading..']
+          data.getNamespaces(function(array) {
+            $timeout(function() {
+              $scope.namespaces = array
+            })
+          })
+
+          //prevents user from choosing 'Loading..'
+          $scope.$watch( function() {
+            return $scope.namespaceSelected
+          }, function(val) {
+            $scope.namespaceSelected = (val === 'Loading..' ? null : val)
+          })
+
+          $scope.done = function() {
+            var prepareParams = function() {
+              var params = {}
+              if($scope.vType === $scope.vTypeOptions[0]) { // New Vertex
+                params.namespace = ($scope.namespaceSelected === undefined || $scope.namespaceSelected === null) ? $scope.namespaceNew : $scope.namespaceSelected
+                params.vId = ($scope.vId === undefined || $scope.vId === "") ? Appbase.uuid() : $scope.vId
+                params.ref = $appbaseRef(Appbase.create(params.namespace, params.vId))
+              } else {
+                params.vPath = $scope.vPath
+                params.ref = $appbaseRef(params.vPath)
+              }
+
+              params.eName = ($scope.eName === undefined || $scope.eName === "") ? (params.vId === undefined? Appbase.uuid() : params.vId) : $scope.eName
+              params.pR = ($scope.pR === undefined || $scope.pR === null) ? undefined : $scope.pR
+
+              return params
+            }
+
+            var params = prepareParams()
+            node.$ref.$setEdge(params.ref, params.eName, params.pR)
+            $scope.closeThisDialog()
           }
 
           $scope.no = function() {
+            $scope.closeThisDialog()
           }
         },
         className: 'ngdialog-theme-dialog-small',
