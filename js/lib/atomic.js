@@ -23,7 +23,6 @@
   };
 
   var xhr = function (type, url, data) {
-    console.log(type, url, data)
     var methods = {
       success: function () {},
       error: function () {}
