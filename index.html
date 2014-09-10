@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/dev-style.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/css/navbar-blue.css" media="screen">
     <link rel="stylesheet" type="text/css" href="/css/footer.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="/css/prism.css" media="screen">
     <link rel="stylesheet" href="css/tree.css" media="screen">
     <link rel="stylesheet" href="css/ngDialog.css" media="screen">
     <link rel="stylesheet" href="css/ngDialog-theme-dialog-small.css" media="screen">
@@ -46,12 +47,12 @@
         </div>
     </div>
 </nav>
-<div class="row" style="margin-top:10vh; width: 100%">
+<div class="row" style="margin-top:10vh; width: 100%" ng-controller="sidebar">
     <div class="col-lg-1">
         <ul class="nav nav-pills nav-stacked" style="margin: 5px">
             <li style="padding: 15px"><span style="font-weight: bolder;">Developer Console</span></li>
-            <li><a href="/developer.html">My Apps</a></li>
-            <li class="active"><a href="">Data Browser</a></li>
+            <li ng-click="goToApps()" ng-class="{'active': currentScope === 'apps'}"><a href="">My Apps</a></li>
+            <li ng-click="goToBrowser()" ng-class="{'active': currentScope === 'browser'}"><a href="">Data Browser</a></li>
         </ul>
     </div>
     <div ng-view class="col-lg-11" style="border-left: solid 2px"></div>
@@ -62,11 +63,13 @@
 <script src="./js/lib/atomic.js"></script>
 <script src="./js/lib/ng-breadcrumbs.js"></script>
 <script src="./js/lib/ngDialog.min.js"></script>
+<script src="./js/lib/oauth.min.js"></script>
 <script type="text/javascript" src="/js/jquery.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
 <script src="http://cdn.appbase.io/appbase.min.js"></script>
 <script src="http://cdn.appbase.io/ng-appbase-ref.js"></script>
 <script src="./js/ng-code.js"></script>
+<script type="text/javascript" src="/js/prism.js"></script>
 </body>
 </html>

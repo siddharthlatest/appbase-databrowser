@@ -1,33 +1,102 @@
 /**
  * Created by Sagar on 30/8/14.
  */
+OAuth.initialize('fjDZzYff0kMpDgKVm9dBkeb439g');
 angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog'])
-  .run(function($rootScope) {
+  .run(function($rootScope, $location) {
+    $rootScope.goToApps = function() {
+      $location.path('/');
+    }
+    $rootScope.goToBrowser = function(path) {
+      $location.path('/browser' + (path !== undefined ? "/" + path: ""));
+    }
   })
   .config(function($routeProvider) {
     $routeProvider
       .when('/',
       {
+        controller:'apps',
+        templateUrl:'html/apps.html'
+      }
+    ).when('/browser',
+      {
         controller:'browser',
         templateUrl:'html/browser.html'
       }
-    ).when('/:path*',
+    ).when('/browser/:path*',
       {
         controller:'browser',
         templateUrl:'html/browser.html'
       }
     ).otherwise({ redirectTo: '/' });
   })
-  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog) {
+  .controller("sidebar", function($scope) {
+    $scope.$on('$routeChangeSuccess', function(event, current, prev) {
+      $scope.currentScope = current? current.controller: undefined
+    });
+  })
+  .controller("apps", function($scope, session, $route, data, $timeout, stringManipulation) {
+    Prism.highlightAll();
+    if($scope.devProfile = session.getProfile()) {
+      var fetchApps = function() {
+        data.getDevsApps(function(apps) {
+          $timeout(function(){
+            $scope.apps = apps;
+            session.setApps(apps);
+          })
+        });
+      }
+
+      $scope.createApp = function (app) {
+        data.createApp(app, function(error) {
+          if(error) {
+            alert('Name taken. Try another name.');
+          } else {
+            fetchApps();
+          }
+        })
+      }
+
+      $scope.logout = function() {
+        session.setApps(null);
+        session.setProfile(null);
+        $route.reload();
+      }
+
+      $scope.appToURL = stringManipulation.appToURL;
+      fetchApps()
+    } else {
+      $scope.loginPopup = function() {
+        OAuth.popup('google')
+          .done(function(result) {
+            result.me()
+              .done(function(profile) {
+                session.setProfile(profile.raw);
+                $route.reload();
+              })
+              .fail(console.log.bind(console))
+          })
+          .fail(console.log.bind(console))
+      }
+    }
+  })
+  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope) {
     $scope.alertType = 'danger'
 
     var appName;
-    if((appName = stringManipulation.parseURL(stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).appName) === undefined){
-      $scope.alert = 'The URL is not proper, or, you are not logged in.'
-      return
+    var URL;
+    if((appName = stringManipulation.parseURL(URL = stringManipulation.cutLeadingTrailingSlashes($routeParams.path)).appName) === undefined) {
+      if((appName = stringManipulation.parseURL(URL = session.getBrowserURL()).appName) === undefined) {
+        $scope.alert = 'The URL is not proper, or, you are not logged in.';
+        return;
+      } else {
+        $rootScope.goToBrowser(URL);
+      }
+    } else {
+      session.setBrowserURL(URL);
     }
 
-    if(!data.isInitComplete() && !data.init(appName)) {
+    if(!data.init(appName)) {
       $scope.alert = 'You are not allowed to browse this data. Go to the developer page and try logging in again.'
       return
     }
@@ -39,14 +108,11 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     var path
 
     if((path = stringManipulation.urlToPath($scope.url = stringManipulation.cutLeadingTrailingSlashes($routeParams.path))) === undefined) {
-      console.log('root', path, $scope.url)
-      $scope.node = data.bindAsRoot($scope)
+      $scope.node = nodeBinding.bindAsRoot($scope)
     } else if(path.indexOf('/') === -1) {
-      console.log('ns', path, $scope.url)
-      $scope.node = data.bindAsNamespace($scope, path)
+      $scope.node = nodeBinding.bindAsNamespace($scope, path)
     } else {
-      console.log('v', path, $scope.url)
-      $scope.node = data.bindAsVertex($scope , path)
+      $scope.node = nodeBinding.bindAsVertex($scope , path)
     }
     $scope.node.expand()
 
@@ -110,27 +176,9 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     }
 
   })
-  .factory('data', function($timeout, $location, $appbaseRef, stringManipulation) {
-    var data = {};
-    var appName;
-    var secret;
-
-    data.isInitComplete = function(){
-      return appName !== undefined
-    }
-
-    data.init = function(appName) {
-      var app_creds = JSON.parse(sessionStorage.getItem('app_creds'))
-      var secret = app_creds !== undefined && app_creds !== null ? app_creds[appName] : undefined
-      if(secret !== undefined) {
-        data.setAppCredentials(appName, secret)
-        return true
-      } else {
-        return false
-      }
-    }
-
-    data.bindAsRoot = function($scope) {
+  .factory('nodeBinding', function(data, stringManipulation, $timeout, $appbaseRef) {
+    var nodeBinding = {};
+    nodeBinding.bindAsRoot = function($scope) {
       var root = {}
       root.name = stringManipulation.getBaseUrl()
       root.meAsRoot = function() {
@@ -142,7 +190,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
         data.getNamespaces(function(namespaces) {
           $timeout(function(){
             namespaces.forEach(function(namespace) {
-              root.children.push(data.bindAsNamespace($scope, namespace))
+              root.children.push(nodeBinding.bindAsNamespace($scope, namespace))
             })
           })
         })
@@ -154,7 +202,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       return root
     }
 
-    data.bindAsNamespace = function($scope, namespace) {
+    nodeBinding.bindAsNamespace = function($scope, namespace) {
       var ns =  {name: namespace}
       ns.meAsRoot = function() {
         $location.path(stringManipulation.pathToUrl(namespace))
@@ -165,7 +213,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
         data.getVerticesOfNamespace(namespace, function(vertices) {
           $timeout(function() {
             vertices.forEach(function(vertexPath) {
-              ns.children.push(data.bindAsVertex($scope, vertexPath))
+              ns.children.push(nodeBinding.bindAsVertex($scope, vertexPath))
             })
           })
         })
@@ -177,12 +225,12 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       return ns
     }
 
-    data.bindAsVertex = function($scope, path, useThisVertex) {
+    nodeBinding.bindAsVertex = function($scope, path, useThisVertex) {
       var bindEdges = function($ref) {
         return $ref.$bindEdges($scope, true, false, {
           onAdd :function(scope, edgeData, edgeRef, done) {
             edgeData.$ref = $appbaseRef(edgeRef)
-            data.bindAsVertex($scope, edgeRef.path(), edgeData)
+            nodeBinding.bindAsVertex($scope, edgeRef.path(), edgeData)
             done()
 
             $timeout(function() {
@@ -237,14 +285,13 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       }
 
       vertex.removeSelfEdge = function() {
-        console.log('removing self edge', vertex.name)
         vertex.$ref.$inVertex().$removeEdge(vertex.name)
       }
 
       vertex.addProperty = function(prop, value) {
-        var data = {}
-        data[prop] = value
-        vertex.$ref.$setData(data)
+        var vData = {}
+        vData[prop] = value
+        vertex.$ref.$setData(vData)
       }
 
       if(useThisVertex === undefined) {
@@ -261,23 +308,39 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
         })
         vertex.name = path.slice(path.lastIndexOf('/') + 1)
       }
-
       return vertex
+    }
+    return nodeBinding;
+  })
+  .factory('data', function($timeout, $location, $appbaseRef, stringManipulation, session) {
+    var data = {};
+    var appName;
+    var secret;
+
+    data.init = function(appName) {
+      secret = session.getAppSecret(appName)
+      if(secret !== undefined) {
+        data.setAppCredentials(appName, secret)
+        return true
+      } else {
+        return false
+      }
     }
 
     data.setAppCredentials = function(app, s) {
+      console.log('creds for ', app)
       Appbase.credentials(app, s);
       appName = app;
       secret = s;
-      stringManipulation.setBaseUrl('http://'+ appName + '.' + 'api1.appbase.io/')
-    };
+      stringManipulation.setBaseUrl(stringManipulation.appToURL(appName));
+    }
 
     data.getAppname = function() {
       return appName;
-    };
+    }
 
     data.getVerticesOfNamespace = function(namespace, done) {
-      atomic.post('http://'+ appName + '.' + 'api1.appbase.io/' + namespace + '/~list', {"data": [""], "secret": secret})
+      atomic.post(stringManipulation.appToURL(appName) + namespace + '/~list', {"data": [""], "secret": secret})
         .success(function(result) {
           var vertices = []
           result.forEach(function(obj) {
@@ -307,9 +370,67 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
         })
     };
 
+    data.createApp = function(app, done) {
+      atomic.put('http://104.130.24.118/app/'+ app)
+        .success(function(response) {
+          console.log(response);
+          if(typeof response === "string") {
+            done(response)
+          } else if(typeof response === "object") {
+            console.log(session.getProfile().id, app)
+            atomic.put('http://104.130.24.118/user/'+ session.getProfile().id, {"appname":app})
+              .success(function(result) {
+                console.log(result)
+                done(null)
+              })
+              .error(function(error) {
+                throw error
+              })
+          } else {
+            throw 'Server Error, try again.'
+          }
+        })
+        .error(function(error) {
+          throw error
+        })
+    }
+
+    data.getDevsApps = function(done) {
+      atomic.get('http://104.130.24.118/user/'+ session.getProfile().id)
+        .success(function(apps) {
+          var appsAndSecrets = {};
+          var appsArrived = 0;
+          var secretArrived = function(app, secret) {
+            appsArrived += 1;
+            appsAndSecrets[app] = secret;
+            if(appsArrived === apps.length) {
+              done(appsAndSecrets);
+            }
+          }
+          apps.forEach(function(app) {
+            data.getAppsSecret(app, function(secret) {
+              secretArrived(app, secret);
+            });
+          });
+        })
+        .error(function(error) {
+          throw error
+        })
+    }
+
+    data.getAppsSecret = function(app, done) {
+      atomic.get('http://104.130.24.118/app/'+ app)
+        .success(function(result) {
+          done(result.secret);
+        })
+        .error(function(error) {
+          throw error
+        })
+    }
+
     return data;
   })
-.factory('stringManipulation', function() {
+  .factory('stringManipulation', function() {
     var stringManipulation = {}
     var baseUrl
     stringManipulation.setBaseUrl = function(bUrl){
@@ -366,5 +487,48 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
     }
 
+    stringManipulation.appToURL = function(app) {
+      return 'http://'+ app + '.' + 'api1.appbase.io/';
+    }
+
     return stringManipulation
+  })
+  .factory('session', function(stringManipulation) {
+    var session = {};
+
+    session.setApps = function(apps) {
+      sessionStorage.setItem('apps', JSON.stringify(apps));
+    };
+
+    session.getApps = function() {
+      return JSON.parse(sessionStorage.getItem('apps'));
+    };
+
+    session.getAppSecret = function(appName) {
+      var apps = session.getApps();
+      return (apps !== undefined && apps !== null ? apps[appName] : undefined);
+    };
+
+    session.setProfile = function(profile) {
+      sessionStorage.setItem('devProfile', JSON.stringify(profile));
+    };
+
+    session.setBrowserURL = function(url) {
+      console.log('storing', url);
+      sessionStorage.setItem('URL', url);
+    };
+
+    session.getBrowserURL = function() {
+      var URL;
+      var apps;
+      console.log('stored',  sessionStorage.getItem('URL'));
+      URL = (URL = sessionStorage.getItem('URL')) !== null ? URL : ((apps = session.getApps()) !== null) ? stringManipulation.appToURL(Object.keys(apps)[0]) : undefined;
+      return URL;
+    };
+
+    session.getProfile = function() {
+      return JSON.parse(sessionStorage.getItem('devProfile'));
+    };
+
+    return session;
   })

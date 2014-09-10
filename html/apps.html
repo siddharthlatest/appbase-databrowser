@@ -1,0 +1,111 @@
+<div class="container-fluid" id="landing">
+    <div id="alertdiv" class="row" style="margin-left:10px;margin-right:10px;width:initial;">
+        <div ng-hide="devProfile" class="alert alert-warning fade in" role="alert">
+            <p>Login to continue</p>
+            <p><button ng-click="loginPopup()" class="btn btn-success">Login with Google</button></p>
+        </div>
+        <button ng-show="devProfile" ng-click="logout()" type="button" class="close"><a class="btn btn-danger">Logout</a></button>
+    </div>
+    <div ng-show="devProfile" id="userapps">
+        <div class="row" style="margin-top:30px;">
+            <div class="col-md-12">
+                {{devProfile.displayName}}'s Apps
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-offset-4 col-xs-4 well">
+                <div class="form-horizontal" ng-repeat="(app, secret) in apps">
+                    <div class="form-group existing-app">
+                        <label for="inputAppname" class="col-sm-4 control-label">App name</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="inputAppname" placeholder="App name" readonly value="{{app}}">
+                        </div>
+                    </div>
+                    <div class="form-group existing-app">
+                        <label for="inputAppsecret" class="col-sm-4 control-label">App Secret</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="inputAppsecret" placeholder="App Secret" readonly value="{{secret}}">
+                        </div>
+                    </div>
+                    <div class="form-group existing-app">
+                        <label class="col-sm-4 control-label">App Data URL</label>
+                        <div class="col-sm-8" style="text-align:left">
+                            <a id="inputAppurl" style="vertical-align:top;font-size:0.6em;text-decoration:underline;" ng-click="goToBrowser(appToURL(app));">{{appToURL(app)}}</a>
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
+                <form ng-submit="createApp(newAppname); newAppname ='' ;">
+                    <div class="form-group new-app">
+                        <div class="col-sm-8">
+                            <input type="text" ng-required="true" class="form-control" id="createAppname" placeholder="App name" ng-model="newAppname">
+                        </div>
+                        <button class="col-sm-4 btn btn-success" type="submit" id="createuserapp">Create App</button>
+                    </div>
+                    <p style="font-size:0.4em" class="hidden">* There is a limit of 1 app per user currently. Shoot us at info@appbase.io for the pro plan if you need more.</p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:30px;">
+        Steps to getting started with Appbase
+    </div>
+    <div class="row getting-started">
+        <div class=" col-xs-2 ">
+            <div class="circle">1</div>
+        </div>
+        <div class=" col-xs-9 getting-started-text ">
+            Add Appbase library to your codebase and set the app credentials as they appear here.<pre><code class="language-markup">&lt;script src="cdn.appbase.io/appbase.js">&lt;/script></code>
+<code id="usercredentials" class="language-javascript">Appbase.credentials("aphrodite", "4d8d0072580912343cd74aa0015cd217")</code></pre>
+        </div>
+    </div>
+    <div class="row getting-started">
+        <div class=" col-xs-2 ">
+            <div class="circle">2</div>
+        </div>
+        <div class=" col-xs-9 getting-started-text ">
+            Now let's create two Appbase references under namespaces "user" and "tweets".<pre><code class="language-javascript">var userRef = Appbase.create("user", "lara")
+var tweetRef = Appbase.create("tweet")</code></pre>As seen here, one can optionally specify the reference name.
+        </div>
+    </div>
+    <div class="row getting-started">
+        <div class=" col-xs-2 ">
+            <div class="circle">3</div>
+        </div>
+        <div class=" col-xs-7 getting-started-text ">
+            Now we will set some data on these references.<pre><code class="language-javascript">userRef.setData({
+    status: "sudo",
+    location: "Belo Horizonte, Brazil"
+})
+tweetRef.setData({
+    message: "Remember Red, hope is a good thing."
+})</code></pre>
+        </div>
+    </div>
+    <div class="row getting-started">
+        <div class=" col-xs-2">
+            <div class="circle">4</div>
+        </div>
+        <div class=" col-xs-9 getting-started-text ">
+            Now let's add the tweet as an edge to our user reference.<pre><code class="language-javascript">userRef.setEdge(tweetRef, 'tweeted')</code></pre>
+        </div>
+    </div>
+    <div class="row getting-started">
+        <div class=" col-xs-2 ">
+            <div class="circle">5</div>
+        </div>
+        <div class=" col-xs-9 getting-started-text ">
+            Go real-time! Listen to the changes on the user reference data properties and edges, to see the changes we have made so far. <pre><code class="language-javascript">userRef.on('properties', function(error, ref, userSnap) {
+    console.log(userSnap.properties().status)
+    console.log(userSnap.properties().location)
+})
+
+userRef.on('edge_added', function(error, edgeRef, eSnap) {
+    edgeRef.on('properties', function(error, ref, tweetSnap) {
+    console.log(tweetSnap.properties().message)
+    })
+})</code></pre>
+
+        </div>
+    </div>
+</div>

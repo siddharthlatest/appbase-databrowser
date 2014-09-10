@@ -23,6 +23,7 @@
   };
 
   var xhr = function (type, url, data) {
+    console.log(type, url, data)
     var methods = {
       success: function () {},
       error: function () {}
@@ -53,6 +54,10 @@
     };
 
     return callbacks;
+  };
+
+  exports['put'] = function (url, data) {
+    return xhr('PUT', url, data);
   };
 
   exports['get'] = function (src) {
