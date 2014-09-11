@@ -35,7 +35,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       $scope.currentScope = current? current.controller: undefined
     });
   })
-  .controller("apps", function($scope, session, $route, data, $timeout, stringManipulation) {
+  .controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', function($scope, session, $route, data, $timeout, stringManipulation) {
     Prism.highlightAll();
     if($scope.devProfile = session.getProfile()) {
       var fetchApps = function() {
@@ -79,9 +79,10 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
           .fail(console.log.bind(console))
       }
     }
-  })
-  .controller("browser", function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope) {
-    $scope.alertType = 'danger'
+  }])
+  .controller("browser", ['$scope', '$appbaseRef', '$timeout', '$routeParams', '$location', 'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding', 'session', '$rootScope', function($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope) {
+    $scope.alertType = 'danger';
+    $scope.goToBrowser = $rootScope.goToBrowser;
 
     var appName;
     var URL;
@@ -175,14 +176,14 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       })
     }
 
-  })
-  .factory('nodeBinding', function(data, stringManipulation, $timeout, $appbaseRef) {
+  }])
+  .factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbaseRef', '$rootScope', function(data, stringManipulation, $timeout, $appbaseRef, $rootScope) {
     var nodeBinding = {};
     nodeBinding.bindAsRoot = function($scope) {
       var root = {}
       root.name = stringManipulation.getBaseUrl()
       root.meAsRoot = function() {
-        $location.path(stringManipulation.pathToUrl(''))
+        $rootScope.goToBrowser(stringManipulation.pathToUrl(''))
       }
       root.expand = function() {
         root.children = []
@@ -205,7 +206,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     nodeBinding.bindAsNamespace = function($scope, namespace) {
       var ns =  {name: namespace}
       ns.meAsRoot = function() {
-        $location.path(stringManipulation.pathToUrl(namespace))
+        $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace))
       }
       ns.expand = function(){
         ns.children = []
@@ -270,7 +271,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       }
 
       vertex.meAsRoot = function() {
-        $location.path(stringManipulation.pathToUrl(path))
+        $rootScope.goToBrowser(stringManipulation.pathToUrl(path))
       }
 
       vertex.color = 'yellowgreen'
@@ -311,11 +312,12 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       return vertex
     }
     return nodeBinding;
-  })
-  .factory('data', function($timeout, $location, $appbaseRef, stringManipulation, session) {
+  }])
+  .factory('data', ['$timeout', '$location', '$appbaseRef', 'stringManipulation', 'session', function($timeout, $location, $appbaseRef, stringManipulation, session) {
     var data = {};
     var appName;
     var secret;
+    var server = "aHR0cDovLzEwNC4xMzAuMjQuMTE4Lw==";
 
     data.init = function(appName) {
       secret = session.getAppSecret(appName)
@@ -354,7 +356,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     }
 
     data.getNamespaces = function(done) {
-      atomic.get('http://104.130.24.118/app/'+ appName +'/namespaces')
+      atomic.get(atob(server)+'app/'+ appName +'/namespaces')
         .success(function(result) {
           var namespaces = []
           result.forEach(function(obj) {
@@ -371,14 +373,14 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     };
 
     data.createApp = function(app, done) {
-      atomic.put('http://104.130.24.118/app/'+ app)
+      atomic.put(atob(server)+'app/'+ app)
         .success(function(response) {
           console.log(response);
           if(typeof response === "string") {
             done(response)
           } else if(typeof response === "object") {
             console.log(session.getProfile().id, app)
-            atomic.put('http://104.130.24.118/user/'+ session.getProfile().id, {"appname":app})
+            atomic.put(atob(server)+'user/'+ session.getProfile().id, {"appname":app})
               .success(function(result) {
                 console.log(result)
                 done(null)
@@ -396,7 +398,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     }
 
     data.getDevsApps = function(done) {
-      atomic.get('http://104.130.24.118/user/'+ session.getProfile().id)
+      atomic.get(atob(server)+'user/'+ session.getProfile().id)
         .success(function(apps) {
           var appsAndSecrets = {};
           var appsArrived = 0;
@@ -419,7 +421,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     }
 
     data.getAppsSecret = function(app, done) {
-      atomic.get('http://104.130.24.118/app/'+ app)
+      atomic.get(atob(server)+'app/'+ app)
         .success(function(result) {
           done(result.secret);
         })
@@ -429,7 +431,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     }
 
     return data;
-  })
+  }])
   .factory('stringManipulation', function() {
     var stringManipulation = {}
     var baseUrl
@@ -493,7 +495,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
 
     return stringManipulation
   })
-  .factory('session', function(stringManipulation) {
+  .factory('session', ['stringManipulation', function(stringManipulation) {
     var session = {};
 
     session.setApps = function(apps) {
@@ -531,4 +533,4 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     };
 
     return session;
-  })
+  }])
