@@ -180,7 +180,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
   .factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbaseRef', '$rootScope', function(data, stringManipulation, $timeout, $appbaseRef, $rootScope) {
     var nodeBinding = {};
     nodeBinding.bindAsRoot = function($scope) {
-      var root = {}
+      var root = {isR: true}
       root.name = stringManipulation.getBaseUrl()
       root.meAsRoot = function() {
         $rootScope.goToBrowser(stringManipulation.pathToUrl(''))
@@ -204,7 +204,7 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
     }
 
     nodeBinding.bindAsNamespace = function($scope, namespace) {
-      var ns =  {name: namespace}
+      var ns =  {name: namespace, isNS: true}
       ns.meAsRoot = function() {
         $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace))
       }
@@ -222,6 +222,19 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       ns.contract = function() {
         ns.expanded = false
         ns.children = []
+      }
+
+      ns.searchable = false;
+      var ignoreToggleClick = false;
+
+      ns.toggleSearch = function() {
+        // prevents multiple clicks
+        if(ignoreToggleClick) return;
+        ignoreToggleClick = true;
+        data.namespaceSearchOptions(namespace, !ns.searchable, $timeout.bind(null, function() {
+          ns.searchable = !ns.searchable;
+          ignoreToggleClick = false;
+        }))
       }
       return ns
     }
@@ -264,6 +277,8 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
       var vertex = useThisVertex || {
         $ref: $appbaseRef(path)
       }
+
+      vertex.isV = true
 
       vertex.expand = function() {
         vertex.expanded = true
@@ -371,6 +386,24 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
           throw error
         })
     };
+
+    data.namespaceSearchOptions = function (ns, bool, done) {
+      var request = {"namespace": [ns]};
+      if(bool) {
+        request["enable"] = true;
+      } else {
+        request["disable"] = true;
+      }
+      atomic.post(atob(server)+'app/'+ appName +'/search', request)
+        .success(function(result) {
+          console.log(result)
+          done()
+        })
+        .error(function(error) {
+          console.log(error)
+          throw error
+        })
+    }
 
     data.createApp = function(app, done) {
       atomic.put(atob(server)+'app/'+ app)
