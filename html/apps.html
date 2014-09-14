@@ -39,11 +39,11 @@
                     <form ng-submit="createApp(newAppname); newAppname ='' ;">
                         <div class="form-group new-app">
                             <div class="col-sm-8">
-                                <input type="text" ng-required="true" class="form-control" id="createAppname" placeholder="App name" ng-model="newAppname">
+                                <input type="text"  pattern="^[a-zA-Z0-9_]*$" ng-required="true" class="form-control" id="createAppname" placeholder="App name" ng-model="newAppname">
                             </div>
                             <button class="col-sm-4 btn btn-success" type="submit" id="createuserapp">Create App</button>
+                            <p class="text-info" style="font-size: 0.7em">Please use only letters (a-z, A-Z), numbers, and underscore.</p>
                         </div>
-                        <p style="font-size:0.4em" class="hidden">* There is a limit of 1 app per user currently. Shoot us at info@appbase.io for the pro plan if you need more.</p>
                     </form>
                 </div>
                 <div style="display:block;clear:both"></div>
