@@ -113,7 +113,7 @@ function SidebarCtrl($scope, $rootScope){
   });
 
   $rootScope.$watch('code', function(data){
-    $scope.code = data ? '$10' : '$0';
+    $scope.code = data ? '$50' : '$0';
   })
   
   $rootScope.$watch('logged', function(data){
