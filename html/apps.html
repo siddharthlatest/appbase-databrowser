@@ -1,56 +1,86 @@
 <div class="container-fluid" id="landing">
-    <div id="alertdiv" class="row" style="margin-left:10px;margin-right:10px;width:initial;">
+    <div class="row" id="alertdiv">
         <div ng-hide="devProfile" class="alert alert-warning fade in" role="alert">
             <p>Login to continue</p>
             <p><button ng-click="loginPopup()" class="btn btn-success">Login with Google</button></p>
         </div>
-        <button ng-show="devProfile" ng-click="logout()" type="button" class="close"><a class="btn btn-danger">Logout</a></button>
     </div>
     <div ng-show="devProfile" id="userapps">
-        <div class="row" style="margin-top:30px;">
-            <div class="col-md-12">
-                {{devProfile.displayName}}'s Apps
+        <div class="row">
+            <div class="col-md-12 main-title">
+                <span ng-bind="devProfile.displayName"></span>'s Apps
+                <button ng-click="logout()" type="button" class="btn btn-danger logout">
+                    Logout
+                </button>
             </div>
         </div>
         <div class="row">
-            <div style="display:block;clear:both;margin-left:15px;margin-right:15px;">
-                <div class="form-horizontal well" ng-repeat="(app, secret) in apps" style="width:430px;float:left;margin:20px;">
-                    <div class="form-group existing-app">
-                        <label for="inputAppname" class="col-sm-4 control-label">App name</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="inputAppname" placeholder="App name" readonly value="{{app}}">
-                        </div>
-                    </div>
-                    <div class="form-group existing-app">
-                        <label for="inputAppsecret" class="col-sm-4 control-label">App Secret</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="inputAppsecret" placeholder="App Secret" readonly value="{{secret}}">
-                        </div>
-                    </div>
-                    <div class="form-group existing-app">
-                        <label class="col-sm-4 control-label">App Data URL</label>
-                        <div class="col-sm-8" style="text-align:left">
-                            <a id="inputAppurl" style="vertical-align:top;font-size:0.6em;text-decoration:underline;" ng-click="goToBrowser(appToURL(app));">{{appToURL(app)}}</a>
-                        </div>
-                    </div>
-                    <hr/>
-                </div>
-                <div class="col-xs-4 col-xs-4-offset">
-                    <form ng-submit="createApp(newAppname); newAppname ='' ;">
-                        <div class="form-group new-app">
-                            <div class="col-sm-8">
-                                <input type="text"  pattern="^[a-zA-Z0-9_]*$" ng-required="true" class="form-control" id="createAppname" placeholder="App name" ng-model="newAppname">
+            <div class="form-horizontal col-md-6">
+                <div class="row wrapper well" ng-submit="createApp(newAppname); newAppname ='' ;">
+                    <form>
+                        <div class="form-group new-app input-line">
+                            <div class="col-sm-12">
+                                <input type="text"
+                                       pattern="^[a-zA-Z0-9_]*$"
+                                       ng-required="true"
+                                       class="form-control"
+                                       placeholder="App name"
+                                       ng-model="newAppname" />
                             </div>
-                            <button class="col-sm-4 btn btn-success" type="submit" id="createuserapp">Create App</button>
-                            <p class="text-info" style="font-size: 0.7em">Please use only letters (a-z, A-Z), numbers, and underscore.</p>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <button class="form-control btn btn-success"
+                                        type="submit" id="createuserapp">
+                                    Create App
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-12 tip">
+                            <span class="text-info">
+                                Please use only letters (a-z, A-Z), numbers, and underscore.
+                            </span>
                         </div>
                     </form>
                 </div>
-                <div style="display:block;clear:both"></div>
+            </div>
+            <div class="form-horizontal col-md-6" ng-show="fetching">
+                <div class="wrapper well">
+                    <span class="loading">loading...</span>
+                </div>
+            </div>
+            <div class="form-horizontal col-md-6" ng-repeat="(app, secret) in apps">
+                <div class="row wrapper well">
+                    <div class="form-group input-line">
+                        <label class="col-sm-3 control-label">App name</label>
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="App name"
+                                   readonly ng-value="app">
+                        </div>
+                    </div>
+                    <div class="form-group input-line">
+                        <label for="inputAppsecret" class="col-sm-3 control-label">App Secret</label>
+                        <div class="col-sm-9">
+                            <input type="text"
+                                   class="form-control"
+                                   placeholder="App Secret"
+                                   readonly ng-value="secret" />
+                        </div>
+                    </div>
+                    <div class="input-line">
+                        <label class="col-sm-3 control-label">App Data URL</label>
+                        <div class="col-sm-9 url">
+                            <a ng-click="goToBrowser(appToURL(app));" ng-bind="appToURL(app)"></a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row" style="margin-top:30px;">
+    <div class="row started-title">
         Steps to getting started with Appbase
     </div>
     <div class="row getting-started">
@@ -75,7 +105,7 @@ var tweetRef = Appbase.create("tweet")</code></pre>As seen here, one can optiona
         <div class=" col-xs-2 ">
             <div class="circle">3</div>
         </div>
-        <div class=" col-xs-7 getting-started-text ">
+        <div class=" col-xs-9 getting-started-text ">
             Now we will set some data on these references.<pre><code class="language-javascript">userRef.setData({
     status: "sudo",
     location: "Belo Horizonte, Brazil"
