@@ -66,7 +66,7 @@ function Routes($routeProvider){
     .otherwise({ redirectTo: '/' });
 }
 
-function StatsCtrl($routeParams, stringManipulation, session, $scope){
+function StatsCtrl($routeParams, stringManipulation, $scope){
   $scope.cap = 500000;
   $scope.chart = {};
   $scope.chartOptions = {
@@ -81,14 +81,15 @@ function StatsCtrl($routeParams, stringManipulation, session, $scope){
   };
   $scope.morris = {
     xkey: 'date',
-    ykeys: ['restAPICalls', 'socketAPICalls', 'total'],
-    labels: ['Rest API Calls', 'Socket API Calls', 'Total']
+    ykeys: ['restAPICalls', 'socketAPICalls', 'searchAPICalls'],
+    labels: ['Rest API Calls', 'Socket API Calls', 'Search API Calls']
   };
   var app = stringManipulation.cutLeadingTrailingSlashes($routeParams.path);
-  if(!session.getApps()){
+  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
+  if(!Object.getOwnPropertyNames(sessionApps).length){
     fetchApps();
   } else {
-    $scope.apps = session.getApps();
+    $scope.apps = sessionApps;
     setApp();
   }
 
@@ -105,31 +106,47 @@ function StatsCtrl($routeParams, stringManipulation, session, $scope){
   }
 
   function getMetrics(){
-    var metrics = {};
     for(var prop in $scope.apps){
+      // Iterate through properties of objects inside $scope.apps
+      $scope.apps[prop].vertices = $scope.apps[prop].metrics.edgesAndVertices.Vertices;
+      $scope.apps[prop].edges = $scope.apps[prop].metrics.edgesAndVertices.Edges;
       var calls = $scope.apps[prop].metrics.calls;
-      if(calls){
+      if(!calls){
+        $scope.apps[prop].metrics = [];
+      } else {
         var metrics = [];
-        var obj = {};
         for(var name in calls){
           if(name !== '_id' && name !== 'appname'){
             var split = name.split(':');
-            if(obj.date){
-              obj[split[1]] = calls[name];
-              metrics.push(obj);
-              obj = {};
-            } else {
-              var date = parseInt(split[0]);
-              obj.date = date;
-              console.log(date);
+            var data = split[1];
+            var date = parseInt(split[0]);
+            var existing = false;
+            metrics.forEach(function(each){
+              if(each.date === date){
+                each[data] = calls[name];
+                existing = true;
+              }
+            });
+            if(!existing){
+              var toPush = {};
+              toPush.date = date;
+              toPush[data] = calls[name];
+              metrics.push(toPush);
             }
-            obj[split[1]] = calls[name];
           }
         }
         $scope.apps[prop].metrics = metrics;
+        var grandTotal = 0;
         $scope.apps[prop].metrics.forEach(function(each){
-          each.total = each.restAPICalls + each.socketAPICalls;
+          var total = 0;
+          total += (each.restAPICalls = each.restAPICalls || 0);
+          total += (each.socketAPICalls = each.socketAPICalls || 0);
+          total += (each.searchAPICalls = each.searchAPICalls || 0);
+          each.total = total;
+          grandTotal += total;
         });
+        $scope.apps[prop].totalAPI = grandTotal;
+
         var monthData=0, weekData=0, dayData;
         var miliDay   = 1000 * 60 * 60 * 24;
         var miliWeek  = miliDay * 7;
@@ -141,7 +158,7 @@ function StatsCtrl($routeParams, stringManipulation, session, $scope){
             monthData += each.total;
             if(now - each.date <= miliWeek){
               weekData += each.total;
-              if(now - each.date <= miliDay*2) dayData = dayData || each.total;
+              dayData = each.total;
             }
           }
         });
@@ -149,15 +166,15 @@ function StatsCtrl($routeParams, stringManipulation, session, $scope){
         $scope.apps[prop].day = dayData;
         $scope.apps[prop].week = weekData;
         $scope.apps[prop].month = monthData;
-        console.log($scope.apps[prop])
-      } else {
-        $scope.apps[prop].metrics = [];
       }
     }
   }
 
-  function setGraph(app){
-    var app = $scope.apps[app];
+  function setGraph(tab){
+    var app = $scope.apps[tab];
+    $scope.vert = app.vertices;
+    $scope.edges = app.edges;
+    $scope.total = app.totalAPI;
     var metrics = app.metrics;
     if(metrics.length){
       $scope.morris.data = metrics;
@@ -180,7 +197,6 @@ function StatsCtrl($routeParams, stringManipulation, session, $scope){
     data.getDevsApps(function(apps) {
       $timeout(function(){
         $scope.apps = apps;
-        session.setApps(apps);
         setApp();
       });
     });
@@ -281,11 +297,12 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     }
 
     $scope.logout = function() {
-      $rootScope.logged = false;
-      $rootScope.$apply();
-      session.setApps(null);
-      session.setProfile(null);
-      $route.reload();
+      $timeout(function(){
+        $rootScope.logged = false;
+        session.setApps(null);
+        session.setProfile(null);
+        $route.reload();
+      });
     }
 
     $scope.appToURL = stringManipulation.appToURL;
@@ -385,7 +402,7 @@ function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, dat
           var prepareParams = function() {
             var params = {}
             if($dialogScope.vType === $dialogScope.vTypeOptions[0]) { // New Vertex
-              params.namespace = ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ? $dialogScope.namespaceNew : $dialogScope.namespaceSelected
+              params.namespace =($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ? $dialogScope.namespaceNew : $dialogScope.namespaceSelected
               params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? Appbase.uuid() : $dialogScope.vId
               params.ref = $appbaseRef(Appbase.create(params.namespace, params.vId))
             } else {
