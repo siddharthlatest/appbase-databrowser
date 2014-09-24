@@ -2,7 +2,7 @@
  * Created by Sagar on 30/8/14.
  */
 OAuth.initialize('fjDZzYff0kMpDgKVm9dBkeb439g');
-angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog'])
+angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog', 'easypiechart'])
   .run(FirstRun)
   .config(Routes)
   .factory('stringManipulation', StringManipulationFactory)
@@ -12,10 +12,12 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
   .controller('signup', ['$rootScope', '$scope', 'session', '$route', '$location', SignupCtrl])
   .controller('sidebar', SidebarCtrl)
   .controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', AppsCtrl])
+  .controller('stats', StatsCtrl)
   .controller("browser",
              ['$scope', '$appbaseRef', '$timeout', '$routeParams', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
-              'session', '$rootScope', BrowserCtrl]);
+              'session', '$rootScope', BrowserCtrl])
+  .directive('barchart', BarChart);
 
 function FirstRun($rootScope, $location){
   $rootScope.goToApps = function() {
@@ -24,6 +26,10 @@ function FirstRun($rootScope, $location){
   }
   $rootScope.goToBrowser = function(path) {
     $location.path('/browser' + (path !== undefined ? "/" + path: ""));
+    update();
+  }
+  $rootScope.goToStats = function(path){
+    $location.path('/stats' + (path ? "/" + path : ""));
     update();
   }
   function update(){
@@ -36,28 +42,150 @@ function FirstRun($rootScope, $location){
 }
 
 function Routes($routeProvider){
+  var browser = {
+    controller: 'browser',
+    templateUrl: 'html/browser.html'
+  }, stats = {
+    controller: 'stats',
+    templateUrl: 'html/stats.html'
+  }, apps = {
+    controller: 'apps',
+    templateUrl: 'html/apps.html'
+  }, signup = {
+    controller: 'signup',
+    templateUrl: 'html/signup.html'
+  };
+
   $routeProvider
-    .when('/',
-    {
-      controller:'apps',
-      templateUrl:'html/apps.html'
+    .when('/', apps)
+    .when('/signup', signup)
+    .when('/browser', browser)
+    .when('/browser/:path*', browser)
+    .when('/stats/:path*', stats)
+    .when('/stats', stats)
+    .otherwise({ redirectTo: '/' });
+}
+
+function StatsCtrl($routeParams, stringManipulation, session, $scope){
+  $scope.cap = 500000;
+  $scope.chart = {};
+  $scope.chartOptions = {
+    animate:{
+        duration:0,
+        enabled:false
+    },
+    barColor:'#428bca',
+    scaleColor:false,
+    lineWidth:20,
+    lineCap:'circle'
+  };
+  $scope.morris = {
+    xkey: 'date',
+    ykeys: ['restAPICalls', 'socketAPICalls', 'total'],
+    labels: ['Rest API Calls', 'Socket API Calls', 'Total']
+  };
+  var app = stringManipulation.cutLeadingTrailingSlashes($routeParams.path);
+  if(!session.getApps()){
+    fetchApps();
+  } else {
+    $scope.apps = session.getApps();
+    setApp();
+  }
+
+  function setApp(){
+    getMetrics();
+    if(app){
+      $scope.app = app;
+    } else {
+      var arr = [];
+      for (var prop in $scope.apps) arr.push(prop);
+      $scope.app = arr.sort()[0];
     }
-  ).when('/browser',
-    {
-      controller:'browser',
-      templateUrl:'html/browser.html'
+    setGraph($scope.app);
+  }
+
+  function getMetrics(){
+    var metrics = {};
+    for(var prop in $scope.apps){
+      var calls = $scope.apps[prop].metrics.calls;
+      if(calls){
+        var metrics = [];
+        var obj = {};
+        for(var name in calls){
+          if(name !== '_id' && name !== 'appname'){
+            var split = name.split(':');
+            if(obj.date){
+              obj[split[1]] = calls[name];
+              metrics.push(obj);
+              obj = {};
+            } else {
+              var date = parseInt(split[0]);
+              obj.date = date;
+              console.log(date);
+            }
+            obj[split[1]] = calls[name];
+          }
+        }
+        $scope.apps[prop].metrics = metrics;
+        $scope.apps[prop].metrics.forEach(function(each){
+          each.total = each.restAPICalls + each.socketAPICalls;
+        });
+        var monthData=0, weekData=0, dayData;
+        var miliDay   = 1000 * 60 * 60 * 24;
+        var miliWeek  = miliDay * 7;
+        var miliMonth = miliDay * 30;
+        var now = Date.now();
+        
+        $scope.apps[prop].metrics.forEach(function(each){
+          if(now - each.date <= miliMonth) {
+            monthData += each.total;
+            if(now - each.date <= miliWeek){
+              weekData += each.total;
+              if(now - each.date <= miliDay*2) dayData = dayData || each.total;
+            }
+          }
+        });
+
+        $scope.apps[prop].day = dayData;
+        $scope.apps[prop].week = weekData;
+        $scope.apps[prop].month = monthData;
+        console.log($scope.apps[prop])
+      } else {
+        $scope.apps[prop].metrics = [];
+      }
     }
-  ).when('/browser/:path*',
-    {
-      controller:'browser',
-      templateUrl:'html/browser.html'
+  }
+
+  function setGraph(app){
+    var app = $scope.apps[app];
+    var metrics = app.metrics;
+    if(metrics.length){
+      $scope.morris.data = metrics;
+      $scope.chart.month = app.month;
+      $scope.chart.week = app.week;
+      $scope.chart.day = app.day;
+      
+      $scope.noData = false;
+    } else {
+      $scope.noData = true;
     }
-  ).when('/signup', 
-    {
-      controller:'signup',
-      templateUrl:'html/signup.html'
-    }
-  ).otherwise({ redirectTo: '/' });
+  }
+
+  $scope.tab = function(tab){
+    $scope.app = tab;
+    setGraph(tab);
+  }
+
+  function fetchApps(){
+    data.getDevsApps(function(apps) {
+      $timeout(function(){
+        $scope.apps = apps;
+        session.setApps(apps);
+        setApp();
+      });
+    });
+  }
+
 }
 
 function SignupCtrl($rootScope, $scope, session, $route, $location){
@@ -134,6 +262,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       $scope.fetching = true;
       data.getDevsApps(function(apps) {
         $timeout(function(){
+          console.log(apps);
           $scope.fetching = false;
           $scope.apps = apps;
           session.setApps(apps);
@@ -550,20 +679,27 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
       .success(function(apps) {
         var appsAndSecrets = {};
         var appsArrived = 0;
-        var secretArrived = function(app, secret) {
+        var secretArrived = function(app, secret, metrics) {
           appsArrived += 1;
-          appsAndSecrets[app] = secret;
+          appsAndSecrets[app] = {};
+          appsAndSecrets[app].secret = secret;
+          appsAndSecrets[app].metrics = metrics;
           if(appsArrived === apps.length) {
+            console.log(appsAndSecrets);
             done(appsAndSecrets);
           }
         }
         apps.forEach(function(app) {
           data.getAppsSecret(app, function(secret) {
-            secretArrived(app, secret);
+            atomic.get(atob(server)+'app/'+app+'/metrics')
+              .success(function(metrics){
+                console.log(app, secret, metrics);
+                secretArrived(app, secret, metrics);
+              });
           });
         });
         $rootScope.fetching = false;
-        $rootScope.apply();
+        $rootScope.$apply();
       })
       .error(function(error) {
         throw error
@@ -685,4 +821,35 @@ function SessionFactory(stringManipulation){
   };
 
   return session;
+}
+
+function BarChart(){
+  return {
+
+      // required to make it work as an element
+      restrict: 'E',
+      template: '<div></div>',
+      replace: true,
+      scope: {
+        data: "=",
+        xkey: "=",
+        ykeys: "=",
+        labels: "="
+      },
+      // observe and manipulate the DOM
+      link: function($scope, element, attrs) {
+
+          var graph = Morris.Area({
+            element: element,
+            data: $scope.data,
+            xkey: $scope.xkey,
+            ykeys: $scope.ykeys,
+            labels: $scope.labels
+          });
+          $scope.$watch('data', function(newData){
+            graph.setData(newData);
+          });
+      }
+
+  };
 }

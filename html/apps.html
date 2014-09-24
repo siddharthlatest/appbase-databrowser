@@ -1,11 +1,11 @@
-<div class="container-fluid" id="landing">
+<div id="landing">
     <div class="row" id="alertdiv">
         <div ng-hide="devProfile" class="alert alert-warning fade in" role="alert">
             <p>Login to continue</p>
             <p><button ng-click="loginPopup()" class="btn btn-success">Login with Google</button></p>
         </div>
     </div>
-    <div ng-show="devProfile" id="userapps">
+    <div ng-show="devProfile" class="container-fluid" id="userapps">
         <div class="row">
             <div class="col-md-12 main-title">
                 <span ng-bind="devProfile.displayName"></span>'s Apps
@@ -50,7 +50,7 @@
                     <span class="loading">loading...</span>
                 </div>
             </div>
-            <div class="form-horizontal col-md-6" ng-repeat="(app, secret) in apps">
+            <div class="form-horizontal col-md-6" ng-repeat="(app, obj) in apps">
                 <div class="row wrapper well">
                     <div class="form-group input-line">
                         <label class="col-sm-3 control-label">App name</label>
@@ -67,13 +67,17 @@
                             <input type="text"
                                    class="form-control"
                                    placeholder="App Secret"
-                                   readonly ng-value="secret" />
+                                   readonly ng-value="obj.secret" />
                         </div>
                     </div>
                     <div class="input-line">
-                        <label class="col-sm-3 control-label">App Data URL</label>
-                        <div class="col-sm-9 url">
-                            <a ng-click="goToBrowser(appToURL(app));" ng-bind="appToURL(app)"></a>
+                        <div class="col-sm-10 url">
+                            <div>
+                                <a ng-click="goToBrowser(appToURL(app));" ng-bind="appToURL(app)"></a>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 analytics">
+                            <a class="glyphicon glyphicon-stats" ng-click="goToStats(app)"></a>
                         </div>
                     </div>
                 </div>
