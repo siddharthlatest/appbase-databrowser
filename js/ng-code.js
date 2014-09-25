@@ -80,7 +80,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope){
     lineCap:'circle'
   };
   $scope.morris = {
-    xkey: 'date',
+    xkey: 'formatedDate',
     ykeys: ['restAPICalls', 'socketAPICalls', 'searchAPICalls'],
     labels: ['Rest API Calls', 'Socket API Calls', 'Search API Calls']
   };
@@ -130,8 +130,11 @@ function StatsCtrl($routeParams, stringManipulation, $scope){
             if(!existing){
               var toPush = {};
               toPush.date = date;
+              date = new Date(date);
+              toPush.formatedDate = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
               toPush[data] = calls[name];
               metrics.push(toPush);
+              console.log(toPush)
             }
           }
         }
