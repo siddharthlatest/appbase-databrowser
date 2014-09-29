@@ -816,7 +816,7 @@ function SessionFactory(stringManipulation){
 
   session.getAppSecret = function(appName) {
     var apps = session.getApps();
-    return (apps !== undefined && apps !== null ? apps[appName] : undefined);
+    return (apps !== undefined && apps !== null ? apps[appName].secret : undefined);
   };
 
   session.setProfile = function(profile) {
