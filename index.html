@@ -55,7 +55,14 @@
             <li ng-click="goToBrowser()" ng-class="{'active': currentScope === 'browser'}"><a href="">Data Browser</a></li>
             <li ng-click="goToStats()" ng-class="{'active': currentScope === 'stats'}"><a href="">Analytics</a></li>
             <li ng-show="logged" class="balance">Balance</li>
-            <li ng-show="logged" class="balance-value" ><b ng-bind="code"></b></li>
+            <li ng-show="logged" class="balance-value" >
+                <div><a class="tooltipbal">
+                    <b ng-bind="code"></b>
+                    <span>
+                        Your API usage is free for now, you will be using your credits after we finalize the API pricing plan
+                    </span>
+                </a></div>
+            </li>
         </ul>
     </div>
 
