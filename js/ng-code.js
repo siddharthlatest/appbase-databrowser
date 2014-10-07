@@ -12,12 +12,53 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
   .controller('signup', ['$rootScope', '$scope', 'session', '$route', '$location', SignupCtrl])
   .controller('sidebar', SidebarCtrl)
   .controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', AppsCtrl])
+  .controller("oauth", OauthCtrl)
   .controller('stats', StatsCtrl)
   .controller("browser",
              ['$scope', '$appbaseRef', '$timeout', '$routeParams', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl])
   .directive('barchart', BarChart);
+
+function OauthCtrl($timeout){
+  var vm = this;
+  var url = "http://auth.appbase.io:6284/api/";
+  vm.apps = {};
+  atomic.get(url + 'providers').success(function(data){
+    $timeout(function(){
+      vm.providers = data;
+      console.log(vm.providers);
+    });
+  });
+
+  vm.getApp = function(appName){
+    atomic.get(url + 'apps/' + appName)
+    .success(function(data){
+      if(data.status === "error" && data.message === "Unknown key"){
+        vm.createApp(appName, secret, ['localhost']);
+      } else {
+        $timeout(function(){
+          vm.apps[appName] = data;
+        });
+      }
+    })
+    .error(function(err){
+      throw err;
+    });
+  };
+  vm.setApp = function(){
+    
+  };
+  vm.createApp = function(appName, secret, domains){
+    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret})
+    .success(function(data){
+      console.log(data);
+    })
+    .error(function(err){
+      throw err;
+    });
+  };
+}
 
 function FirstRun($rootScope, $location){
   $rootScope.goToApps = function() {
