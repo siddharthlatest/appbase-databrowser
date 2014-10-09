@@ -47,6 +47,7 @@
         </div>
     </div>
 </nav>
+<div class="spacer"></div>
 <div class="page-wrapper" ng-controller="sidebar">
     <div class="sidebar">
         <ul class="nav nav-pills nav-stacked">
@@ -54,6 +55,7 @@
             <li ng-click="goToApps()" ng-class="{'active': currentScope === 'apps'}"><a href="">My Apps</a></li>
             <li ng-click="goToBrowser()" ng-class="{'active': currentScope === 'browser'}"><a href="">Data Browser</a></li>
             <li ng-click="goToStats()" ng-class="{'active': currentScope === 'stats'}"><a href="">Analytics</a></li>
+            <li ng-click="goToOauth()" ng-class="{'active': currentScope === 'oauthd'}"><a href="">Authentication</a></li>
             <li ng-show="logged" class="balance">Balance</li>
             <li ng-show="logged" class="balance-value" >
                 <div><a class="tooltipbal">
@@ -62,6 +64,9 @@
                         Your API usage is free for now, you will be using your credits after we finalize the API pricing plan
                     </span>
                 </a></div>
+            </li>
+            <li ng-show="(logged && affiliate)">
+                You are a partner
             </li>
         </ul>
     </div>
@@ -78,6 +83,7 @@
 </div>
 <script type="text/javascript" src="/js/jquery.js"></script>
 <script src="./js/lib/angular.min.js" type="application/javascript" ></script>
+<script src="./js/lib/angular-animate.min.js" type="application/javascript"></script>
 <script src="./js/lib/angular-route.min.js" type="application/javascript"></script>
 <script src="./js/lib/atomic.js"></script>
 <script src="./js/lib/ng-breadcrumbs.js"></script>
@@ -92,6 +98,7 @@
 <script src="/js/raphael-min.js"></script>
 <script src="/js/morris.min.js"></script>
 <script src="/js/angular.easypiechart.min.js"></script>
+
 
 <!-- begin olark code -->
 <script data-cfasync="false" type='text/javascript'>/*<![CDATA[*/window.olark||(function(c){var f=window,d=document,l=f.location.protocol=="https:"?"https:":"http:",z=c.name,r="load";var nt=function(){

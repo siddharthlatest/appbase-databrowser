@@ -2,84 +2,172 @@
  * Created by Sagar on 30/8/14.
  */
 OAuth.initialize('fjDZzYff0kMpDgKVm9dBkeb439g');
-angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog', 'easypiechart'])
+angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog', 'easypiechart', 'ngAnimate'])
   .run(FirstRun)
   .config(Routes)
+  .factory("oauthFactory", OauthFactory)
   .factory('stringManipulation', StringManipulationFactory)
   .factory('session', ['stringManipulation', SessionFactory])
   .factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbaseRef', '$rootScope', NodeBinding])
   .factory('data', ['$timeout', '$location', '$appbaseRef', 'stringManipulation', 'session', '$rootScope', DataFactory])
   .controller('signup', ['$rootScope', '$scope', 'session', '$route', '$location', SignupCtrl])
   .controller('sidebar', SidebarCtrl)
-  .controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', AppsCtrl])
-  .controller("oauth", OauthCtrl)
+  .controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', 'oauthFactory', AppsCtrl])
   .controller('stats', StatsCtrl)
+  .controller('oauthd', OauthCtrl)
   .controller("browser",
              ['$scope', '$appbaseRef', '$timeout', '$routeParams', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl])
+  .directive('imgSrc', ImgSrc)
   .directive('barchart', BarChart);
 
-function OauthCtrl($timeout){
-  var vm = this;
+function OauthFactory($timeout, $q){
+  var oauth = {};
   var url = "http://auth.appbase.io:6284/api/";
-  vm.apps = {};
-  atomic.get(url + 'providers').success(function(data){
-    $timeout(function(){
-      vm.providers = data;
-      console.log(vm.providers);
-    });
-  });
-
-  vm.getApp = function(appName){
+  var providers = [{ name: 'google',   logo: 'http://i.imgur.com/DdiI23J.png'},
+                   { name: 'facebook', logo: 'http://i.imgur.com/aw9vfpF.png'},
+                   { name: 'linkedin', logo: 'http://i.imgur.com/Sj1lsuK.png'},
+                   { name: 'dropbox',  logo: 'http://i.imgur.com/n1hwdcn.jpg'},
+                   { name: 'github',   logo: 'http://i.imgur.com/87aTdQv.png'}];
+  //logos added mannualy because the ones from the API are terrible
+  oauth.getApp = function(appName, secret){
+    var deferred = $q.defer();
     atomic.get(url + 'apps/' + appName)
     .success(function(data){
-      if(data.status === "error" && data.message === "Unknown key"){
-        vm.createApp(appName, secret, ['localhost']);
-      } else {
-        $timeout(function(){
-          vm.apps[appName] = data;
-        });
-      }
+      deferred.resolve(data);
     })
-    .error(function(err){
-      throw err;
+    .error(function(data){
+      if(data.status === "error" && data.message === "Unknown key"){
+        oauth.createApp(appName, secret, ['localhost'])
+        .then(function(data){
+          deferred.resolve(data);
+        })
+        .error(function(data){
+          deferred.reject(data);
+        });
+      } else {
+        deferred.reject(data);
+      }
     });
+    return deferred.promise;
   };
-  vm.setApp = function(){
-    
+
+  oauth.removeDomain = function(appName, domain){
+    var deferred = $q.defer();
+    atomic.delete(url + 'apps/' + appName + '/domains/' + domain)
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(data){
+      deferred.reject(data);
+    });
+    return deferred.promise;
   };
-  vm.createApp = function(appName, secret, domains){
+
+  oauth.addDomain = function(appName, domain){
+    var deferred = $q.defer();
+    atomic.post(url + 'apps/' + appName + '/domains/' + domain)
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(data){
+      deferred.reject(data);
+    });
+    return deferred.promise;
+  };
+
+  oauth.createApp = function(appName, secret, domains){
+    var deferred = $q.defer();
     atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret})
     .success(function(data){
-      console.log(data);
+      deferred.resolve(data);
     })
     .error(function(err){
-      throw err;
+      deferred.reject(err);
     });
+    return deferred.promise;
   };
+
+  oauth.getProviders = function(){
+    var deferred = $q.defer();
+    var retProviders = [];
+    var providerNumber = 0;
+    providers.forEach(function(each){
+      atomic.get(url + 'providers/' + each.name)
+      .success(function(data){
+        data.data.logo = each.logo;
+        retProviders.push(data.data);
+        providerNumber++;
+        if(providerNumber === providers.length)
+          deferred.resolve(retProviders);
+      })
+      .error(function(data){
+        deferred.reject(data);
+      });
+    });
+    return deferred.promise;
+  };
+
+  oauth.getKeySets = function(app, appProviders){
+    var deferred = $q.defer();
+    var providerNumber = 0;
+    var retProviders = [];
+    appProviders.forEach(function(each){
+      atomic.get(url + 'apps/' + app + '/keysets/' + each)
+      .success(function(data){
+        data.data.provider = each;
+        retProviders.push(data.data);
+        providerNumber++;
+        if(providerNumber === appProviders.length)
+          deferred.resolve(retProviders);
+      })
+      .error(function(data){deferred.reject(data)});
+    });
+    return deferred.promise;
+  };
+
+  oauth.removeProvider = function(app, provider){
+    var deferred = $q.defer();
+    atomic.delete(url + 'apps/' + app + '/keysets/' + provider)
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  oauth.addProvider = function(app, provider, client, secret){
+    var deferred = $q.defer();
+    atomic.post(url + 'apps/' + app + '/keysets/' + provider,
+    {response_type: 'both', parameters: {client_id: client, client_secret: secret}})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  return oauth;
 }
 
 function FirstRun($rootScope, $location){
   $rootScope.goToApps = function() {
     $location.path('/');
-    update();
   }
   $rootScope.goToBrowser = function(path) {
     $location.path('/browser' + (path !== undefined ? "/" + path: ""));
-    update();
   }
   $rootScope.goToStats = function(path){
     $location.path('/stats' + (path ? "/" + path : ""));
-    update();
   }
-  function update(){
-    $('.page').css('margin-top', $('nav').height() + 'px');
+  $rootScope.goToOauth = function(path){
+    $location.path('/oauth' + (path ? "/" + path : ""));
   }
-  $(window).resize($.throttle(250,function(){$('.page').css('margin-top', $('nav').height() + 'px');}));
-  $(function(){
-    update();
-  });
 }
 
 function Routes($routeProvider){
@@ -95,6 +183,9 @@ function Routes($routeProvider){
   }, signup = {
     controller: 'signup',
     templateUrl: 'html/signup.html'
+  }, oauth = {
+    controller: 'oauthd',
+    templateUrl: 'html/oauth.html'
   };
 
   $routeProvider
@@ -104,10 +195,168 @@ function Routes($routeProvider){
     .when('/browser/:path*', browser)
     .when('/stats/:path*', stats)
     .when('/stats', stats)
+    .when('/oauth', oauth)
+    .when('/oatuh/:path*', oauth)
     .otherwise({ redirectTo: '/' });
 }
 
-function StatsCtrl($routeParams, stringManipulation, $scope){
+function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope){
+  $scope.status = "Loading...";
+  $scope.loading = $scope.loadingProv = $scope.editing = false;
+  $scope.callbackDomain = $scope.callbackURL = 'http://auth.appbase.io:6284';
+  $scope.sorter = function(prov){
+    return $scope.userProviders.indexOf(prov.provider);
+  };
+  $scope.removeDomain = function(domain){
+    $scope.loading = true;
+    oauthFactory.removeDomain($scope.app, encodeURIComponent(domain))
+    .then(function(data){
+      if(data.status !== "success") throw data;
+      $timeout(function(){
+        $scope.domains.splice($scope.domains.indexOf(domain), 1);
+        $scope.loading = false;
+      });
+    }, function(data){throw data;});
+  };
+  $scope.addDomain = function(domain){
+    $scope.loading = true;
+    oauthFactory.addDomain($scope.app, encodeURIComponent(domain))
+    .then(function(data){
+      if(data.status !== "success") throw data;
+      $timeout(function(){
+        $scope.domains.push(domain);
+        $scope.loading = false;
+        $scope.domainInput = '';
+      });
+    },function(data){throw data;});
+  };
+  $scope.removeProvider = function(provider){
+    $scope.loadingProv = true;
+    oauthFactory.removeProvider($scope.app, provider)
+    .then(function(data){
+      if(data.status !== "success") throw data;
+      $timeout(function(){
+        $scope.userProviders.splice($scope.userProviders.indexOf(provider), 1);
+        $scope.loadingProv = false;
+      });
+    }, function(data){throw data;});
+  };
+  $scope.add = function(provider){
+    $scope.provider = provider;
+    $scope.editing = $scope.adding = true;
+  };
+  $scope.edit = function(provider){
+    $scope.provider = provider;
+    $scope.editing = true;
+    $scope.adding = false;
+  }
+  $scope.done = function(){
+    $scope.editing = $scope.adding = false;
+    if(!$scope.app || !$scope.provider.provider || !$scope.clientID || !$scope.clientSecret) throw 'error';
+    $scope.loadingProv = true;
+    oauthFactory.addProvider($scope.app, $scope.provider.provider, $scope.clientID, $scope.clientSecret)
+    .then(function(data){
+      console.log(data);
+      $timeout(function(){
+        $scope.loadingProv = false;
+        $scope.userProviders.push($scope.provider.provider);
+      });
+    }, function(err){throw err});
+    $scope.clientID = $scope.clientSecret = '';
+  }
+  $scope.cancel = function(){
+    $scope.editing = $scope.adding = false;
+  }
+  $scope.tab = function(app){
+    $scope.status = $scope.provStatus = "Loading...";
+    $scope.domains = [];
+    $scope.userProviders = [];
+    oauthFactory.getApp(app, $scope.apps[app].secret)
+    .then(function(oauth){
+      oauth = oauth.data;
+      $timeout(function(){
+        $scope.status = false;
+        $scope.domains = oauth.domains;
+      });
+      if(oauth.keysets.length){
+        oauthFactory.getKeySets(app, oauth.keysets)
+        .then(function(data){
+          data.forEach(function(each){
+            $scope.userProviders.push(each.provider);
+          });
+          $timeout(function(){
+            $scope.keys = data;
+            $scope.provStatus = false;
+          });
+        }, function(data){throw data});
+      } else {
+        $timeout(function(){
+          $scope.provStatus = false;
+        });
+      }
+      
+    }, function(data){throw data});
+    $scope.app = app;
+  };
+
+  oauthFactory.getProviders()
+  .then(function(data){
+    console.log(data)
+    $scope.providers = data;
+  }, function(data){
+    throw data;
+  });
+
+  var app = stringManipulation.cutLeadingTrailingSlashes($routeParams.path);
+  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
+
+  
+  if(typeof sessionApps === "object" && sessionApps){
+    if(!Object.getOwnPropertyNames(sessionApps).length){
+      fetchApps();
+    } else {
+      $scope.apps = sessionApps;
+      init();
+    }
+  } else {
+    if(session.getProfile())
+      fetchApps();
+    else
+      $rootScope.goToApps();
+  }
+
+  function init(){
+    if(app){
+      $scope.app = app;
+    } else {
+      var arr = [];
+      for (var prop in $scope.apps) arr.push(prop);
+      $scope.app = arr.sort()[0];
+    }
+    $scope.tab($scope.app);
+  }
+
+
+
+  function fetchApps(){
+    data.getDevsApps(function(apps) {
+      $timeout(function(){
+        // for(var app in apps){
+        //   oauthFactory.getApp(app, apps[app].secret)
+        //   .then(function(data){
+        //     apps[app].oauth = data;
+        //   }, function(data){
+        //     throw data;
+        //   });
+        // }
+        $scope.apps = apps;
+        init();
+      });
+    });
+  }
+}
+
+function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope){
   $scope.cap = 500000;
   $scope.chart = {};
   $scope.chartOptions = {
@@ -127,11 +376,19 @@ function StatsCtrl($routeParams, stringManipulation, $scope){
   };
   var app = stringManipulation.cutLeadingTrailingSlashes($routeParams.path);
   var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
-  if(!Object.getOwnPropertyNames(sessionApps).length){
-    fetchApps();
+  if(sessionApps){
+    if(!Object.getOwnPropertyNames(sessionApps).length){
+      fetchApps();
+    } else {
+      $scope.apps = sessionApps;
+      setApp();
+    }
   } else {
-    $scope.apps = sessionApps;
-    setApp();
+    if(session.getProfile())
+      fetchApps();
+    else{
+      $rootScope.goToApps();
+    }
   }
 
   function setApp(){
@@ -175,7 +432,6 @@ function StatsCtrl($routeParams, stringManipulation, $scope){
               toPush.formatedDate = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
               toPush[data] = calls[name];
               metrics.push(toPush);
-              console.log(toPush)
             }
           }
         }
@@ -309,20 +565,41 @@ function SidebarCtrl($scope, $rootScope){
   })
 }
   
-function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope){
+function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory){
   Prism.highlightAll();
   if($scope.devProfile = session.getProfile()) {
     $rootScope.logged = true;
     $.post('http://162.243.5.104:8080/u', {user: $scope.devProfile.id}).done(function(data){
-      console.log(data)
       $rootScope.code = (data == "true");
       $rootScope.$apply();
+      if($rootScope.code) console.log('User has $50 coupon.');
+    });
+    console.log($scope.devProfile);
+    $scope.devProfile.emails.forEach(function(email){
+      $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
+        data: JSON.stringify({email: email.value}), contentType:"application/json; charset=utf-8",
+        dataType:"json",
+        success: function(data){
+          console.log(data)
+          $timeout(function(){
+            $rootScope.affiliate = $rootScope.affiliate || (data == "true");
+          });
+          if($rootScope.affiliate) console.log('User is a member of the affiliate program.');
+        }
+      });
     });
     var fetchApps = function() {
       $scope.fetching = true;
       data.getDevsApps(function(apps) {
         $timeout(function(){
-          console.log(apps);
+          for(var app in apps){
+            oauthFactory.getApp(app, apps[app].secret)
+            .then(function(data){
+              apps[app].oauth = data;
+            }, function(data){
+              throw data;
+            });
+          }
           $scope.fetching = false;
           $scope.apps = apps;
           session.setApps(apps);
@@ -882,6 +1159,22 @@ function SessionFactory(stringManipulation){
   };
 
   return session;
+}
+
+function ImgSrc(){
+  return {
+    scope: {
+      src: '@'
+    },
+    link: function(scope, element, attrs) {
+      attrs.$observe('src', function(src){
+        element.css('display', 'block');
+      });
+      element.bind('error', function(err) {
+        element.css('display', 'none');
+      });
+    }
+  } 
 }
 
 function BarChart(){

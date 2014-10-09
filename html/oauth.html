@@ -1,0 +1,118 @@
+<div class="col-md-12 st-tab">
+	<ul class="nav nav-tabs" role="tablist">
+		<li ng-repeat="(name, obj) in apps | orderBy : name" ng-class="{'active': name===app}" repeat-end="app">
+			<a href="" ng-bind="name" ng-click="tab(name)"></a>
+		</li>
+	</ul>
+</div>
+<div class="col-md-12 oa-tab">
+	<div class="list">
+		<div class="col-md-4">
+			<div class="title"><span>Domains</span></div>
+			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
+			<div ng-hide="status" ng-class="{overlay: loading}">
+				<ul class="list-group oa-dom">
+				<form ng-submit="addDomain(domainInput)">
+					<li ng-repeat="domain in domains" class="list-group-item oa-dom-item">
+						<span class="badge btn-danger" ng-click="removeDomain(domain)">&times;</span>
+						<div class="domain"><span ng-bind="domain"></span></div>
+					</li>
+					<li ng-if="!domains.length" class="list-group-item empty-list"><i>No callback domains added</i></li>
+					<li class="list-group-item oa-dom-input form-inline">
+						<div class="oa-dom-input-inpt" ng-class="{exp:(focus||domainInput)}">
+							<input type="text" class="form-control" placeholder="Add domain..." ng-model="domainInput"/>
+						</div>
+						<div class="oa-dom-input-btn" ng-show="domainInput">
+							<button type="submit" class="form-control btn btn-success"><span></span></button>
+						</div>
+					</li>
+				</form>
+				</ul>
+			</div><br>
+		</div>
+		<div class="col-md-8">
+			<div class="title"><span>Providers</span></div>
+			<div ng-bind="provStatus" class="oa-dom" ng-show="provStatus"></div>
+			<div ng-hide="provStatus || editing" ng-class="{overlay: loadingProv}">
+				<ul class="list-group oa-dom">
+					<li class="list-group-item oa-prov" ng-repeat="provider in providers | orderBy:sorter:true">
+						<img ng-src="{{provider.logo}}" />
+						<span ng-bind="provider.name"></span>
+						<button ng-show="userProviders.indexOf(provider.provider)==-1" ng-click="add(provider)" class="btn btn-success">Add</button>
+						<button ng-show="userProviders.indexOf(provider.provider)!==-1" ng-click="removeProvider(provider.provider)" class="btn btn-danger">Remove</button>
+						<button ng-show="userProviders.indexOf(provider.provider)!==-1" ng-click="edit(provider)"class="btn btn-warning">Edit</button>
+						
+					</li>
+				</ul>
+			</div>
+			<div ng-show="editing && !provStatus" ng-class="{overlay: loadingProv}" class="oa-ed-prov">
+				<div class="bs-callout">
+					<h4>
+						<span ng-hide="adding">Edit your <span ng-bind="provider.name"></span> application tokens.</span>
+						<span ng-show="adding">Create an application on <span ng-bind="provider.name"></span>.</span>
+					</h4>
+					<p>Check the useful links below for guidance. Use the following callbacks:</p>
+				</div>
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Callback URL</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" disabled ng-model="callbackURL" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Domain URL</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" disabled ng-model="callbackDomain"/>
+						</div>
+					</div>
+				</form>
+				<img img-src ng-if="provider.provider" ng-src="http://auth.appbase.io:6284/api/providers/{{provider.provider}}/config.png" />
+				<div class="bs-callout">
+					<h4>Enter your API keys.</h4>
+					<p>When in doubt where to find this, check your provider documentation.</p>
+				</div>
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Client ID</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" placeholder="Enter your client ID" ng-model="clientID">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Client Secret</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" placeholder="Enter your client secret" ng-model="clientSecret">
+						</div>
+					</div>
+				</form>
+				<img img-src ng-if="provider.provider" ng-src="http://auth.appbase.io:6284/api/providers/{{provider.provider}}/keys.png" />
+				<div class="oa-edit-btn">
+					<ul class="list-inline">
+						<li><button class="btn btn-success" ng-click="done()">Done</button></li>
+						<li><button class="btn btn-warning" ng-click="cancel()">Cancel</button></li>
+					</ul>
+				</div>
+				<div class="bs-callout">
+					<h4>Useful links</h4>
+					<p>
+						<ul class="list-unstyled">
+							<li>
+								<a ng-href="{{provider.href.provider}}"><span ng-bind="provider.name"></span></a>
+							</li>
+							<li>
+								<a ng-href="{{provider.href.docs}}">Documentation</a>
+							</li>
+							<li>
+								<a ng-href="{{provider.href.apps}}">Applications</a>
+							</li>
+							<li>
+								<a ng-href="{{provider.href.keys}}">Keys</a>
+							</li>
+						</ul>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
