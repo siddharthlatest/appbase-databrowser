@@ -36,7 +36,7 @@
 			<div ng-hide="provStatus || editing" ng-class="{overlay: loadingProv}">
 				<ul class="list-group oa-dom">
 					<li class="list-group-item oa-prov" ng-repeat="provider in providers | orderBy:sorter:true">
-						<img ng-src="{{provider.logo}}" />
+						<img ng-src="{{provider.logo}}" style="width: auto"/>
 						<span ng-bind="provider.name"></span>
 						<button ng-show="userProviders.indexOf(provider.provider)==-1" ng-click="add(provider)" class="btn btn-success">Add</button>
 						<button ng-show="userProviders.indexOf(provider.provider)!==-1" ng-click="removeProvider(provider.provider)" class="btn btn-danger">Remove</button>

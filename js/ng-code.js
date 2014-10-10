@@ -25,11 +25,11 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
 function OauthFactory($timeout, $q){
   var oauth = {};
   var url = "http://auth.appbase.io:6284/api/";
-  var providers = [{ name: 'google',   logo: 'http://i.imgur.com/DdiI23J.png'},
-                   { name: 'facebook', logo: 'http://i.imgur.com/aw9vfpF.png'},
-                   { name: 'linkedin', logo: 'http://i.imgur.com/Sj1lsuK.png'},
-                   { name: 'dropbox',  logo: 'http://i.imgur.com/n1hwdcn.jpg'},
-                   { name: 'github',   logo: 'http://i.imgur.com/87aTdQv.png'}];
+  var providers = [{ name: 'google'},
+                   { name: 'facebook'},
+                   { name: 'linkedin'},
+                   { name: 'dropbox'},
+                   { name: 'github'}];
   //logos added mannualy because the ones from the API are terrible
   oauth.getApp = function(appName, secret){
     var deferred = $q.defer();
@@ -96,7 +96,7 @@ function OauthFactory($timeout, $q){
     providers.forEach(function(each){
       atomic.get(url + 'providers/' + each.name)
       .success(function(data){
-        data.data.logo = each.logo;
+        data.data.logo = url + 'providers/' + each.name + '/logo';
         retProviders.push(data.data);
         providerNumber++;
         if(providerNumber === providers.length)
