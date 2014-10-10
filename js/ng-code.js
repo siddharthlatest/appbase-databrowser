@@ -574,17 +574,16 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       $rootScope.$apply();
       if($rootScope.code) console.log('User has $50 coupon.');
     });
-    console.log($scope.devProfile);
+    $rootScope.affiliate = false;
     $scope.devProfile.emails.forEach(function(email){
       $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
         data: JSON.stringify({email: email.value}), contentType:"application/json; charset=utf-8",
         dataType:"json",
         success: function(data){
-          console.log(data)
+          console.log(email.value, ': ', data)
           $timeout(function(){
-            $rootScope.affiliate = $rootScope.affiliate || (data == "true");
+             if(data == "true") $rootScope.affiliate = true;
           });
-          if($rootScope.affiliate) console.log('User is a member of the affiliate program.');
         }
       });
     });
