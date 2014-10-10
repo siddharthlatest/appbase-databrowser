@@ -582,7 +582,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
         success: function(data){
           console.log(email.value, ': ', data)
           $timeout(function(){
-             if(data == "true") $rootScope.affiliate = true;
+             if(data) $rootScope.affiliate = true;
           });
         }
       });
