@@ -1,5 +1,5 @@
 /.idea/
 *.sublime-project
 *.sublime-workspace
-
+.zedstate
 *.log
