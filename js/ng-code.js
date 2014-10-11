@@ -142,7 +142,7 @@ function OauthFactory($timeout, $q){
   oauth.addProvider = function(app, provider, client, secret){
     var deferred = $q.defer();
     atomic.post(url + 'apps/' + app + '/keysets/' + provider,
-    {response_type: 'both', parameters: {client_id: client, client_secret: secret}})
+    {response_type: 'code', parameters: {client_id: client, client_secret: secret}})
     .success(function(data){
       deferred.resolve(data);
     })
@@ -205,7 +205,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   $scope.loading = $scope.loadingProv = $scope.editing = false;
   $scope.callbackDomain = $scope.callbackURL = 'http://auth.appbase.io:6284';
   $scope.sorter = function(prov){
-    return $scope.userProviders.indexOf(prov.provider);
+    return $scope.userProviders[prov.provider]? true: false;
   };
   $scope.removeDomain = function(domain){
     $scope.loading = true;
@@ -236,7 +236,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     .then(function(data){
       if(data.status !== "success") throw data;
       $timeout(function(){
-        $scope.userProviders.splice($scope.userProviders.indexOf(provider), 1);
+        delete $scope.userProviders[provider];
         $scope.loadingProv = false;
       });
     }, function(data){throw data;});
@@ -245,8 +245,10 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.provider = provider;
     $scope.editing = $scope.adding = true;
   };
-  $scope.edit = function(provider){
+  $scope.edit = function(provider) {
     $scope.provider = provider;
+    $scope.clientID = $scope.userProviders[provider.provider].parameters.client_id;
+    $scope.clientSecret = $scope.userProviders[provider.provider].parameters.client_secret;
     $scope.editing = true;
     $scope.adding = false;
   }
@@ -256,21 +258,22 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.loadingProv = true;
     oauthFactory.addProvider($scope.app, $scope.provider.provider, $scope.clientID, $scope.clientSecret)
     .then(function(data){
-      console.log(data);
       $timeout(function(){
         $scope.loadingProv = false;
-        $scope.userProviders.push($scope.provider.provider);
+        $scope.userProviders[$scope.provider.provider] = {response_type: 'code', parameters: {client_id: $scope.clientID, client_secret: $scope.clientSecret}};
       });
     }, function(err){throw err});
     $scope.clientID = $scope.clientSecret = '';
   }
   $scope.cancel = function(){
     $scope.editing = $scope.adding = false;
+    $scope.clientID = '';
+    $scope.clientSecret = '';
   }
   $scope.tab = function(app){
     $scope.status = $scope.provStatus = "Loading...";
     $scope.domains = [];
-    $scope.userProviders = [];
+    $scope.userProviders = {};
     oauthFactory.getApp(app, $scope.apps[app].secret)
     .then(function(oauth){
       oauth = oauth.data;
@@ -281,8 +284,8 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
       if(oauth.keysets.length){
         oauthFactory.getKeySets(app, oauth.keysets)
         .then(function(data){
-          data.forEach(function(each){
-            $scope.userProviders.push(each.provider);
+          data.forEach(function(each) {
+            $scope.userProviders[each.provider] = each;
           });
           $timeout(function(){
             $scope.keys = data;
@@ -301,7 +304,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
 
   oauthFactory.getProviders()
   .then(function(data){
-    console.log(data)
     $scope.providers = data;
   }, function(data){
     throw data;
