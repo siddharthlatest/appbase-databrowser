@@ -39,7 +39,7 @@ function OauthFactory($timeout, $q){
     })
     .error(function(data){
       if(data.status === "error" && data.message === "Unknown key"){
-        oauth.createApp(appName, secret, ['localhost'])
+        oauth.createApp(appName, secret, ['localhost', '127.0.0.1'])
         .then(function(data){
           deferred.resolve(data);
         })
@@ -270,16 +270,19 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.clientID = '';
     $scope.clientSecret = '';
   }
-  $scope.tab = function(app){
+  $scope.tab = function(app) {
+    $scope.cancel();
     $scope.status = $scope.provStatus = "Loading...";
     $scope.domains = [];
     $scope.userProviders = {};
     oauthFactory.getApp(app, $scope.apps[app].secret)
     .then(function(oauth){
       oauth = oauth.data;
-      $timeout(function(){
+      $timeout(function() {
         $scope.status = false;
         $scope.domains = oauth.domains;
+        $scope.domains.splice($scope.domains.indexOf('localhost'), 1); //not showing localhost and 127.0.0.1 in the view
+        $scope.domains.splice($scope.domains.indexOf('127.0.0.1'), 1);
       });
       if(oauth.keysets.length){
         oauthFactory.getKeySets(app, oauth.keysets)
