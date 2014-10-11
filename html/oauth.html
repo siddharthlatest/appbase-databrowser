@@ -8,7 +8,8 @@
 <div class="col-md-12 oa-tab">
 	<div class="list">
 		<div class="col-md-4">
-			<div class="title"><span>Domains</span></div>
+			<h4>Authorized domains</h4>
+			<p>Only following domains will be allowed to make auth requests to Appbase server.</p>
 			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
 			<div ng-hide="status" ng-class="{overlay: loading}">
 				<ul class="list-group oa-dom">
@@ -31,7 +32,7 @@
 			</div><br>
 		</div>
 		<div class="col-md-8">
-			<div class="title"><span>Providers</span></div>
+		  <h4>Provider settings</h4>
 			<div ng-bind="provStatus" class="oa-dom" ng-show="provStatus"></div>
 			<div ng-hide="provStatus || editing" ng-class="{overlay: loadingProv}">
 				<ul class="list-group oa-dom">
@@ -41,77 +42,60 @@
 						<button ng-show="userProviders.indexOf(provider.provider)==-1" ng-click="add(provider)" class="btn btn-success">Add</button>
 						<button ng-show="userProviders.indexOf(provider.provider)!==-1" ng-click="removeProvider(provider.provider)" class="btn btn-danger">Remove</button>
 						<button ng-show="userProviders.indexOf(provider.provider)!==-1" ng-click="edit(provider)"class="btn btn-warning">Edit</button>
-						
 					</li>
 				</ul>
 			</div>
 			<div ng-show="editing && !provStatus" ng-class="{overlay: loadingProv}" class="oa-ed-prov">
+  			<div class="oa-edit-btn">
+          <ul class="list-inline">
+            <li><img ng-src="{{provider.logo}}" style="width: auto"/></li>
+            <li><h3 ng-bind="provider.name"> </h3></li>
+            <li class="pull-right"><button class="btn btn-warning" ng-click="cancel()">Cancel</button></li>
+            <li class="pull-right"><button class="btn btn-success" ng-click="done()">Done</button></li>
+          </ul>
+        </div>
+				<div>
+					<p>Find your applications on <span ng-bind="provider.name"></span> <a ng-href="{{provider.href.apps}}">here</a>.</p>
+					<p>Find <span ng-bind="provider.name"></span>'s documentation <a ng-href="{{provider.href.docs}}">here</a>.</p>
+				</div>
+				<hr>
 				<div class="bs-callout">
-					<h4>
-						<span ng-hide="adding">Edit your <span ng-bind="provider.name"></span> application tokens.</span>
-						<span ng-show="adding">Create an application on <span ng-bind="provider.name"></span>.</span>
-					</h4>
-					<p>Check the useful links below for guidance. Use the following callbacks:</p>
+					<h4>Enter your applicaion's keys.</h4>
+					<form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label" style="font-size: 1em">Client ID</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" placeholder="Enter your client ID" ng-model="clientID">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" style="font-size: 1em">Client Secret</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" placeholder="Enter your client secret" ng-model="clientSecret">
+              </div>
+            </div>
+          </form>
 				</div>
-				<form class="form-horizontal">
-					<div class="form-group">
-						<label class="col-sm-2 control-label">Callback URL</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" disabled ng-model="callbackURL" />
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-2 control-label">Domain URL</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" disabled ng-model="callbackDomain"/>
-						</div>
-					</div>
-				</form>
-				<img img-src ng-if="provider.provider" ng-src="http://auth.appbase.io:6284/api/providers/{{provider.provider}}/config.png" />
+				<hr>
 				<div class="bs-callout">
-					<h4>Enter your API keys.</h4>
-					<p>When in doubt where to find this, check your provider documentation.</p>
-				</div>
-				<form class="form-horizontal">
-					<div class="form-group">
-						<label class="col-sm-2 control-label">Client ID</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" placeholder="Enter your client ID" ng-model="clientID">
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-2 control-label">Client Secret</label>
-						<div class="col-sm-10">
-							<input type="text" class="form-control" placeholder="Enter your client secret" ng-model="clientSecret">
-						</div>
-					</div>
-				</form>
-				<img img-src ng-if="provider.provider" ng-src="http://auth.appbase.io:6284/api/providers/{{provider.provider}}/keys.png" />
-				<div class="oa-edit-btn">
-					<ul class="list-inline">
-						<li><button class="btn btn-success" ng-click="done()">Done</button></li>
-						<li><button class="btn btn-warning" ng-click="cancel()">Cancel</button></li>
-					</ul>
-				</div>
-				<div class="bs-callout">
-					<h4>Useful links</h4>
-					<p>
-						<ul class="list-unstyled">
-							<li>
-								<a ng-href="{{provider.href.provider}}"><span ng-bind="provider.name"></span></a>
-							</li>
-							<li>
-								<a ng-href="{{provider.href.docs}}">Documentation</a>
-							</li>
-							<li>
-								<a ng-href="{{provider.href.apps}}">Applications</a>
-							</li>
-							<li>
-								<a ng-href="{{provider.href.keys}}">Keys</a>
-							</li>
-						</ul>
-					</p>
-				</div>
+          <h4>Authorize the following domain and the callback in your app's settings on <span ng-bind="provider.name"></span>.</h4>
+          <p>This will allow Appbase to interact with the provider server and retirve the 
+          access tokens for you, which will be available in the API for use.</p>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label" style="font-size: 1em">Callback URL</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" disabled ng-model="callbackURL" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" style="font-size: 1em">Domain</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" disabled ng-model="callbackDomain"/>
+              </div>
+            </div>
+          </form>
+        </div>
 			</div>
 		</div>
 	</div>
