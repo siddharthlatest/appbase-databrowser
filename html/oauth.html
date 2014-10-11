@@ -60,8 +60,28 @@
 				</div>
 				<hr>
 				<div class="bs-callout">
-					<h4>Enter your application's keys.</h4>
-					<form class="form-horizontal">
+          <h4>Authorize the following domain and the callback in your app's settings on <span ng-bind="provider.name"></span>.</h4>
+          <p>This will allow Appbase to interact with the provider server and retirve the 
+          access tokens for you, which will be available in the API for use.</p>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label" style="font-size: 1em">Callback URL: </label>
+              <div class="col-sm-10">
+                <label class="control-label" style="font-size: 1em" ng-bind="callbackURL" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label" style="font-size: 1.1em">Domain: </label>
+              <div class="col-sm-10">
+                <label class="control-label" style="font-size: 1.1em" ng-bind="callbackDomain"/>
+              </div>
+            </div>
+          </form>
+        </div>
+        <hr>
+        <div class="bs-callout">
+          <h4>Enter your application's keys.</h4>
+          <form class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-2 control-label" style="font-size: 1em">Client ID</label>
               <div class="col-sm-10">
@@ -72,26 +92,6 @@
               <label class="col-sm-2 control-label" style="font-size: 1em">Client Secret</label>
               <div class="col-sm-10">
                 <input type="text" class="form-control" placeholder="Enter your client secret" ng-model="clientSecret">
-              </div>
-            </div>
-          </form>
-				</div>
-				<hr>
-				<div class="bs-callout">
-          <h4>Authorize the following domain and the callback in your app's settings on <span ng-bind="provider.name"></span>.</h4>
-          <p>This will allow Appbase to interact with the provider server and retirve the 
-          access tokens for you, which will be available in the API for use.</p>
-          <form class="form-horizontal">
-            <div class="form-group">
-              <label class="col-sm-2 control-label" style="font-size: 1em">Callback URL</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" disabled ng-model="callbackURL" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="col-sm-2 control-label" style="font-size: 1em">Domain</label>
-              <div class="col-sm-10">
-                <input type="text" class="form-control" disabled ng-model="callbackDomain"/>
               </div>
             </div>
           </form>
