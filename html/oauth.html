@@ -25,7 +25,7 @@
 						<span class="badge btn-danger" ng-click="removeDomain(domain)">&times;</span>
 						<div class="domain"><span ng-bind="domain"></span></div>
 					</li>
-					<li ng-if="!domains.length" class="list-group-item empty-list"><i>No callback domains added</i></li>
+					<li ng-if="!domains.length" class="list-group-item empty-list"><i>No domains added</i></li>
 					<li class="list-group-item oa-dom-input form-inline">
 						<div class="oa-dom-input-inpt" ng-class="{exp:(focus||domainInput)}">
 							<input type="text" class="form-control" placeholder="Add domain..." ng-model="domainInput"/>
