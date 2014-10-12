@@ -24,13 +24,22 @@ angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDi
 
 function OauthFactory($timeout, $q){
   var oauth = {};
-  var url = "http://auth.appbase.io:6284/api/";
+  var config = { 
+    oauthd: "https://auth.appbase.io",
+    authBase: "/",
+    apiBase: "/api/"
+  };
+  var url = config.oauthd + config.apiBase;
   var providers = [{ name: 'google'},
                    { name: 'facebook'},
                    { name: 'linkedin'},
                    { name: 'dropbox'},
                    { name: 'github'}];
-  //logos added mannualy because the ones from the API are terrible
+
+  oauth.getOauthdConfig = function() {
+    return config;
+  }
+  
   oauth.getApp = function(appName, secret){
     var deferred = $q.defer();
     atomic.get(url + 'apps/' + appName)
@@ -203,7 +212,8 @@ function Routes($routeProvider){
 function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope){
   $scope.status = "Loading...";
   $scope.loading = $scope.loadingProv = $scope.editing = false;
-  $scope.callbackDomain = $scope.callbackURL = 'http://auth.appbase.io:6284';
+  $scope.callbackDomain = oauthFactory.getOauthdConfig().oauthd;
+  $scope.callbackURL = oauthFactory.getOauthdConfig().oauthd + oauthFactory.getOauthdConfig().authBase;
   $scope.sorter = function(prov){
     return $scope.userProviders[prov.provider]? true: false;
   };
@@ -261,9 +271,9 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
       $timeout(function(){
         $scope.loadingProv = false;
         $scope.userProviders[$scope.provider.provider] = {response_type: 'code', parameters: {client_id: $scope.clientID, client_secret: $scope.clientSecret}};
+        $scope.clientID = $scope.clientSecret = '';
       });
     }, function(err){throw err});
-    $scope.clientID = $scope.clientSecret = '';
   }
   $scope.cancel = function(){
     $scope.editing = $scope.adding = false;
