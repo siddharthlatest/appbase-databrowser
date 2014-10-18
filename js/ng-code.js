@@ -970,12 +970,16 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
     atomic.get(atob(server)+'app/'+ appName +'/namespaces')
       .success(function(result) {
         var namespaces = []
-        result.forEach(function(obj) {
-          obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
-          if(obj.name !== 'system.indexes'){
-            namespaces.push(obj.name)
-          }
-        })
+        if (result["namespaces"] !== null) {
+          result["namespaces"].forEach(function(obj) {
+            obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
+            if(obj.name !== 'system.indexes'){
+              namespaces.push(obj.name)
+            }
+          })
+        } else {
+          console.log("Namespaces not returned in the expected format.")
+        }
         done(namespaces)
       })
       .error(function(error) {
