@@ -1,7 +1,7 @@
 <div class="col-md-12 st-tab">
 	<ul class="nav nav-tabs" role="tablist">
 		<li ng-repeat="(name, obj) in apps | orderBy : name" ng-class="{'active': name===app}" repeat-end="app">
-			<a href="" ng-bind="name" ng-click="tab(name)"></a>
+			<a href="" ng-bind="name" ng-click="switch(name)"></a>
 		</li>
 	</ul>
 </div>
@@ -27,16 +27,41 @@
 					</li>
 					<li ng-if="!domains.length" class="list-group-item empty-list"><i>No domains added</i></li>
 					<li class="list-group-item oa-dom-input form-inline">
-						<div class="oa-dom-input-inpt" ng-class="{exp:(focus||domainInput)}">
+						<div class="oa-dom-input-inpt" ng-class="{exp:domainInput.length}">
 							<input type="text" class="form-control" placeholder="Add domain..." ng-model="domainInput"/>
 						</div>
-						<div class="oa-dom-input-btn" ng-show="domainInput">
+						<div class="oa-dom-input-btn" ng-show="domainInput.length">
 							<button type="submit" class="form-control btn btn-success"><span></span></button>
 						</div>
 					</li>
 				</form>
 				</ul>
-			</div><br>
+			</div>
+			<div>
+			<h4>Expiry time</h4>
+			<p>Choose a value from 60 minutes to 90 days.</p>
+			<p>
+				<u>Examples:</u>
+				<br>60m (60 minutes), 1d (1 day), 1w (1 week)
+			</p>
+			</div>
+			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
+			<div ng-hide="status" ng-class="{overlay: loading}">
+				<ul class="list-group oa-dom">
+				<form ng-submit="updateExpiry(timeInput)">
+					<li class="list-group-item empty-list"><i>Current value: <span ng-bind="readTime(expiryTime)"></span></i></li>
+					<li class="list-group-item oa-dom-input form-inline">
+						<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">
+							<input type="text" class="form-control" placeholder="Expiry time..." ng-model="timeInput"/>
+						</div>
+						<div class="oa-dom-input-btn oa-expiry" ng-show="timeInput">
+							<button type="submit" class="form-control btn btn-success" ng-disabled="!validate(timeInput)"><span></span></button>
+						</div>
+					</li>
+				</form>
+				</ul>
+			</div>
+			<br>
 		</div>
 		<div class="col-md-8">
 		  <h4>Provider settings</h4>

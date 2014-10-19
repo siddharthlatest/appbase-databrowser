@@ -73,10 +73,13 @@
                     <div class="input-line">
                         <div class="col-sm-10 url">
                             <div>
-                                <a ng-click="goToBrowser(appToURL(app));" ng-bind="appToURL(app)"></a>
+                                <a ng-click="goToBrowser(appToURL(app));$rootScope.currentApp=app;" ng-bind="appToURL(app)"></a>
                             </div>
                         </div>
-                        <div class="col-sm-2 analytics">
+                        <div class="col-sm-1 analytics">
+                            <a class="glyphicon glyphicon-lock" ng-click="goToOauth(app)"></a>
+                        </div>
+                        <div class="col-sm-1 analytics">
                             <a class="glyphicon glyphicon-stats" ng-click="goToStats(app)"></a>
                         </div>
                     </div>
