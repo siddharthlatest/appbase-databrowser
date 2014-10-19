@@ -15,6 +15,15 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-1 col-md-offset-11 text-left">
+                <div class="onoffswitch">
+                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ng-model="api" checked>
+                    <label class="onoffswitch-label" for="myonoffswitch">
+                        <span class="onoffswitch-inner"></span>
+                        <span class="onoffswitch-switch"></span>
+                    </label>
+                </div>
+            </div>
             <div class="form-horizontal col-md-6">
                 <div class="row wrapper well" ng-submit="createApp(newAppname); newAppname ='' ;">
                     <form>
@@ -73,7 +82,7 @@
                     <div class="input-line">
                         <div class="col-sm-10 url">
                             <div>
-                                <a ng-click="goToBrowser(appToURL(app));$rootScope.currentApp=app;" ng-bind="appToURL(app)"></a>
+                                <a ng-click="goToBrowser(appToURL(app, api));$rootScope.currentApp=app;" ng-bind="appToURL(app, api)"></a>
                             </div>
                         </div>
                         <div class="col-sm-1 analytics">

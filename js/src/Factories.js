@@ -112,8 +112,8 @@ function StringManipulationFactory(){
     return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
   }
 
-  stringManipulation.appToURL = function(app) {
-    return 'http://'+ app + '.' + 'api1.appbase.io/';
+  stringManipulation.appToURL = function(app, api) {
+    return 'http://'+ app + '.' + 'api'+(api?'1':'2')+'.appbase.io/';
   }
 
   return stringManipulation;
