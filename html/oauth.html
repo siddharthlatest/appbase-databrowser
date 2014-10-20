@@ -30,7 +30,7 @@
 				<ul class="list-group oa-dom">
 				<form ng-submit="addDomain(domainInput)">
 					<li ng-repeat="domain in domains" class="list-group-item oa-dom-item">
-						<span class="badge btn-danger" ng-click="removeDomain(domain)">&times;</span>
+						<span class="badge btn-danger" ng-show="domain !== 'localhost' && domain !== '127.0.0.1'" ng-click="removeDomain(domain)">&times;</span>
 						<div class="domain"><span ng-bind="domain"></span></div>
 					</li>
 					<li ng-if="!domains.length" class="list-group-item empty-list"><i>No domains added</i></li>
