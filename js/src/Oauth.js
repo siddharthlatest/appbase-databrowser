@@ -287,7 +287,7 @@ function OauthFactory($timeout, $q){
 
   oauth.createApp = function(appName, secret, domains){
     var deferred = $q.defer();
-    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, expiryTime: 1000*60*60*24*30})
+    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, tokenExpiry: 1000*60*60*24*30})
     .success(function(data){
       deferred.resolve(data);
     })
@@ -362,7 +362,7 @@ function OauthFactory($timeout, $q){
 
   oauth.updateTime = function(appName, time){
     var deferred = $q.defer();
-    atomic.post(url + 'apps/' + appName, {expiryTime: time})
+    atomic.post(url + 'apps/' + appName, {tokenExpiry: time})
     .success(function(data){
       deferred.resolve(data);
     })
