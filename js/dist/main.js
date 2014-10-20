@@ -761,6 +761,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
 }
 
 })();
+
 (function(){
 angular
 .module("abDataBrowser")
