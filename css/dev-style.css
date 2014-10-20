@@ -472,6 +472,28 @@ div[ng-view]{
   color: #2AD37A;
 }
 
+.oa-tit{
+	margin-top:10px;
+	margin-bottom: 7px;
+}
+
+.oa-tit b{
+	font-size: 18px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-weight: 500;
+	line-height: 1.1;
+}
+
+.oa-tit i{
+	font-size: 2.5em;
+	color:black;
+	border-bottom:1px dotted black;
+}
+
+.oa-tit span{
+	font-size: 2.5em;
+}
+
 .onoffswitch {
     position: relative; width: 80px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;

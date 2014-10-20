@@ -13,7 +13,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       $rootScope.$apply();
       if($rootScope.code) console.log('User has $50 coupon.');
     });
-    $rootScope.affiliate = false; 
+    $rootScope.affiliate = false;
     $scope.devProfile.emails.forEach(function(email){
       $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
         data: JSON.stringify({email: email.value}), contentType:"application/json; charset=utf-8",
@@ -23,20 +23,32 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
           $timeout(function(){
              if(data) $rootScope.affiliate = true;
           });
-        } 
+        }
       });
     });
-    var fetchApps = function() {
+    var fetchApps = function(newApp) {
       $scope.fetching = true;
       data.getDevsApps(function(apps) {
         $timeout(function(){
           for(var app in apps){
-            oauthFactory.getApp(app, apps[app].secret)
-            .then(function(data){
-              apps[app].oauth = data;
-            }, function(data){
-              throw data;
-            });
+            if(app === newApp){
+              oauthFactory.createApp(app, apps[app].secret, ['localhost'])
+              .then(function(data){
+                apps[app].oauth = data;
+                apps[app].oauth.data.domains = ['localhost'];
+                apps[app].oauth.data.keysets = [];
+                apps[app].oauth.data.secret = apps[app].secret;
+              }, function(data){
+                throw data;
+              });
+            } else {
+              oauthFactory.getApp(app, apps[app].secret)
+              .then(function(data){
+                apps[app].oauth = data;
+              }, function(data){
+                throw data;
+              });
+            }
           }
           $scope.fetching = false;
           $scope.apps = apps;
@@ -50,8 +62,8 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
         if(error) {
           alert('Name taken. Try another name.');
         } else {
-          fetchApps();
-        } 
+          fetchApps(app);
+        }
       })
     }
 

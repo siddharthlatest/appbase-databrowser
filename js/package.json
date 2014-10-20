@@ -9,10 +9,12 @@
   "author": "Henrique Sa",
   "license": "-",
   "dependencies": {
+    "connect": "^3.3.0",
     "gulp": "^3.8.8",
     "gulp-concat": "^2.4.1",
     "gulp-livereload": "^2.1.1",
     "gulp-notify": "^2.0.0",
-    "gulp-watch": "^1.1.0"
+    "gulp-watch": "^1.1.0",
+    "serve-static": "^1.7.0"
   }
 }

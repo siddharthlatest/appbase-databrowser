@@ -92,8 +92,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
         $scope.domains = oauth.domains;
         $scope.expiryTime = oauth.expiryTime || 1000*60*60*24*30;
         //not showing localhost and 127.0.0.1 in the view
-        if($scope.domains.indexOf('127.0.0.1') !== -1) $scope.domains.splice($scope.domains.indexOf('127.0.0.1'), 1);
-        if($scope.domains.indexOf('localhost') !== -1) $scope.domains.splice($scope.domains.indexOf('localhost'), 1);
       });
       if(oauth.keysets.length){
         oauthFactory.getKeySets(app, oauth.keysets)

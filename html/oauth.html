@@ -8,15 +8,23 @@
 <div class="col-md-12 oa-tab">
 	<div class="list">
 		<div class="col-md-4">
-			<h4>Authorized domains</h4>
-			<p>Only the domains listed here are allowed to make an oauth request on behalf of this app. You should add a domain here if you are planning to use it for user requests.</p>
-			<p>Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.</p>
-			<p>
-			  <u>Correct examples:</u>
-			  <br>https://domain.com, http://domain.com:3254, abc.domain.com
-			  <br><u>Incorrect Examples:</u>
-			  <br>domain.com/foobar/this
-			</p>
+			<div class="oa-tit">
+			<b >Authorized domains</b>
+			<a class="tooltipbal">
+			    <i>?</i>
+			    <span>
+			        <p>Only the domains listed here are allowed to make an oauth request on behalf of this app. You should add a domain here if you are planning to use it for user requests.</p>
+    				<p>Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.</p>
+    				<p>
+    				  <u>Correct examples:</u>
+    				  <br>https://domain.com, http://domain.com:3254, abc.domain.com
+    				  <br><u>Incorrect Examples:</u>
+    				  <br>domain.com/foobar/this
+    				</p>
+			    </span>
+			</a>
+			</div>
+				
 			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
 			<div ng-hide="status" ng-class="{overlay: loading}">
 				<ul class="list-group oa-dom">
