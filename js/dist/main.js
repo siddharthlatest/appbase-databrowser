@@ -880,7 +880,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   };
 
   $scope.validate = function(time){
-    var minTime = 1000*60*60, maxTime = 1000*60*60*24*90;
+    var minTime = 1000*60*60, maxTime = 1000*60*60*24*60;
     var valid = {'s':1000, 'm':1000*60, 'h':1000*60*60, 'd':1000*60*60*24, 'w':1000*60*60*24*7};
     if(/^[0-9]{1,}[smhdw]{1}$/.test(time)){
       for(var prop in valid){
