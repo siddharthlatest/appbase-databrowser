@@ -93,7 +93,6 @@ function StringManipulationFactory(){
   stringManipulation.cutLeadingTrailingSlashes = function(input) {
     if(typeof input !== 'string')
       return
-
     while(input.charAt(input.length - 1) === '/') {
       input = input.slice(0,-1);
     }
@@ -164,13 +163,19 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
   data.getNamespaces = function(done) {
     atomic.get(atob(server)+'app/'+ appName +'/namespaces')
       .success(function(result) {
+        if(result !== undefined && result.namesapces !== undefined && result.search_enabled !== undefined) {
+          return console.error("Unexpected response from server for namespaces:", result);
+        }
+      
         var namespaces = []
-        result.forEach(function(obj) {
+        result.namespaces.forEach(function(obj) {
           obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
-          if(obj.name !== 'system.indexes'){
-            namespaces.push(obj.name)
+          if(obj.name !== 'system.indexes') {
+            obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
+            namespaces.push(obj)
           }
         })
+        
         done(namespaces)
       })
       .error(function(error) {
@@ -278,10 +283,10 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
     root.expand = function() {
       root.children = []
       root.expanded = true
-      data.getNamespaces(function(namespaces) {
+      data.getNamespaces(function(namespaceObjs) {
         $timeout(function(){
-          namespaces.forEach(function(namespace) {
-            root.children.push(nodeBinding.bindAsNamespace($scope, namespace))
+          namespaceObjs.forEach(function(namespaceObj) {
+            root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable))
           })
         })
       })
@@ -294,7 +299,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
     return root
   }
 
-  nodeBinding.bindAsNamespace = function($scope, namespace) {
+  nodeBinding.bindAsNamespace = function($scope, namespace, searchable) {
     var ns =  {name: namespace, isNS: true}
     ns.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace))
@@ -321,7 +326,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
       ns.children = []
     }
 
-    ns.searchable = false;
+    ns.searchable = searchable || false;
     var ignoreToggleClick = false;
 
     ns.toggleSearch = function() {
