@@ -122,7 +122,7 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
   var data = {};
   var appName;
   var secret;
-  var server = "Ly9hcHBiYXNlYWNjb3VudHMuZWxhc3RpY2JlYW5zdGFsay5jb20v";
+  var server = "Ly9hY2NvdW50cy5hcHBiYXNlLmlvLw==";
 
   data.init = function(appName) {
     secret = session.getAppSecret(appName)
