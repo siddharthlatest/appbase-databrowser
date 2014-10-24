@@ -217,14 +217,16 @@ function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, dat
         $dialogScope.text = "in " + node.name
         $dialogScope.vTypeOptions = ['New Vertex', 'Existing Vertex']
         $dialogScope.vType = $dialogScope.vTypeOptions[0]
-        $dialogScope.namespaceN = 'asdkj'
 
         $dialogScope.namespaces = ['Loading..']
         data.getNamespaces(function(array) {
           $timeout(function() {
-            $dialogScope.namespaces = array
-          }) 
-        }) 
+            $dialogScope.namespaces = [];
+            for(var i=0; i< array.length; i++) {
+              $dialogScope.namespaces.push(array[i].name);
+            }
+          })
+        })
 
         //prevents user from choosing 'Loading..'
         $dialogScope.$watch( function() {
