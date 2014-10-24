@@ -283,13 +283,18 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
     root.expand = function() {
       root.children = []
       root.expanded = true
-      data.getNamespaces(function(namespaceObjs) {
-        $timeout(function(){
+      var existingNamespaces = [];
+      setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
+        console.log('fetched namespaces');
+        $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
-            root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable))
+            if(existingNamespaces.indexOf(namespaceObj.name) === -1) {
+              root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable))
+              existingNamespaces.push(namespaceObj.name)
+            }
           })
         })
-      })
+      }), 2000)
     }
     root.contract = function(){
       root.expanded = false
