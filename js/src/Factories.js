@@ -416,7 +416,8 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
     }
 
     vertex.removeSelfEdge = function() {
-      vertex.ref.inVertex().removeEdge(vertex.name);
+      var isARootVertex = (stringManipulation.parsePath(path).obj_path === undefined);
+      isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name); //destroy if root vertex, remove edge if not
     }
 
     vertex.addProperty = function(prop, value) {
