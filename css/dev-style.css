@@ -281,6 +281,11 @@ div[ng-view]>div{
 .tooltipbal b:hover{
 	color:black;
 }
+
+.tooltipbal b span{
+  display:inline
+}
+
 .tooltipbal strong {line-height:30px;}
 .tooltipbal:hover {text-decoration:none;} 
 .tooltipbal span {
