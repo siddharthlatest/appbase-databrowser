@@ -2,7 +2,6 @@
  * Created by Sagar on 30/8/14.
  */
 (function(){
-OAuth.initialize('fjDZzYff0kMpDgKVm9dBkeb439g');
 angular.module("abDataBrowser", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'ngDialog', 'easypiechart', 'ngAnimate'])
   .run(FirstRun)
   .config(Routes);
