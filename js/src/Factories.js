@@ -157,7 +157,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   }
 
   data.setAppCredentials = function(app, s) {
-    Appbase.credentials(app, s);
+    $appbase.credentials(app, s);
     appName = app;
     secret = s;
     stringManipulation.setBaseUrl(stringManipulation.appToURL(appName));
