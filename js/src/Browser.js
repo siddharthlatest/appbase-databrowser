@@ -108,9 +108,7 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
           if(node.isV) {
             if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
             else node.ref.setEdge(params.eName, params.ref)
-          } else if(node.isNS) {
-            node.children.unshift(nodeBinding.bindAsVertex($scope, params.namespace + '/' + params.vId))
-          } else {
+          } else if(node.isR) {
             node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
           }
           $dialogScope.closeThisDialog()
