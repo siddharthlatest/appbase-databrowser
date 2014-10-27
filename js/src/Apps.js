@@ -4,7 +4,7 @@ angular
 .controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', 'oauthFactory', '$appbase', AppsCtrl]);
 
 function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, $appbase) {
-  $scope.api = true;
+  $scope.api = false;
   Prism.highlightAll();
   if($scope.devProfile = session.getProfile()) {
     $rootScope.logged = true;
