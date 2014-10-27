@@ -156,11 +156,11 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
 angular
 .module("abDataBrowser")
 .controller("browser",
-             ['$scope', '$appbaseRef', '$timeout', '$routeParams', '$location',
+             ['$scope', '$appbase', '$timeout', '$routeParams', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl]);
 
-function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope){
+function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope){
   $scope.alertType = 'danger';
   $scope.goToBrowser = $rootScope.goToBrowser;
 
@@ -209,7 +209,7 @@ function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, dat
         if (!node.isV) {
           $dialogScope.title = "Add Vertex"
         } else {
-          $dialogScope.title = "Add Out-vertex at path: " + node.$ref.$path();
+          $dialogScope.title = "Add Out-vertex at path: " + node.ref.path();
         }
         if(node.isNS) {
           $dialogScope.namespaceSelected = node.name
@@ -242,16 +242,17 @@ function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, dat
               params.namespace =
                 ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
                 $dialogScope.namespaceNew : $dialogScope.namespaceSelected
-              params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? Appbase.uuid() : $dialogScope.vId
-              params.ref = $appbaseRef(Appbase.create(params.namespace, params.vId))
+              params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? $appbase.uuid() : $dialogScope.vId
+              params.ref = $appbase.ns(params.namespace).v(params.vId)
             } else {
               params.vPath = $dialogScope.vPath
-              params.ref = $appbaseRef(params.vPath)
+              var parsedPath = stringManipulation.parsePath(params.vPath);
+              params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
             }
 
             params.eName = 
               ($dialogScope.eName === undefined || $dialogScope.eName === "") ?
-              (params.vId === undefined? Appbase.uuid() : params.vId) : $dialogScope.eName
+              (params.vId === undefined? $appbase.uuid() : params.vId) : $dialogScope.eName
             params.pR = ($dialogScope.pR === undefined || $dialogScope.pR === null) ? undefined : $dialogScope.pR
 
             return params
@@ -259,10 +260,9 @@ function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, dat
 
           var params = prepareParams()
           if(node.isV) {
-            node.$ref.$setEdge(params.ref, params.eName, params.pR)
-          } else if(node.isNS) {
-            node.children.unshift(nodeBinding.bindAsVertex($scope, params.namespace + '/' + params.vId))
-          } else {
+            if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
+            else node.ref.setEdge(params.eName, params.ref)
+          } else if(node.isR) {
             node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
           }
           $dialogScope.closeThisDialog()
@@ -338,8 +338,8 @@ angular
 .module("abDataBrowser")
 .factory('stringManipulation', StringManipulationFactory)
 .factory('session', ['stringManipulation', '$rootScope', SessionFactory])
-.factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbaseRef', '$rootScope', NodeBinding])
-.factory('data', ['$timeout', '$location', '$appbaseRef', 'stringManipulation', 'session', '$rootScope', DataFactory]);
+.factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbase', '$rootScope', NodeBinding])
+.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', 'session', '$rootScope', DataFactory]);
 
 function SessionFactory(stringManipulation, $rootScope){
   var session = {};
@@ -362,7 +362,6 @@ function SessionFactory(stringManipulation, $rootScope){
   };
 
   session.setBrowserURL = function(url) {
-    console.log('storing', url);
     sessionStorage.setItem('URL', url);
     $rootScope.currentApp = stringManipulation.urlToAppname(url);
   };
@@ -412,17 +411,40 @@ function StringManipulationFactory(){
   stringManipulation.pathToUrl = function(path) {
     return baseUrl + path
   }
+  
+  stringManipulation.parsePath = function(path) {
+    return stringManipulation.parseURL(stringManipulation.pathToUrl(path));
+  }
 
   stringManipulation.parseURL = function(url) {
-    var intermediate = url;
-    intermediate = intermediate === undefined? undefined: url.split(/\/\/(.+)?/)[1]
-    intermediate = intermediate === undefined? undefined: intermediate.split(/\.(.+)?/)
-    var appname = intermediate === undefined? undefined: intermediate[0]
-    var path = intermediate === undefined? undefined: intermediate[1].split(/\/(.+)?/)[1]
-    return {
-      appName: appname,
-      path: path
+    var intermediate, appname, version, path, namespace, key, obj_path, v;
+    intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
+    intermediate = intermediate[1].split(/\/(.+)?/)[1].split(/\/(.+)?/);
+    appname = intermediate[0];
+    intermediate = intermediate[1].split(/\/(.+)?/);
+    version = intermediate[0];
+    path = intermediate[1];
+    if(path) {
+      intermediate = path.split(/\/(.+)?/);
+      namespace = intermediate[0];
+      v = intermediate[1];
+      key;
+      obj_path;
+      if(v) {
+        intermediate = v.split(/\/(.+)?/);
+        key = intermediate[0];
+        obj_path = intermediate[1];
+      }
     }
+    var retObj = {
+      appName: appname,
+      ns: namespace,
+      key: key,
+      obj_path: obj_path,
+      path: path,
+      v: v
+    }
+    return retObj;
   }
 
   stringManipulation.cutLeadingTrailingSlashes = function(input) {
@@ -447,13 +469,13 @@ function StringManipulationFactory(){
   }
 
   stringManipulation.appToURL = function(app, api) {
-    return 'http://'+ app + '.' + 'api'+(api?'1':'2')+'.appbase.io/';
+    return "https://api.appbase.io/"+ app +"/v" + (api? "1": "2") + "/";
   }
 
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbaseRef, stringManipulation, session, $rootScope) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, session, $rootScope) {
   var data = {};
   var appName;
   var secret;
@@ -470,8 +492,7 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
   }
 
   data.setAppCredentials = function(app, s) {
-    console.log('creds for ', app)
-    Appbase.credentials(app, s);
+    $appbase.credentials(app, s);
     appName = app;
     secret = s;
     stringManipulation.setBaseUrl(stringManipulation.appToURL(appName));
@@ -606,64 +627,83 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
   return data;
 }
 
-function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope) {
+function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
   var nodeBinding = {};
   nodeBinding.bindAsRoot = function($scope) {
-    var root = {isR: true}
-    console.log('root')
-    root.name = stringManipulation.getBaseUrl()
+    var root = {isR: true};
+    console.log('root');
+    root.name = stringManipulation.getBaseUrl();
     root.meAsRoot = function() {
-      $rootScope.goToBrowser(stringManipulation.pathToUrl(''))
+      $rootScope.goToBrowser(stringManipulation.pathToUrl(''));
     }
     root.expand = function() {
-      root.children = []
-      root.expanded = true
+      root.children = [];
+      root.expanded = true;
       var existingNamespaces = [];
       setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
         console.log('fetched namespaces');
         $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
             if(existingNamespaces.indexOf(namespaceObj.name) === -1) {
-              root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable))
-              existingNamespaces.push(namespaceObj.name)
+              root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
+              existingNamespaces.push(namespaceObj.name);
             }
           })
         })
       }), 2000)
     }
     root.contract = function(){
-      root.expanded = false
-      root.children = []
+      root.expanded = false;
+      root.children = [];
     }
 
     return root
   }
+  
+  var vertexBindCallbacks = {
+    onAdd :function(scope, vData, vRef, done) {
+      nodeBinding.bindAsVertex(scope, vRef.path(), vData);
+      done();
+
+      $timeout(function() {
+        vData.color = 'white';
+      }, 500);
+    },
+    onUnbind : function(scope, vData, vRef) {
+      vData.ref && vData.ref.unbind();
+    },
+    onRemove : function(scope, vData, vRef, done) {
+      $timeout(function() {
+        vData.color = 'tomato';
+      });
+
+      $timeout(function() {
+        done();
+      }, 500)
+    },
+    onChange : function(scope, vData, vRef, done) {
+      vData.color = 'gold';
+      done();
+
+      $timeout(function() {
+        vData.color = 'white';
+      }, 500);
+    }
+  }
 
   nodeBinding.bindAsNamespace = function($scope, namespace, searchable) {
-    var ns =  {name: namespace, isNS: true}
+    var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
-      $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace))
+      $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace));
     }
-    ns.expand = function(){
-      ns.children = []
-      ns.expanded = true
-      data.getVerticesOfNamespace(namespace, function(vertices) {
-        $timeout(function() {
-          vertices.forEach(function(vertexPath) {
-            console.log(vertexPath)
-            ns.children.push(nodeBinding.bindAsVertex($scope, vertexPath))
-          })
-        })
-      })
-      // Appbase.ns(namespace).on('vertex_added', function(err, vref){
-      //   $timeout(function(){
-      //     ns.children.push(nodeBinding.bindAsVertex($scope, stringManipulation.urlToPath(vref.URL())));
-      //   });
-      // });
+    ns.expand = function() {
+      ns.children = ns.ref.bindVertices($scope, vertexBindCallbacks);
+      ns.expanded = true;
     }
+    
     ns.contract = function() {
-      ns.expanded = false
-      ns.children = []
+      ns.expanded = false;
+      ns.ref.unbindVertices();
     }
 
     ns.searchable = searchable || false;
@@ -676,98 +716,66 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
       data.namespaceSearchOptions(namespace, !ns.searchable, $timeout.bind(null, function() {
         ns.searchable = !ns.searchable;
         ignoreToggleClick = false;
-      }))
+      }));
     }
     return ns
   }
 
   nodeBinding.bindAsVertex = function($scope, path, useThisVertex) {
-    console.log(path, useThisVertex)
-    var bindEdges = function($ref) {
-      return $ref.$bindEdges($scope, true, false, {
-        onAdd :function(scope, edgeData, edgeRef, done) {
-          edgeData.$ref = $appbaseRef(edgeRef)
-          nodeBinding.bindAsVertex($scope, edgeRef.path(), edgeData)
-          done()
-
-          $timeout(function() {
-            edgeData.color = 'white'
-          }, 500)
-        },
-        onUnbind : function(scope, edgeData, edgeRef) {
-          edgeData.$ref && edgeData.$ref.$unbind()
-        },
-        onRemove : function(scope, edgeData, edgeRef, done) {
-          $timeout(function() {
-            edgeData.color = 'tomato'
-          })
-
-          $timeout(function() {
-            done()
-          }, 500)
-        },
-        onChange : function(scope, edgeData, edgeRef, done) {
-          edgeData.color = 'gold'
-          done()
-
-          $timeout(function() {
-            edgeData.color = 'white'
-          }, 500)
-        }
-      })
-    }
-
+    
+    var parsedPath = stringManipulation.parsePath(path);
     var vertex = useThisVertex || {
-      $ref: $appbaseRef(path)
+      ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
     }
 
     vertex.isV = true
 
     vertex.expand = function() {
-      vertex.expanded = true
-      vertex.children = bindEdges(vertex.$ref)
+      vertex.expanded = true;
+      vertex.children = vertex.ref.bindEdges($scope, vertexBindCallbacks);
     }
 
     vertex.meAsRoot = function() {
-      $rootScope.goToBrowser(stringManipulation.pathToUrl(path))
+      $rootScope.goToBrowser(stringManipulation.pathToUrl(path));
     }
 
-    vertex.color = 'yellowgreen'
+    vertex.color = 'yellowgreen';
 
     vertex.contract = function() {
-      vertex.expanded = false
-      vertex.$ref.$unbindEdges()
+      vertex.expanded = false;
+      vertex.ref.unbindEdges();
     }
 
     vertex.removeProperty = function(prop) {
-      vertex.$ref.$removeData([prop])
+      vertex.ref.removeData([prop]);
     }
 
     vertex.removeSelfEdge = function() {
-      vertex.$ref.$inVertex().$removeEdge(vertex.name)
+      var isARootVertex = (stringManipulation.parsePath(path).obj_path === undefined);
+      isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name); //destroy if root vertex, remove edge if not
     }
 
     vertex.addProperty = function(prop, value) {
-      var vData = {}
-      vData[prop] = value
-      vertex.$ref.$setData(vData)
+      var vData = {};
+      vData[prop] = value;
+      vertex.ref.setData(vData);
     }
 
     if(useThisVertex === undefined) {
-      vertex.properties = vertex.$ref.$bindProperties($scope, {
+      vertex.properties = vertex.ref.bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
           if(vertex.color == 'white')
-            vertex.color = 'gold'
-          done()
+            vertex.color = 'gold';
+          done();
 
           $timeout(function() {
-            vertex.color = 'white'
-          }, 500)
+            vertex.color = 'white';
+          }, 500);
         }
       })
-      vertex.name = path.slice(path.lastIndexOf('/') + 1)
+      vertex.name = path.slice(path.lastIndexOf('/') + 1);
     }
-    return vertex
+    return vertex;
   }
   return nodeBinding;
 }
