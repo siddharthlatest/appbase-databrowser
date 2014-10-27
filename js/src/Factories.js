@@ -27,7 +27,6 @@ function SessionFactory(stringManipulation, $rootScope){
   };
 
   session.setBrowserURL = function(url) {
-    console.log('storing', url);
     sessionStorage.setItem('URL', url);
     $rootScope.currentApp = stringManipulation.urlToAppname(url);
   };
@@ -83,7 +82,7 @@ function StringManipulationFactory(){
   }
 
   stringManipulation.parseURL = function(url) {
-    var intermediate, appname, version, path, namespace, key, obj_path;
+    var intermediate, appname, version, path, namespace, key, obj_path, v;
     intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
     intermediate = intermediate[1].split(/\/(.+)?/)[1].split(/\/(.+)?/);
     appname = intermediate[0];
@@ -93,10 +92,11 @@ function StringManipulationFactory(){
     if(path) {
       intermediate = path.split(/\/(.+)?/);
       namespace = intermediate[0];
+      v = intermediate[1];
       key;
       obj_path;
-      if(intermediate[1]) {
-        intermediate = intermediate[1].split(/\/(.+)?/);
+      if(v) {
+        intermediate = v.split(/\/(.+)?/);
         key = intermediate[0];
         obj_path = intermediate[1];
       }
@@ -106,7 +106,8 @@ function StringManipulationFactory(){
       ns: namespace,
       key: key,
       obj_path: obj_path,
-      path: path
+      path: path,
+      v: v
     }
     return retObj;
   }
@@ -368,11 +369,9 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
   }
 
   nodeBinding.bindAsVertex = function($scope, path, useThisVertex) {
-    console.log(path, useThisVertex)
-    var bindEdges = function($ref) {
-      return $ref.$bindEdges($scope, true, false, {
+    var bindEdges = function(ref) {
+      return ref.bindEdges($scope, {
         onAdd :function(scope, edgeData, edgeRef, done) {
-          edgeData.$ref = $appbase(edgeRef)
           nodeBinding.bindAsVertex($scope, edgeRef.path(), edgeData)
           done()
 
@@ -381,7 +380,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
           }, 500)
         },
         onUnbind : function(scope, edgeData, edgeRef) {
-          edgeData.$ref && edgeData.$ref.$unbind()
+          edgeData.ref && edgeData.ref.unbind()
         },
         onRemove : function(scope, edgeData, edgeRef, done) {
           $timeout(function() {
@@ -402,16 +401,17 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
         }
       })
     }
-
+    
+    var parsedPath = stringManipulation.parsePath(path);
     var vertex = useThisVertex || {
-      $ref: $appbase(path)
+      ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
     }
 
     vertex.isV = true
 
     vertex.expand = function() {
       vertex.expanded = true
-      vertex.children = bindEdges(vertex.$ref)
+      vertex.children = bindEdges(vertex.ref)
     }
 
     vertex.meAsRoot = function() {
@@ -422,25 +422,25 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
 
     vertex.contract = function() {
       vertex.expanded = false
-      vertex.$ref.$unbindEdges()
+      vertex.ref.unbindEdges()
     }
 
     vertex.removeProperty = function(prop) {
-      vertex.$ref.$removeData([prop])
+      vertex.ref.removeData([prop])
     }
 
     vertex.removeSelfEdge = function() {
-      vertex.$ref.$inVertex().$removeEdge(vertex.name)
+      vertex.ref.inVertex().removeEdge(vertex.name)
     }
 
     vertex.addProperty = function(prop, value) {
       var vData = {}
       vData[prop] = value
-      vertex.$ref.$setData(vData)
+      vertex.ref.setData(vData)
     }
 
     if(useThisVertex === undefined) {
-      vertex.properties = vertex.$ref.$bindProperties($scope, {
+      vertex.properties = vertex.ref.bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
           if(vertex.color == 'white')
             vertex.color = 'gold'
