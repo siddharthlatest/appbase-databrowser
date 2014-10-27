@@ -1,9 +1,9 @@
 (function(){
 angular
 .module("abDataBrowser")
-.controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', 'oauthFactory', AppsCtrl]);
+.controller("apps", ['$scope', 'session', '$route', 'data', '$timeout', 'stringManipulation', '$rootScope', 'oauthFactory', '$appbase', AppsCtrl]);
 
-function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory){
+function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, $appbase) {
   $scope.api = true;
   Prism.highlightAll();
   if($scope.devProfile = session.getProfile()) {
@@ -58,6 +58,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     $scope.logout = function() {
       $timeout(function(){
         $rootScope.logged = false;
+        $appbase.unauth();
         session.setApps(null);
         session.setProfile(null);
         $route.reload();
@@ -68,16 +69,14 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     fetchApps()
   } else {
     $scope.loginPopup = function() {
-      OAuth.popup('google')
-        .done(function(result) {
-          result.me()
-            .done(function(profile) {
-              session.setProfile(profile.raw);
-              $route.reload();
-            })
-            .fail(console.log.bind(console))
-        })
-        .fail(console.log.bind(console))
+      $appbase.credentials('aphrodite');
+      $appbase.authPopup('google', { authorize: { scope: ['openid email'] } }, function(error, result, req) {
+        if(error) {
+          throw error;
+        }
+        session.setProfile(result.raw);
+        $route.reload();
+      })
     }
   }
   $rootScope.$watch('fetching', function(data){
