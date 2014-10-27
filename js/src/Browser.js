@@ -55,7 +55,7 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
         if (!node.isV) {
           $dialogScope.title = "Add Vertex"
         } else {
-          $dialogScope.title = "Add Out-vertex at path: " + node.$ref.$path();
+          $dialogScope.title = "Add Out-vertex at path: " + node.ref.path();
         }
         if(node.isNS) {
           $dialogScope.namespaceSelected = node.name
@@ -88,16 +88,17 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
               params.namespace =
                 ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
                 $dialogScope.namespaceNew : $dialogScope.namespaceSelected
-              params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? Appbase.uuid() : $dialogScope.vId
-              params.ref = $appbase(Appbase.create(params.namespace, params.vId))
+              params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? $appbase.uuid() : $dialogScope.vId
+              params.ref = $appbase.ns(params.namespace).v(params.vId)
             } else {
               params.vPath = $dialogScope.vPath
-              params.ref = $appbase(params.vPath)
+              var parsedPath = stringManipulation.parsePath(params.vPath);
+              params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
             }
 
             params.eName = 
               ($dialogScope.eName === undefined || $dialogScope.eName === "") ?
-              (params.vId === undefined? Appbase.uuid() : params.vId) : $dialogScope.eName
+              (params.vId === undefined? $appbase.uuid() : params.vId) : $dialogScope.eName
             params.pR = ($dialogScope.pR === undefined || $dialogScope.pR === null) ? undefined : $dialogScope.pR
 
             return params
@@ -105,7 +106,8 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
 
           var params = prepareParams()
           if(node.isV) {
-            node.$ref.$setEdge(params.ref, params.eName, params.pR)
+            if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
+            else node.ref.setEdge(params.eName, params.ref)
           } else if(node.isNS) {
             node.children.unshift(nodeBinding.bindAsVertex($scope, params.namespace + '/' + params.vId))
           } else {
