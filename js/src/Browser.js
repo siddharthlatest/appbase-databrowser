@@ -2,11 +2,11 @@
 angular
 .module("abDataBrowser")
 .controller("browser",
-             ['$scope', '$appbaseRef', '$timeout', '$routeParams', '$location',
+             ['$scope', '$appbase', '$timeout', '$routeParams', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl]);
 
-function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope){
+function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope){
   $scope.alertType = 'danger';
   $scope.goToBrowser = $rootScope.goToBrowser;
 
@@ -89,10 +89,10 @@ function BrowserCtrl($scope, $appbaseRef, $timeout, $routeParams, $location, dat
                 ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
                 $dialogScope.namespaceNew : $dialogScope.namespaceSelected
               params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? Appbase.uuid() : $dialogScope.vId
-              params.ref = $appbaseRef(Appbase.create(params.namespace, params.vId))
+              params.ref = $appbase(Appbase.create(params.namespace, params.vId))
             } else {
               params.vPath = $dialogScope.vPath
-              params.ref = $appbaseRef(params.vPath)
+              params.ref = $appbase(params.vPath)
             }
 
             params.eName = 

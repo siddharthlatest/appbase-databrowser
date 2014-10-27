@@ -3,8 +3,8 @@ angular
 .module("abDataBrowser")
 .factory('stringManipulation', StringManipulationFactory)
 .factory('session', ['stringManipulation', '$rootScope', SessionFactory])
-.factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbaseRef', '$rootScope', NodeBinding])
-.factory('data', ['$timeout', '$location', '$appbaseRef', 'stringManipulation', 'session', '$rootScope', DataFactory]);
+.factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbase', '$rootScope', NodeBinding])
+.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', 'session', '$rootScope', DataFactory]);
 
 function SessionFactory(stringManipulation, $rootScope){
   var session = {};
@@ -77,17 +77,38 @@ function StringManipulationFactory(){
   stringManipulation.pathToUrl = function(path) {
     return baseUrl + path
   }
+  
+  stringManipulation.parsePath = function(path) {
+    return stringManipulation.parseURL(stringManipulation.pathToUrl(path));
+  }
 
   stringManipulation.parseURL = function(url) {
-    var intermediate = url;
-    intermediate = intermediate === undefined? undefined: url.split(/\/\/(.+)?/)[1]
-    intermediate = intermediate === undefined? undefined: intermediate.split(/\.(.+)?/)
-    var appname = intermediate === undefined? undefined: intermediate[0]
-    var path = intermediate === undefined? undefined: intermediate[1].split(/\/(.+)?/)[1]
-    return {
+    var intermediate, appname, version, path, namespace, key, obj_path;
+    intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
+    intermediate = intermediate[1].split(/\/(.+)?/)[1].split(/\/(.+)?/);
+    appname = intermediate[0];
+    intermediate = intermediate[1].split(/\/(.+)?/);
+    version = intermediate[0];
+    path = intermediate[1];
+    if(path) {
+      intermediate = path.split(/\/(.+)?/);
+      namespace = intermediate[0];
+      key;
+      obj_path;
+      if(intermediate[1]) {
+        intermediate = intermediate[1].split(/\/(.+)?/);
+        key = intermediate[0];
+        obj_path = intermediate[1];
+      }
+    }
+    var retObj = {
       appName: appname,
+      ns: namespace,
+      key: key,
+      obj_path: obj_path,
       path: path
     }
+    return retObj;
   }
 
   stringManipulation.cutLeadingTrailingSlashes = function(input) {
@@ -112,13 +133,13 @@ function StringManipulationFactory(){
   }
 
   stringManipulation.appToURL = function(app, api) {
-    return 'http://'+ app + '.' + 'api'+(api?'1':'2')+'.appbase.io/';
+    return "https://api.appbase.io/"+ app +"/v" + (api? "1": "2") + "/";
   }
 
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbaseRef, stringManipulation, session, $rootScope) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, session, $rootScope) {
   var data = {};
   var appName;
   var secret;
@@ -271,7 +292,7 @@ function DataFactory($timeout, $location, $appbaseRef, stringManipulation, sessi
   return data;
 }
 
-function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope) {
+function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
   var nodeBinding = {};
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true}
@@ -351,7 +372,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
     var bindEdges = function($ref) {
       return $ref.$bindEdges($scope, true, false, {
         onAdd :function(scope, edgeData, edgeRef, done) {
-          edgeData.$ref = $appbaseRef(edgeRef)
+          edgeData.$ref = $appbase(edgeRef)
           nodeBinding.bindAsVertex($scope, edgeRef.path(), edgeData)
           done()
 
@@ -383,7 +404,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbaseRef, $rootScope
     }
 
     var vertex = useThisVertex || {
-      $ref: $appbaseRef(path)
+      $ref: $appbase(path)
     }
 
     vertex.isV = true
