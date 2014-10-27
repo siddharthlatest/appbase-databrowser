@@ -41,10 +41,6 @@ function SessionFactory(stringManipulation, $rootScope){
       URL = apps ? stringManipulation.appToURL(Object.keys(apps)[0]) : undefined;
     }
     return URL;
-
-    //console.log('stored',  sessionStorage.getItem('URL'));
-    //URL = (URL = sessionStorage.getItem('URL')) !== null ? URL : ((apps = session.getApps()) !== null)
-    //? stringManipulation.appToURL(Object.keys(apps)[0]) : undefined;
   };
 
   session.getProfile = function() {
@@ -82,6 +78,7 @@ function StringManipulationFactory(){
   }
 
   stringManipulation.parseURL = function(url) {
+    if(!url) return {}; //return empty object for undefined
     var intermediate, appname, version, path, namespace, key, obj_path, v;
     intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
     intermediate = intermediate[1].split(/\/(.+)?/)[1].split(/\/(.+)?/);
@@ -225,14 +222,11 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   data.createApp = function(app, done) {
     atomic.put(atob(server)+'app/'+ app)
       .success(function(response) {
-        console.log(response);
         if(typeof response === "string") {
           done(response)
         } else if(typeof response === "object") {
-          console.log(session.getProfile().id, app)
           atomic.put(atob(server)+'user/'+ session.getProfile().id, {"appname":app})
             .success(function(result) {
-              console.log(result)
               done(null)
             })
             .error(function(error) {
@@ -258,7 +252,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
           appsAndSecrets[app].secret = secret;
           appsAndSecrets[app].metrics = metrics;
           if(appsArrived === apps.length) {
-            console.log(appsAndSecrets);
             done(appsAndSecrets);
           }
         }
@@ -266,7 +259,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
           data.getAppsSecret(app, function(secret) {
             atomic.get(atob(server)+'app/'+app+'/metrics')
               .success(function(metrics){
-                console.log(app, secret, metrics);
                 secretArrived(app, secret, metrics);
               });
           });
@@ -296,7 +288,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
   var nodeBinding = {};
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
-    console.log('root');
     root.name = stringManipulation.getBaseUrl();
     root.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(''));
@@ -306,7 +297,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
       root.expanded = true;
       var existingNamespaces = [];
       setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
-        console.log('fetched namespaces');
         $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
             if(existingNamespaces.indexOf(namespaceObj.name) === -1) {
