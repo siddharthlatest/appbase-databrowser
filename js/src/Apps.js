@@ -8,24 +8,23 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   Prism.highlightAll();
   if($scope.devProfile = session.getProfile()) {
     $rootScope.logged = true;
-    $.post('http://162.243.5.104:8080/u', {user: $scope.devProfile.id}).done(function(data){
+    $.post('http://162.243.5.104:8080/u', {user: $scope.devProfile.uid}).done(function(data){
       $rootScope.code = (data == "true");
       $rootScope.$apply();
       if($rootScope.code) console.log('User has $50 coupon.');
     });
     $rootScope.affiliate = false; 
-    $scope.devProfile.emails.forEach(function(email){
-      $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
-        data: JSON.stringify({email: email.value}), contentType:"application/json; charset=utf-8",
-        dataType:"json",
-        success: function(data){
-          console.log(email.value, ': ', data)
-          $timeout(function(){
-             if(data) $rootScope.affiliate = true;
-          });
-        } 
-      });
+    $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
+      data: JSON.stringify({email: $scope.devProfile.email}), contentType:"application/json; charset=utf-8",
+      dataType:"json",
+      success: function(data){
+        console.log($scope.devProfile.email, ': ', data)
+        $timeout(function(){
+           if(data) $rootScope.affiliate = true;
+        });
+      } 
     });
+    
     var fetchApps = function() {
       $scope.fetching = true;
       data.getDevsApps(function(apps) {
@@ -68,15 +67,17 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     $scope.appToURL = stringManipulation.appToURL;
     fetchApps()
   } else {
-    $scope.loginPopup = function() {
+    $scope.loginPopup = function(provider) {
       $appbase.credentials('aphrodite');
-      $appbase.authPopup('google', { authorize: { scope: ['openid email'] } }, function(error, result, req) {
-        if(error) {
-          throw error;
+      $appbase.authPopup(provider, provider === 'google' ? { authorize: { scope: ['openid email'] } } : {},
+          function(error, result, req) {
+          if(error) {
+            throw error;
+          }
+          session.setProfile(result);
+          $route.reload();
         }
-        session.setProfile(result.raw);
-        $route.reload();
-      })
+      )
     }
   }
   $rootScope.$watch('fetching', function(data){

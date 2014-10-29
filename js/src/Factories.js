@@ -225,7 +225,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         if(typeof response === "string") {
           done(response)
         } else if(typeof response === "object") {
-          atomic.put(atob(server)+'user/'+ session.getProfile().id, {"appname":app})
+          atomic.put(atob(server)+'user/'+ session.getProfile().uid, {"appname":app})
             .success(function(result) {
               done(null)
             })
@@ -242,7 +242,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   }
 
   data.getDevsApps = function(done) {
-    atomic.get(atob(server)+'user/'+ session.getProfile().id)
+    atomic.get(atob(server)+'user/'+ session.getProfile().uid)
       .success(function(apps) {
         var appsAndSecrets = {};
         var appsArrived = 0;
