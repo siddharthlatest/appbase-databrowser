@@ -262,7 +262,9 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
             if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
             else node.ref.setEdge(params.eName, params.ref)
           } else if(node.isR) {
-            node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
+            if(!nodeBinding.childExists(node, params.namespace)) {
+              node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
+            }
           }
           $dialogScope.closeThisDialog()
         }
@@ -620,6 +622,15 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
 
 function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
   var nodeBinding = {};
+  nodeBinding.childExists = function(node, childName) {
+    for(var i=0 ; i<node.children.length; i++) {
+       if(node.children[i].name === childName) {
+         return true;
+       }
+    }
+    return false;
+  };
+  
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();

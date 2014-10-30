@@ -286,6 +286,15 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
 
 function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
   var nodeBinding = {};
+  nodeBinding.childExists = function(node, childName) {
+    for(var i=0 ; i<node.children.length; i++) {
+       if(node.children[i].name === childName) {
+         return true;
+       }
+    }
+    return false;
+  };
+  
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();
