@@ -304,13 +304,11 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
     root.expand = function() {
       root.children = [];
       root.expanded = true;
-      var existingNamespaces = [];
       setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
         $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
-            if(existingNamespaces.indexOf(namespaceObj.name) === -1) {
+            if(!nodeBinding.childExists(root, namespaceObj.name)) {
               root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
-              existingNamespaces.push(namespaceObj.name);
             }
           })
         })
