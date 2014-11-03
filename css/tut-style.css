@@ -1,0 +1,83 @@
+.tut-matter h1{
+    font-family: corbert;
+    font-size: 100%;
+}
+
+.tut-matter p {
+    font-family: sanspro;
+    font-size: 90%;
+}
+
+.tut-matter ul{
+    font-family: corbert;
+    font-size: 90%;
+}
+
+.tut-matter li{
+    font-family: corbert;
+    font-size: 90%;
+}
+
+.tut-head {
+  font-family: corbert;
+  font-size: 100%;
+}
+
+.tut-text{
+  font-family: corbert;
+  font-size: 90%;
+}
+
+.pagination li a {
+  font-family: corbert;
+}
+
+.pagination li a:hover {
+  background-color: #428BCA;
+}
+
+.pagination .disabled a:hover {
+  background-color: gray;
+}
+
+.pagination li a {
+  margin-left: 0.5px;
+  margin-right: 0.5px;
+}
+
+.editor-container {
+  max-height: 20.5em;
+  overflow: auto;
+  width: 35em;
+}
+
+.tut-matter-container {
+  max-height: 22.5em;
+  overflow-y: auto;
+  width: 21em; 
+  margin-left: 3em; 
+  background-color: white;
+}
+
+.next-button {
+  padding: 2px 4px! important;
+}
+
+.orangify {
+  background: #FF9900! important;
+}
+
+.glyph-align {
+  vertical-align: middle;
+}
+
+.CodeMirror-code {
+  font-family: Consolas, Monaco, 'Andale Mono', monospace !important;
+}
+
+.suggestion-box {
+  vertical-align: middle;
+  background: url(../images/light_dots.png);
+  padding-bottom: 0.1em;
+  width: 35em;
+}

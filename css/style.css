@@ -1,0 +1,195 @@
+@font-face {
+  	font-family: "corbert";
+  	src: url(../fonts/Corbert-Regular-webfont.ttf);
+}
+@font-face {
+	font-family: "sanspro";
+	src: url(../fonts/SourceSansPro-Light.otf);
+}
+/*-------------------------------Common-------------------------------*/
+html{
+	min-width: 320px;
+}
+html,body {
+    width: 100%;
+/*    height: 100%;
+*/    position: relative;
+}
+
+ul{
+	padding-left:10px;
+	text-align: justify;
+}
+img, object{
+	width: 100%;
+}
+a:-webkit-any-link{
+	cursor: auto;
+}
+/*-------------------------------Common-------------------------------*/
+
+h1{
+	color: rgb(41, 120, 176);
+	font-size: 1.5em;
+}
+.row{
+	font-size: 1.5em;
+}
+
+.navbar-nav > li {
+	margin-left:20px;
+	font-size:17px;
+}
+
+.navbar .nav > li > a {
+  font-family: corbert;
+}
+
+#landing {
+	padding-top: 20px !important;
+	background: url(../images/light_dots.png);
+	width: 100%;
+	padding: 0px;
+	font-size: 2.5em;
+	text-align: center;
+}
+
+#landing > div {
+	width: 100%;
+}
+
+@media screen and (min-width: 992px){
+	.container:nth-child(even){
+		direction: rtl !important;
+	}
+	.container:nth-child(even) > div > div{
+		direction: ltr;
+	}
+	#landing-text{
+		top: 25% !important;
+	}
+	.border-left {
+		border-left: 1px solid #ababab
+	}
+}
+@media screen and (max-width: 768px) {
+	.navbar-brand img {
+		width: 200px;
+	}
+}
+@media screen and (max-width: 1200px){
+	h1{
+		font-size: 1.5em;
+	}
+	.row{
+		font-size: 1.5em;
+	}
+}
+@media screen and (max-width: 991px){
+	.row > div{
+		text-align: center;
+	}
+	.row object{
+		width: 60% !important;
+	}
+	#landing h1{
+		font-size: 1.3em;
+	}
+	#landing{
+		font-size: 2.3em;
+	}
+	h1{
+		font-size: 1.5em;
+	}
+	.row{
+		font-size: 1.2em;
+	}
+	img[src*="connector"]{
+		display: none;
+	}
+	.container:not(:first-child){
+		padding-top: 5%;
+	}
+	.border-left {
+		border-left: 1px solid #ababab;
+		padding-left: 10px;
+	}
+}
+@media screen and (max-width: 600px){
+	#landing h1{
+		font-size: 1.3em !important;
+	}
+	#landing-text{
+		font-size: 0.7em !important;
+	}
+	object{
+		width: 80% !important;
+	}
+	h1{
+		font-size: 1.5em;
+	}
+	.row{
+		font-size: 1em;
+	}
+	#mce-EMAIL{
+		width: 100% !important;
+		margin-bottom: 1%;
+	}
+	#mc-embedded-subscribe{
+		width: 100% !important;
+		margin-top: 1%;
+		margin-left: 0px !important;
+	}
+}
+#mce-EMAIL{
+	border: 1px solid #aaa;
+	border-radius:5px;
+}
+input[type="button"], input[type="submit"]{
+	border-radius:0;
+	box-shadow: 0px -3px 0px rgba(50,50,50,0.53) inset;
+	font-size: 1em;
+	background: #2AD37A;
+	color: white;
+}
+
+.btn-green {
+	border-radius:0;
+	box-shadow: 0px -3px 0px rgba(50,50,50,0.53) inset;
+	font-size: 1em;
+	background: #2AD37A;
+	color: white;
+	padding: 8px 10px;
+	border: 0px;
+}
+
+input[type="button"]{
+	padding: 8px 10px;
+	border: 0px;
+	font-size: 1.2em;
+}
+
+.highlightedLine {
+    background-color: rgba(41,120,176, 0.6);
+}
+
+* {
+    margin: 0;
+}
+html, body {
+/*    height: 100%;
+*/}
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -4em;
+}
+.footer, .push {
+    height: 4em;
+}
+
+.spacer{
+	min-height: 50px;
+	height: 4vw;
+}

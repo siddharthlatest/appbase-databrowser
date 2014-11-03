@@ -1,0 +1,30 @@
+footer{
+	background: #174463;
+	font-size: 1.2em;
+	padding: 50px 0%;
+}
+footer a{
+	color: #cdcdcd !important;
+}
+footer .row{
+	display: table;
+}
+footer .row > div{
+	vertical-align: top;
+	display: table-cell;
+	float: none;
+}
+@media screen and (max-width: 600px){
+	footer{
+		font-size: 0.9em;
+		padding: 25px 0px;
+	}
+	footer .col-xs-1{
+		padding: 5px;
+	}
+}
+@media screen and (max-width: 400px){
+	footer{
+		font-size: 0.77em;
+	}
+}
