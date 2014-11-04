@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="100%" height="100%" viewBox="0 0 960 729.059" enable-background="new 0 0 960 729.059" xml:space="preserve">
+<line opacity="0.3" fill="none" stroke="#414042" stroke-miterlimit="10" x1="437.158" y1="101.077" x2="307.838" y2="326.839"/>
+<line opacity="0.3" fill="none" stroke="#414042" stroke-miterlimit="10" x1="306.752" y1="326.839" x2="141.673" y2="545.056"/>
+<line opacity="0.3" fill="none" stroke="#414042" stroke-miterlimit="10" x1="306.752" y1="326.839" x2="458.158" y2="467.788"/>
+<line opacity="0.3" fill="none" stroke="#414042" stroke-miterlimit="10" x1="714.644" y1="243.571" x2="833.912" y2="545.056"/>
+<line opacity="0.3" fill="none" stroke="#414042" stroke-miterlimit="10" x1="714.644" y1="243.571" x2="575.901" y2="628.323"/>
+<line opacity="0.3" fill="none" stroke="#414042" stroke-miterlimit="10" x1="437.158" y1="101.077" x2="714.644" y2="243.571"/>
+<circle opacity="0.2" fill="#414042" cx="437.158" cy="101.078" r="47.509"/>
+<g>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="437.158" cy="101.078" r="35.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#414042" cx="437.158" cy="101.078" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" cx="437.158" cy="101.077" r="21"/>
+		<circle fill="none" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="437.158" cy="101.077" r="21"/>
+	</g>
+</g>
+<g>
+	<circle opacity="0.2" fill="#414042" cx="307.838" cy="326.84" r="47.509"/>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="307.838" cy="326.84" r="35.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#414042" cx="307.838" cy="326.84" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" cx="307.838" cy="326.839" r="21"/>
+		<circle fill="none" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="307.838" cy="326.839" r="21"/>
+	</g>
+</g>
+
+
+<g id="outer-boundary">
+	<g>
+		<circle fill="#E6E7E8" cx="714.644" cy="243.572" r="47.509"/>
+		<circle fill="none" stroke="#0075A8" stroke-miterlimit="10" cx="714.644" cy="243.572" r="47.509"/>
+	</g>
+	<defs>
+		<filter id="Adobe_OpacityMaskFilter" filterUnits="userSpaceOnUse" x="666.635" y="195.563" width="96.018" height="96.018">
+				<feColorMatrix  type="matrix" values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0" color-interpolation-filters="sRGB" result="source"/>
+		</filter>
+	</defs>
+	<mask maskUnits="userSpaceOnUse" x="666.635" y="195.563" width="96.018" height="96.018" id="SVGID_1_"></mask>
+	<g opacity="0.75" mask="url(#SVGID_1_)">
+		<circle fill="#FFFFFF" cx="714.644" cy="243.572" r="47.509"/>
+		<circle fill="none" stroke="#FFFFFF" stroke-miterlimit="10" cx="714.644" cy="243.572" r="47.509"/>
+	</g>
+</g>
+
+<g>
+	<circle opacity="0.2" fill="#414042" cx="714.644" cy="243.572" r="47.509"/>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="714.644" cy="243.572" r="35.759"/>
+	</g>
+	<g opacity="0.9">			
+		<circle fill="#414042" cx="714.644" cy="243.572" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" id="change1" cx="714.644" cy="243.571" r="21"/>
+		<circle fill="none" id="change2" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="714.644" cy="243.571" r="21"/>
+	</g>
+</g>
+
+
+<g>
+	<circle opacity="0.2" fill="#414042" cx="141.673" cy="545.057" r="47.509"/>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="141.673" cy="545.057" r="35.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#414042" cx="141.673" cy="545.057" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" cx="141.673" cy="545.056" r="21"/>
+		<circle fill="none" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="141.673" cy="545.056" r="21"/>
+	</g>
+</g>
+<g>
+	<circle opacity="0.2" fill="#414042" cx="458.158" cy="467.789" r="47.509"/>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="458.158" cy="467.789" r="35.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#414042" cx="458.158" cy="467.789" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" cx="458.158" cy="467.788" r="21"/>
+		<circle fill="none" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="458.158" cy="467.788" r="21"/>
+	</g>
+</g>
+<g>
+	<circle opacity="0.2" fill="#414042" cx="575.901" cy="628.324" r="47.509"/>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="575.901" cy="628.324" r="35.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#414042" cx="575.901" cy="628.324" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" cx="575.901" cy="628.323" r="21"/>
+		<circle fill="none" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="575.901" cy="628.323" r="21"/>
+	</g>
+</g>
+<g>
+	<circle opacity="0.2" fill="#414042" cx="833.912" cy="545.057" r="47.509"/>
+	<g opacity="0.4">
+		<circle fill="#414042" cx="833.912" cy="545.057" r="35.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#414042" cx="833.912" cy="545.057" r="29.759"/>
+	</g>
+	<g opacity="0.9">
+		<circle fill="#0075A8" cx="833.912" cy="545.056" r="21"/>
+		<circle fill="none" stroke="#D1D3D4" stroke-width="2" stroke-miterlimit="10" cx="833.912" cy="545.056" r="21"/>
+	</g>
+</g>
+   <script type="text/javascript" xlink:href="../js/snap.svg-min.js"></script>
+   <script type="text/javascript">
+   <![CDATA[
+	  var diagramGroup = Snap.select('#Layer_1');
+      var outer_border = diagramGroup.select('#outer-boundary').attr({opacity: 0});
+      var executeSVG = function(){
+   	  	 done = true;
+         setTimeout(function(){
+         	diagramGroup.select('#change1').animate({fill: '#E6E7E8'}, 1500, mina.bounce);
+	         diagramGroup.select('#change2').animate({stroke: '#0075A8'}, 1500, mina.bounce);
+	         outer_border.animate({opacity: 1}, 1500, mina.bounce);
+         }, 200);
+      }
+   ]]>
+   </script>
+   <script>
+   		var done = false;
+   		document.execute = function(){
+   			if(!done)
+   				executeSVG();
+   		}
+   </script>
+</svg>
