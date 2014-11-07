@@ -301,29 +301,39 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope) {
     root.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(''));
     }
+    
     root.expand = function() {
       root.children = [];
       root.expanded = true;
-      setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
+      root.intervalID = setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
         $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
             if(!nodeBinding.childExists(root, namespaceObj.name)) {
-              root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
+              root.children.unshift(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
             }
           })
         })
-      }), 2000)
+      }), 2000);
     }
-    root.contract = function(){
+    
+    root.contract = function() {
       root.expanded = false;
+      root.children.forEach(function(namespaceNode) {
+        namespaceNode.contract();
+      });
       root.children = [];
+      if(root.intervalID !== undefined) clearInterval(root.intervalID);
     }
+    
+    $scope.$on('$destroy', function() {
+      root.contract();
+    })
 
     return root
   }
   
   var vertexBindCallbacks = {
-    onAdd :function(scope, vData, vRef, done) {
+    onAdd : function(scope, vData, vRef, done) {
       nodeBinding.bindAsVertex(scope, vRef.path(), vData);
       done();
 
