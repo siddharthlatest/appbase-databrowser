@@ -54,17 +54,17 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
         }
       })
     }
+
+    Appbase.credentials('appbase_dev_console');
+    Appbase.authPopup('google', { authorize: { scope: ['openid email'] } }, function(error, result, req) {
+      if(error) {
+        throw error;
+      }
+      proceed(result);
+    })
   }
-  Appbase.credentials('appbase_dev_console');
-  Appbase.authRedirect('google', { authorize: { scope: ['openid email'] } }, document.location.href)
-  Appbase.authCallback('google', function(error, result, req) {
-    if(error) {
-      throw error;
-    }
-    proceed(result);
-  });  
+  
+    
 }
-
-
 
 })();
