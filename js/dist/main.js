@@ -1228,7 +1228,7 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
       })
     }
 
-    Appbase.credentials('appbase_dev_console');
+    Appbase.credentials('aphrodite');
     Appbase.authPopup('google', { authorize: { scope: ['openid email'] } }, function(error, result, req) {
       if(error) {
         throw error;
