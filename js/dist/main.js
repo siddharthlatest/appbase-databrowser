@@ -134,7 +134,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     fetchApps()
   } else {
     $scope.loginPopup = function(provider) {
-      $appbase.credentials('appbase_dev_console');
+      $appbase.credentials('aphrodite');
       $appbase.authPopup(provider, provider === 'google' ? { authorize: { scope: ['openid email'] } } : {},
           function(error, result, req) {
           if(error) {
