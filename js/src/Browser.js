@@ -49,7 +49,7 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
 
   $scope.addEdgeInto = function(node) {
     ngDialog.open({
-      template: 'html/dialog-new-vertex.html',
+      template: '/developer/html/dialog-new-vertex.html',
       controller: ['$scope', function($dialogScope) {
         $dialogScope.node = node
         if (!node.isV) {
