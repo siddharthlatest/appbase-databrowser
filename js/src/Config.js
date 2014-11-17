@@ -34,19 +34,19 @@ function FirstRun($rootScope, $location, stringManipulation){
 function Routes($routeProvider){
   var browser = {
     controller: 'browser',
-    templateUrl: 'html/browser.html'
+    templateUrl: '/developer/html/browser.html'
   }, stats = {
     controller: 'stats',
-    templateUrl: 'html/stats.html'
+    templateUrl: '/developer/html/stats.html'
   }, apps = {
     controller: 'apps',
-    templateUrl: 'html/apps.html'
+    templateUrl: '/developer/html/apps.html'
   }, signup = {
     controller: 'signup',
-    templateUrl: 'html/signup.html'
+    templateUrl: '/developer/html/signup.html'
   }, oauth = {
     controller: 'oauthd',
-    templateUrl: 'html/oauth.html'
+    templateUrl: '/developer/html/oauth.html'
   };
 
   $routeProvider
