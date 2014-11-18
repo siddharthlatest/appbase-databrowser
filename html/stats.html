@@ -1,12 +1,8 @@
-<div class="col-md-12 st-tab">
-	<ul class="nav nav-tabs" role="tablist">
-		<li ng-repeat="(name, obj) in apps | orderBy : name" ng-class="{'active': name===app}" repeat-end="app">
-			<a href="" ng-bind="name" ng-click="switch(name)"></a>
-		</li>
-	</ul>
-</div>
-<div class="col-md-12">
-	<span ng-show="noData">No data to display!</span>
+<div class="col-xs-12" id="stats">
+	<div ng-show="noData" class="no-data">
+		<div class="sad">:(</div>
+		<span>No data to display.</span>
+	</div>
 	<div ng-show="!noData" >
 		<div class="col-md-3">
 			<div class="st-sum">
@@ -34,25 +30,8 @@
 			</div>
 		</div>
 		<div class="col-md-12">
-			<barchart xkey="morris.xkey" ykeys="morris.ykeys" labels="morris.labels" data="morris.data">
+			<barchart xkey="morris.xkey" ykeys="morris.ykeys" labels="morris.labels" data="morris.data" colors="morris.colors">
 			</barchart>
 		</div>
 	</div>
 </div>
-<div class="col-md-2">
-</div>
-
-
-<!-- <div class="row page" ng-controller="sidebar">
-    <div class="col-lg-2" ng-show="!hide">
-        <ul class="nav nav-pills nav-stacked sidebar">
-            <li class="title">Developer Console</li>
-            <li ng-click="goToApps()" ng-class="{'active': currentScope === 'apps'}"><a href="">My Apps</a></li>
-            <li ng-click="goToBrowser()" ng-class="{'active': currentScope === 'browser'}"><a href="">Data Browser</a></li>
-            <li ng-click="goToStats()" ng-class="{'active': currentScope === 'stats'}"><a href="">Analytics</a></li>
-            <li ng-show="logged" class="balance">Balance</li>
-            <li ng-show="logged" class="balance-value" ><b ng-bind="code"></b></li>
-        </ul>
-    </div>
-    <div ng-view class="main" ng-class="{'col-lg-10': !hide, 'col-lg-12': hide}"></div>
-</div> -->

@@ -1,0 +1,20 @@
+<nav class="navbar" id="manage" ng-controller="navbar">
+  <div class="container-fluid">
+    <div class="navbar-header">
+    	<div class="app-title" ng-bind="$parent.currentApp"></div>
+    </div>
+    <div class="navbar-right">
+    	<ul class="nav navbar-nav navbar-right">
+            <li><a ng-href="/developer/#/{{$parent.currentApp}}/stats">
+                <span ng-class="{underline: $parent.where()==='stats'}">Analytics</span>
+            </a></li>
+    		<li><a ng-href="/developer/#/{{$parent.currentApp}}/browser">
+                <span ng-class="{underline: $parent.where()==='browser'}">Data Browser</span>
+            </a></li>
+    		<li><a ng-href="/developer/#/{{$parent.currentApp}}/oauth">
+                <span ng-class="{underline: $parent.where()==='oauth'}">Authentication</span>
+            </a></li>
+    	</ul>
+    </div>
+  </div>
+</nav>

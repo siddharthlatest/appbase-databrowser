@@ -1,4 +1,4 @@
-<div class="dev-browser">
+<div class="dev-browser" id="browser">
     <div ng-show='alert && alert !== "" ' class="alert alert-{{alertType}}" role="alert" style="opacity: 0.6;">{{alert}}</div>
 
     <ol ng-show="node" class="breadcrumb">
@@ -11,6 +11,7 @@
         </li>
 
         <div class="form-group form-inline pull-right">
+            <div class="checkbox"><button class="btn btn-xs btn-warning" ng-click="addEdgeInto(node);">Add Vertex</button></div>
             <div class="checkbox">
                 <label style="font-size: 1em">
                     <input type="checkbox" ng-model="modifyEnabled"> Enable modifications
@@ -24,6 +25,6 @@
         </div>
     </ol>
 
-    <div ng-show="node" class="tree" ng-include="'html/node.html'"></div>    
+    <div ng-show="node" class="tree" ng-include="'/developer/html/node.html'"></div>    
 
 </div>

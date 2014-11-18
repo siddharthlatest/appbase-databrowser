@@ -1,0 +1,641 @@
+.morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
+.morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
+
+.ngdialog.ngdialog-theme-dialog-small {
+  padding-bottom: 5vh;
+  padding-top: 5vh;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
+  background: #fff;
+  color: #444;
+  line-height: 1.5em;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 1em;
+  position: relative;
+  width: 60%;
+  max-height: 85vh;
+  overflow: auto;
+  border-radius:5px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
+  background: transparent;
+  color: #bbb;
+  content: "\00D7";
+  font-size: 26px;
+  font-weight: 400;
+  height: 30px;
+  line-height: 26px;
+  position: absolute;
+  right: 3px;
+  text-align: center;
+  top: 3px;
+  width: 30px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
+  color: #777;
+}
+
+@media (max-width: 568px) {
+  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
+    -webkit-animation: none;
+    animation: none;
+  }
+}
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}
+/* console */
+@font-face {
+  font-family: "Source Sans Pro Light";
+  src: url('/styles/fonts/SourceSansPro-Light.otf'); }
+
+@font-face {
+  font-family: "Source Sans Pro Extra Light";
+  src: url('/styles/fonts/SourceSansPro-ExtraLight.otf'); }
+
+@font-face {
+  font-family: "Source Sans Pro Bold";
+  src: url('/styles/fonts/SourceSansPro-Bold.otf'); }
+
+@font-face {
+  font-family: "Source Sans Pro Regular";
+  src: url('/styles/fonts/SourceSansPro-Regular.otf'); }
+
+@font-face {
+  font-family: "Source Sans Pro Extra Light Italic";
+  src: url('/styles/fonts/SourceSansPro-ExtraLightIt.otf'); }
+
+@-webkit-keyframes appear {
+  0% {
+    opacity: 0; }
+
+  100% {
+    opacity: 1; } }
+
+@keyframes appear {
+  0% {
+    opacity: 0; }
+
+  100% {
+    opacity: 1; } }
+
+@-webkit-keyframes slideOutLeft {
+  100% {
+    display: none; }
+
+  to {
+    opacity: 0; } }
+
+@keyframes slideOutLeft {
+  100% {
+    display: none; }
+
+  to {
+    opacity: 0; } }
+
+@-webkit-keyframes slideInRight {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+@keyframes slideInRight {
+  from {
+    opacity: 0; }
+
+  to {
+    opacity: 1; } }
+
+.ng-enter {
+  -webkit-animation: slideInRight 0.3s both ease-in-out 0.31s;
+  animation: slideInRight 0.3s both ease-in-out 0.31s; }
+
+.ng-leave {
+  -webkit-animation: slideOutLeft 0.3s both ease-in-out;
+  animation: slideOutLeft 0.3s both ease-in-out; }
+
+#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #manage.ng-leave, #manage.ng-enter {
+  -webkit-animation: none;
+  animation: none; }
+
+.view-wrapper, body {
+  height: 100%; }
+
+#nav {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 10; }
+
+.footer {
+  position: relative;
+  z-index: 2; }
+
+body {
+  padding-top: 70px; }
+
+#sidebar {
+  font-family: "Source Sans Pro Regular";
+  font-size: 1.2em;
+  padding: 0;
+  background-color: #7DD3F4;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  z-index: 0;
+  padding-top: 10vh; }
+  #sidebar ul li {
+    text-align: center; }
+    #sidebar ul li a {
+      color: white; }
+      #sidebar ul li a:hover {
+        background-color: transparent;
+        text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.6); }
+      #sidebar ul li a.active {
+        background-color: #50BAEF; }
+    #sidebar ul li.balance {
+      text-align: center;
+      width: 100%;
+      color: white;
+      position: absolute;
+      bottom: 200px; }
+      #sidebar ul li.balance .title {
+        font-family: "Source Sans Pro Light";
+        letter-spacing: 2px;
+        font-size: 0.85em; }
+      #sidebar ul li.balance .value {
+        font-family: "Source Sans Pro Extra Light";
+        font-size: 2.5em; }
+
+#view {
+  margin-bottom: 5vh;
+  padding-left: 0;
+  padding-right: 0; }
+  #view div[ng-view] {
+    min-height: calc(100vh - 260px); }
+
+#applications {
+  font-family: "Source Sans Pro Extra Light Italic";
+  margin-bottom: 50px; }
+  #applications .main-title {
+    text-align: center;
+    font-family: "Source Sans Pro Extra Light";
+    font-size: 3.5em;
+    color: #888;
+    padding: 50px 0 30px; }
+  #applications .loading {
+    line-height: 128px;
+    text-align: center; }
+  #applications .appear {
+    -webkit-animation: appear 0.5s ease-in-out;
+    animation: appear 0.5s ease-in-out; }
+  #applications .well {
+    background-color: #F2F2F2;
+    box-shadow: none;
+    border: none;
+    margin: 30px;
+    padding: 25px 30px 15px;
+    border-radius: 15px;
+    color: #888; }
+    #applications .well .tip {
+      text-align: center;
+      line-height: 30px;
+      height: 30px; }
+      #applications .well .tip .text-info {
+        color: #888; }
+    #applications .well input {
+      border: none; }
+      #applications .well input:not([readonly]) {
+        text-align: center; }
+      #applications .well input[readonly] {
+        background-color: #e5e5e5;
+        cursor: default; }
+    #applications .well .url {
+      line-height: 2;
+      cursor: pointer; }
+    #applications .well button#createuserapp, #applications .well a#createuserapp {
+      background-color: #2AD37A;
+      border: none;
+      text-transform: uppercase;
+      box-shadow: none; }
+      #applications .well button#createuserapp:hover, #applications .well a#createuserapp:hover {
+        background-color: #3ed986; }
+      #applications .well button#createuserapp:active, #applications .well a#createuserapp:active {
+        background-color: #26be6d; }
+    #applications .well button.manage, #applications .well a.manage {
+      background-color: #50BAEF;
+      color: white;
+      font-family: "Source Sans Pro Light";
+      text-transform: uppercase; }
+      #applications .well button.manage:hover, #applications .well a.manage:hover {
+        background-color: #67c3f1; }
+      #applications .well button.manage:active, #applications .well a.manage:active {
+        background-color: #21a8eb; }
+    #applications .well .manage-button {
+      text-align: right; }
+
+#manage {
+  min-height: 60px;
+  height: 60px;
+  background-color: #888;
+  border-radius: 0;
+  border: 0;
+  margin-bottom: 0;
+  margin-top: 2px; }
+  #manage .container-fluid {
+    height: 60px;
+    padding: -1px 5vw 0; }
+    #manage .container-fluid .navbar-header {
+      line-height: 60px;
+      height: 60px; }
+      #manage .container-fluid .navbar-header .app-title {
+        font-family: "Source Sans Pro Extra Light";
+        color: white;
+        font-size: 2em; }
+    #manage .container-fluid .navbar-right {
+      font-family: "Source Sans Pro Regular";
+      font-size: 1em;
+      height: 60px;
+      line-height: 60px;
+      color: white;
+      text-transform: uppercase;
+      margin-right: 3vw; }
+      #manage .container-fluid .navbar-right:hover li a > * {
+        border: 0; }
+      #manage .container-fluid .navbar-right li a {
+        height: 60px;
+        line-height: 60px;
+        padding: 0 20px;
+        color: white; }
+        #manage .container-fluid .navbar-right li a:hover {
+          background-color: #666; }
+      #manage .container-fluid .navbar-right .underline {
+        border-bottom: 1px solid white; }
+
+#browser {
+  font-family: "Source Sans Pro Light";
+  font-size: 1.1em; }
+  #browser .breadcrumb {
+    background-color: #aaa;
+    border-radius: 0;
+    color: white;
+    margin-bottom: 0; }
+    #browser .breadcrumb .active {
+      color: white; }
+    #browser .breadcrumb li a {
+      color: #eee; }
+      #browser .breadcrumb li a:hover {
+        color: white; }
+  #browser .propertiesBox form {
+    position: relative; }
+    #browser .propertiesBox form .form-group {
+      width: 100%; }
+      #browser .propertiesBox form .form-group button[type="submit"] {
+        border: 0;
+        background: transparent span;
+        background-font-size: 1em;
+        background-color: limegreen; }
+  #browser ul {
+    list-style: none;
+    padding-left: 30px; }
+    #browser ul li {
+      padding: 2px 0; }
+  #browser .tree > .node > ul {
+    padding: 15px 20px; }
+  #browser .glyphicon {
+    cursor: pointer; }
+  #browser .glyphicon-plus-sign {
+    color: #22a861;
+    font-weight: bolder; }
+  #browser .glyphicon-minus-sign {
+    color: coral; }
+  #browser .tooltipbal {
+    font-size: 1em; }
+  #browser .glyphicon-remove {
+    color: red;
+    font-weight: bolder; }
+
+#stats {
+  font-family: "Source Sans Pro Extra Light";
+  margin-top: 15px; }
+  #stats .st-sum {
+    font-size: 1.2em;
+    margin-top: 40px; }
+  #stats .no-data {
+    padding-top: 20vh;
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    color: #666; }
+    #stats .no-data .sad {
+      font-family: "Source Sans Pro Bold";
+      font-size: 4em;
+      color: #999; }
+  #stats .chart {
+    font-size: 1.2em;
+    position: relative;
+    display: inline-block;
+    width: 110px;
+    height: 110px;
+    margin: 10px 0;
+    text-align: center; }
+  #stats .chart canvas {
+    position: absolute;
+    top: 0;
+    left: 0; }
+  #stats .percent {
+    display: inline-block;
+    line-height: 110px;
+    z-index: 2; }
+  #stats svg {
+    width: 100% !important; }
+
+#oauth {
+  font-family: "Source Sans Pro Light";
+  font-size: 1.1em; }
+  #oauth h4 {
+    font-family: "Source Sans Pro Extra Light";
+    font-size: 2em; }
+  #oauth .fa-info-circle {
+    font-size: 0.55em;
+    margin-left: 5px;
+    display: inline-block;
+    color: #bbb; }
+    #oauth .fa-info-circle:hover {
+      color: #666; }
+  #oauth .example {
+    border-bottom: 1px dotted black;
+    color: #888; }
+    #oauth .example:hover {
+      color: #222; }
+  #oauth .tooltip-inner {
+    font-family: "Source Sans Pro Regular"; }
+  #oauth .oa-tab .list div .title {
+    text-align: center; }
+  #oauth .oa-tab {
+    height: 100%; }
+  #oauth .oa-dom-item .badge {
+    font-family: sans-serif;
+    line-height: 15px;
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #d43f3a;
+    cursor: pointer;
+    -webkit-user-select: none; }
+    #oauth .oa-dom-item .badge:hover {
+      background-color: #de6a68; }
+    #oauth .oa-dom-item .badge:active {
+      background-color: #d43d3a; }
+  #oauth .oa-dom {
+    padding-top: 1px;
+    font-family: "Source Sans Pro Light"; }
+  #oauth .oa-dom .domain {
+    -webkit-user-select: none;
+    cursor: default;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 80%; }
+  #oauth .oa-dom-input {
+    padding: 3px 5px; }
+  #oauth .oa-dom-input-inpt input {
+    position: relative;
+    margin: 0;
+    height: 40px;
+    width: 100%;
+    background-color: white;
+    z-index: 2; }
+  #oauth .oa-dom-input-inpt {
+    width: 100%;
+    transition: all ease 0.3s; }
+  #oauth .oa-dom-input-btn button {
+    height: 40px;
+    line-height: 20px;
+    width: 100%;
+    margin-left: 2%;
+    text-align: center; }
+  #oauth .oa-dom-input-btn button span::after {
+    content: '+'; }
+  #oauth .oa-expiry button span::after {
+    content: '+' !important; }
+  #oauth .oa-dom-input-btn {
+    float: right;
+    width: 10%;
+    transition: all ease 0.3s 0.1s;
+    position: relative;
+    top: -40px; }
+  #oauth .oa-dom-input-btn.ng-hide {
+    opacity: 0; }
+  #oauth .oa-dom-input-btn.ng-hide-remove {
+    display: block !important; }
+  #oauth .exp {
+    width: 88%; }
+  #oauth .overlay {
+    opacity: 0.7; }
+  @media (min-width: 768px) {
+    #oauth .oa-dom-input-btn button span::after {
+      content: 'Add'; }
+    #oauth .oa-expiry button span::after {
+      content: 'Save' !important; }
+    #oauth .oa-dom-input-btn {
+      width: 18%; }
+    #oauth .exp {
+      width: 80%; } }
+  #oauth .oa-prov img {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+    margin-top: -4px; }
+  #oauth .oa-prov button {
+    float: right;
+    padding: 0 10px;
+    height: 30px;
+    margin: 9px 3px;
+    border-radius: 4px; }
+  #oauth .oa-prov {
+    overflow: hidden;
+    padding: 0 10px;
+    line-height: 48px;
+    height: 50px;
+    font-family: "Source Sans Pro Light"; }
+  #oauth .oa-ed-prov {
+    font-family: "Source Sans Pro Light";
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0 10px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 60px; }
+  #oauth .oa-ed-prov label {
+    line-height: 35px; }
+  #oauth .oa-ed-prov img {
+    width: 80%;
+    margin: 20px 10%; }
+  #oauth .oa-edit-btn ul img {
+    position: relative;
+    top: -5px; }
+  #oauth .oa-edit-btn ul .label {
+    position: relative;
+    top: -2px;
+    margin: 0 5px; }
+  #oauth .oa-edit-btn ul .pull-right {
+    position: relative;
+    top: 15px; }
+  #oauth #provider {
+    font-size: 1.1em; }
+    #oauth #provider > h4 {
+      margin-bottom: 12px; }
+    #oauth #provider .provider-title {
+      font-size: 1.3em; }
+    #oauth #provider ul {
+      margin-bottom: 0; }
+    #oauth #provider .fa {
+      font-size: 1.1em; }
+    #oauth #provider label {
+      font-size: 0.9em; }
+    #oauth #provider input {
+      position: relative;
+      top: 10px; }
+
+#not-logged {
+  display: table;
+  text-align: center;
+  min-height: calc(100vh - (211px)); }
+  #not-logged > div {
+    display: table-cell;
+    vertical-align: middle; }
+    #not-logged > div h1 {
+      padding: 5vh 10vw;
+      color: #888; }
+    #not-logged > div button {
+      font-size: 2em;
+      margin-top: 2%;
+      margin: 2%;
+      padding-left: 50px;
+      padding-right: 50px;
+      border: 2px solid #2AD37A;
+      border-radius: 10px;
+      color: #2AD37A;
+      background-color: white; }
+      #not-logged > div button:hover {
+        background-color: #2AD37A;
+        color: white; }
+
+#loading {
+  position: fixed;
+  font-family: "Source Sans Pro Light";
+  font-size: 2em;
+  color: #444;
+  text-align: center;
+  margin: 0 auto;
+  height: 100%;
+  width: 100%;
+  top: 40vh; }

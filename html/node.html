@@ -1,16 +1,13 @@
 <div class="node" xmlns="http://www.w3.org/1999/html">
-    <div class="content" style="background-color: {{node.color}}" ng-mouseover="node.mouse = true;" ng-mouseleave="node.mouse = false;">
-        <span class="glyphicon glyphicon-plus-sign" ng-hide="!node || node.expanded" ng-click="node.expand()" style="cursor: pointer; color: seagreen"></span>
-        <span class="glyphicon glyphicon-minus-sign" ng-show="node.expanded" ng-click="node.contract()" style="cursor: pointer; color: coral"></span>
-        <a href="" ng-click="node.meAsRoot()">{{node.name}}</a> <span ng-show="showPriorities && node.priority" class="badge">Priority: {{node.priority}}</span> <span ng-show="modifyEnabled && node.mouse && node.removeSelfEdge" ng-click="node.removeSelfEdge()" style="color: red;font-weight: bolder; cursor: pointer;" title="Remove edge '{{node.name}}'" class="glyphicon glyphicon-remove"></span>
-        <span ng-show="node.isNS" ng-click="node.toggleSearch()" ng-class="node.searchable? 'glyphicon-eye-open text-success' : 'glyphicon-eye-close text-danger';" class="glyphicon tooltipbal" style="cursor: pointer; font-size: 1em">
-                    <span style="font-family: corbert">
-                        {{node.searchable? 'Search enabled. Click to disable.' : 'Search disabled. Click to enable.'}}
-                    </span>
+    <div class="content"  hide-parent ng-mouseover="node.mouse = true;" ng-mouseleave="node.mouse = false;" background-color="node.color">
+        <span class="glyphicon glyphicon-plus-sign" ng-hide="!node || node.expanded" ng-click="node.expand()"></span>
+        <span class="glyphicon glyphicon-minus-sign" ng-show="node.expanded" ng-click="node.contract()"></span>
+        <a href="" ng-click="node.meAsRoot()" ng-bind="node.name"></a> <span ng-show="showPriorities && node.priority" class="badge">Priority: {{node.priority}}</span> <span ng-show="modifyEnabled && node.mouse && node.removeSelfEdge" ng-click="node.removeSelfEdge()" title="Remove edge '{{node.name}}'" class="glyphicon glyphicon-remove"></span>
+        <span ng-show="node.isNS" ng-click="node.toggleSearch()" ng-class="node.searchable? 'glyphicon-eye-open text-success' : 'glyphicon-eye-close text-danger';" class="glyphicon tooltipbal" style="cursor: pointer; font-size: 1em" onmouseenter="$(this).tooltip({ trigger: 'hover' })" title="Toggle search" data-toggle="tooltip" data-placement="right">
         </span>
         <ul class="propertiesBox" ng-show="node.properties">
-            <form ng-show="modifyEnabled && node.mouse" ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''" class="form" style="position: relative">
-                <div class="row form-group" style="width: 100%;">
+            <form ng-show="modifyEnabled && node.mouse" ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''" class="form">
+                <div class="row form-group">
                     <div class="col-xs-4">
                         <input ng-required="true" type="text" class="input-sm form-control" ng-model="newProp" placeholder="New Property">
                     </div>
@@ -21,7 +18,7 @@
                         <input ng-required="true" type="text" class="input-sm form-control" ng-model="newVal" placeholder="Value">
                     </div>
                     <div class="col-xs-1">
-                        <button type="submit" style="border: 0; background: transparent" class="form-control"><span style="font-size:1em; color: limegreen;font-weight: bolder;" class="glyphicon glyphicon-plus"></span></button>
+                        <button type="submit" class="form-control"><span class="glyphicon glyphicon-plus"></span></button>
                     </div>
                 </div>
             </form>
@@ -30,7 +27,7 @@
                     &#8226;  {{prop}}: {{val}}
                 </div>
                 <div ng-show="modifyEnabled && node.mouse" class="col-xs-1">
-                    <span ng-click="node.removeProperty(prop)" style="color: red;font-weight: bolder; cursor: pointer;" title="Remove '{{prop}}'" class="glyphicon glyphicon-remove pull-right"></span>
+                    <span ng-click="node.removeProperty(prop)" title="Remove '{{prop}}'" class="glyphicon glyphicon-remove pull-right"></span>
                 </div>
             </li>
         </ul>
