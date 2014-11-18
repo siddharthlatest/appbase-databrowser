@@ -225,7 +225,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         if(typeof response === "string") {
           done(response)
         } else if(typeof response === "object") {
-          atomic.put(atob(server)+'user/'+ session.getProfile().uid, {"appname":app})
+          atomic.put(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
             .success(function(result) {
               done(null)
             })
@@ -240,9 +240,64 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         throw error
       })
   }
-
-  data.getDevsApps = function(done) {
+  
+  data.deleteApp = function(done) {
+    atomic.delete(atob(server)+'app/'+ app)
+      .success(function(response) {
+        if(typeof response === "string") {
+          done(response)
+        } else if(typeof response === "object") {
+          atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+            .success(function(result) {
+              done(null)
+            })
+            .error(function(error) {
+              throw error
+            })
+        } else {
+          throw 'Server Error, try again.'
+        }
+      })
+      .error(function(error) {
+        throw error
+      })
+  }
+  
+  // checks if the user has any apps with registered with uid, pushes them with emailid
+  data.uidToEmail = function(done) {
+    //fetch from uid
     atomic.get(atob(server)+'user/'+ session.getProfile().uid)
+      .success(function(apps) {
+        if(!apps.length) return done();
+        var appsRemaining = apps.length;
+        var checkForDone = function() {
+          appsRemaining -= 1;
+          if(appsRemaining === 0) {
+            done();
+          }
+        }
+        apps.forEach(function(app) {
+          //add into email
+          atomic.put(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+            .success(function(result) {
+              //delete from uid
+              atomic.delete(atob(server)+'user/'+ session.getProfile().uid, {"appname":app})
+                .success(function(result) {
+                  checkForDone();
+                })
+                .error(function(error) {
+                  throw error
+                })
+            })
+            .error(function(error) {
+              throw error
+            })
+        });
+      })
+  }
+  
+  data.getDevsAppsWithEmail = function(done) {
+    atomic.get(atob(server)+'user/'+ session.getProfile().email)
       .success(function(apps) {
         var appsAndSecrets = {};
         var appsArrived = 0;
@@ -271,6 +326,10 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   }
 
+  data.getDevsApps = function(done) {
+    data.uidToEmail(data.getDevsAppsWithEmail.bind(null, done));
+  }
+  
   data.getAppsSecret = function(app, done) {
     atomic.get(atob(server)+'app/'+ app)
       .success(function(result) {

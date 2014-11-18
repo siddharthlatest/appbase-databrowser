@@ -3,4 +3,4 @@
 *.sublime-workspace
 .zedstate
 *.log
-node-modules/
+node_modules/
