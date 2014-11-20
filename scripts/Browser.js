@@ -6,7 +6,7 @@ angular
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl]);
 
-function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope){
+function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
   $rootScope.db_loading = true;
   $scope.alertType = 'danger';
   $scope.goToBrowser = $rootScope.goToBrowser;
