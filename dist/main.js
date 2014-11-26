@@ -48,7 +48,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
       $rootScope.logged = false;
     });
   });
-
 } 
 
 function Routes($routeProvider){
@@ -171,14 +170,12 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
 angular
 .module("AppbaseDashboard")
 .controller("browser",
-             ['$scope', '$appbase', '$timeout', '$routeParams', '$location',
+             ['$scope', '$appbase', '$timeout', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl]);
 
 function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
   $rootScope.db_loading = true;
-  $scope.alertType = 'danger';
-  $scope.goToBrowser = $rootScope.goToBrowser;
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
   if(!appName || !session.getApps() || !session.getApps()[appName]) {
     $rootScope.goToApps();
@@ -193,23 +190,8 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
     session.setBrowserURL(URL);
   }
 
-  //URL = stringManipulation.cutLeadingTrailingSlashes($routeParams.urlToPath)
-  //appName = stringManipulation.parseURL(URL).appName; 
-  // if(appName === undefined){
-  //   if((appName = stringManipulation.parseURL(URL = session.getBrowserURL()).appName) === undefined) {
-  //     $scope.alert = 'The URL is not proper, or, you are not logged in.';
-  //     return;
-  //   } else {
-  //     $rootScope.goToBrowser(URL);
-  //   }
-  // } else {
-  //   session.setBrowserURL(URL);
-  // }
-
-
   if(!data.init(appName)) {
-    $scope.alert = 'You are not allowed to browse this data. Go to the developer page and try logging in again.'
-    return
+    $rootScope.goToApps();
   }
 
   $scope.url = URL;
@@ -233,81 +215,75 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
   $rootScope.db_loading = false;
   
   $scope.addEdgeInto = function(node) {
-    ngDialog.open({
-      template: '/developer/html/dialog-new-vertex.html',
-      controller: ['$scope', function($dialogScope) {
-        $dialogScope.node = node
-        if (!node.isV) {
-          $dialogScope.title = "Add Vertex"
-        } else {
-          $dialogScope.title = "Add Out-vertex at path: " + node.ref.path();
-        }
-        if(node.isNS) {
-          $dialogScope.namespaceSelected = node.name
-        }
-        $dialogScope.text = "in " + node.name
-        $dialogScope.vTypeOptions = ['New Vertex', 'Existing Vertex']
-        $dialogScope.vType = $dialogScope.vTypeOptions[0]
+    var namespaces = [];
+    node.loadingNs = true;
+    data.getNamespaces(function(array) {
+      node.loadingNs = false;
+      array.forEach(function(each){
+        namespaces.push(each.name);
+      });
+      ngDialog.open({
+        template: '/developer/html/dialog-new-vertex.html',
+        controller: ['$scope', function($dialogScope) {
+          $dialogScope.namespaces = namespaces;
+          $dialogScope.node = node;
+          if (!node.isV) {
+            $dialogScope.title = "Add Vertex"
+          } else {
+            $dialogScope.title = "Add Out-vertex at path: " + node.ref.path();
+          }
+          if(node.isNS) {
+            $dialogScope.namespaceSelected = node.name;
+          }
+          $dialogScope.text = "in " + node.name
+          $dialogScope.vTypeOptions = ['New Vertex', 'Existing Vertex']
+          $dialogScope.vType = $dialogScope.vTypeOptions[0]
 
-        $dialogScope.namespaces = ['Loading..']
-        data.getNamespaces(function(array) {
-          $timeout(function() {
-            $dialogScope.namespaces = [];
-            for(var i=0; i< array.length; i++) {
-              $dialogScope.namespaces.push(array[i].name);
+          $dialogScope.done = function() {
+            var prepareParams = function() {
+              var params = {}
+              if($dialogScope.vType === $dialogScope.vTypeOptions[0]) { // New Vertex
+                params.namespace =
+                  ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
+                  $dialogScope.namespaceNew : $dialogScope.namespaceSelected
+                params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? $appbase.uuid() : $dialogScope.vId
+                params.ref = $appbase.ns(params.namespace).v(params.vId)
+              } else {
+                params.vPath = $dialogScope.vPath
+                var parsedPath = stringManipulation.parsePath(params.vPath);
+                params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
+              }
+
+              params.eName = 
+                ($dialogScope.eName === undefined || $dialogScope.eName === "") ?
+                (params.vId === undefined? $appbase.uuid() : params.vId) : $dialogScope.eName
+              params.pR = ($dialogScope.pR === undefined || $dialogScope.pR === null) ? undefined : $dialogScope.pR
+
+              return params
             }
-          })
-        })
 
-        //prevents user from choosing 'Loading..'
-        $dialogScope.$watch( function() {
-          return $dialogScope.namespaceSelected
-        }, function(val) {
-          $dialogScope.namespaceSelected = (val === 'Loading..' ? null : val)
-        })
-
-        $dialogScope.done = function() {
-          var prepareParams = function() {
-            var params = {}
-            if($dialogScope.vType === $dialogScope.vTypeOptions[0]) { // New Vertex
-              params.namespace =
-                ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
-                $dialogScope.namespaceNew : $dialogScope.namespaceSelected
-              params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? $appbase.uuid() : $dialogScope.vId
-              params.ref = $appbase.ns(params.namespace).v(params.vId)
-            } else {
-              params.vPath = $dialogScope.vPath
-              var parsedPath = stringManipulation.parsePath(params.vPath);
-              params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
+            var params = prepareParams()
+            if(node.isV) {
+              if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
+              else node.ref.setEdge(params.eName, params.ref)
+            } else if(node.isR) {
+              if(!nodeBinding.childExists(node, params.namespace)) {
+                node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
+              }
             }
-
-            params.eName = 
-              ($dialogScope.eName === undefined || $dialogScope.eName === "") ?
-              (params.vId === undefined? $appbase.uuid() : params.vId) : $dialogScope.eName
-            params.pR = ($dialogScope.pR === undefined || $dialogScope.pR === null) ? undefined : $dialogScope.pR
-
-            return params
+            $dialogScope.closeThisDialog()
           }
 
-          var params = prepareParams()
-          if(node.isV) {
-            if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
-            else node.ref.setEdge(params.eName, params.ref)
-          } else if(node.isR) {
-            if(!nodeBinding.childExists(node, params.namespace)) {
-              node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
-            }
+          $dialogScope.no = function() {
+            $dialogScope.closeThisDialog()
           }
-          $dialogScope.closeThisDialog()
-        }
+        }],
+        className: 'ngdialog-theme-dialog-small',
+        showClose: false
+      });
 
-        $dialogScope.no = function() {
-          $dialogScope.closeThisDialog()
-        }
-      }],
-      className: 'ngdialog-theme-dialog-small',
-      showClose: false
-    })
+
+    });
   }
 }
 })();
@@ -317,6 +293,7 @@ angular
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
 .directive('hideParent', HideParent)
+.directive('showParent', ShowParent)
 .directive('barchart', BarChart);
 
 
@@ -399,13 +376,23 @@ function HideParent() {
   }
 }
 
+function ShowParent() {
+  return {
+    restrict: 'C',
+    link: function (scope, element) {
+      if(!element.closest('.child').length) {
+        element.show();
+      }
+    }
+  }
+}
+
 })();
 (function(){
 angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
 .factory('session', ['stringManipulation', '$rootScope', SessionFactory])
-.factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbase', '$rootScope', 'session', NodeBinding])
 .factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', 'session', '$rootScope', DataFactory]);
 
 function SessionFactory(stringManipulation, $rootScope){
@@ -745,8 +732,14 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   return data;
 }
 
+})();
+
+(function(){
+angular
+.module("AppbaseDashboard")
+.factory('nodeBinding', ['data','stringManipulation','$timeout','$appbase','$rootScope','session','$log',NodeBinding]);
+
 function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session) {
-  var ctx = this;
   var nodeBinding = {};
   nodeBinding.childExists = function(node, childName) {
     for(var i=0 ; i<node.children.length; i++) {
@@ -756,7 +749,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     }
     return false;
   };
-  
+
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();
@@ -766,19 +759,28 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     root.expand = function() {
       root.children = [];
       root.expanded = true;
-      setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
+      root.loading = true;
+      pollNamespaces(function(){
+        root.loading = false;
+      });
+      setInterval(pollNamespaces, 2000);
+    }
+    root.contract = function(){
+      root.expanded = false;
+      root.children = [];
+    }
+
+    function pollNamespaces(cb){
+      data.getNamespaces(function(namespaceObjs){
         $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
             if(!nodeBinding.childExists(root, namespaceObj.name)) {
               root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
             }
-          })
-        })
-      }), 2000)
-    }
-    root.contract = function(){
-      root.expanded = false;
-      root.children = [];
+          });
+        });
+        if(cb) cb();
+      });
     }
 
     return root
@@ -798,7 +800,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     },
     onRemove : function(scope, vData, vRef, done) {
       $timeout(function() {
-        vData.color = 'tomato';
+        $('[data-toggle="tooltip"]').tooltip('destroy');
       });
 
       $timeout(function() {
@@ -812,6 +814,9 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       $timeout(function() {
         vData.color = 'white';
       }, 500);
+    },
+    onComplete : function(){
+      console.timeEnd('Angular on complete fired')
     }
   }
 
@@ -821,10 +826,14 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace));
     }
     ns.expand = function() {
-      ns.children = ns.ref.bindVertices($scope, vertexBindCallbacks);
       ns.expanded = true;
+      ns.loading = true;
+      ns.children = ns.ref.bindVertices($scope, $.extend({}, vertexBindCallbacks, { onComplete: function(){
+        $timeout(function(){
+          ns.loading = false;
+        });
+      }}));
     }
-    
     ns.contract = function() {
       ns.expanded = false;
       ns.ref.unbindVertices();
@@ -834,14 +843,21 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     var ignoreToggleClick = false;
 
     ns.toggleSearch = function() {
+      ns.toggling = true;
       // prevents multiple clicks
       if(ignoreToggleClick) return;
       ignoreToggleClick = true;
       data.namespaceSearchOptions(namespace, !ns.searchable, $timeout.bind(null, function() {
+        ns.toggling = false;
         ns.searchable = !ns.searchable;
         ignoreToggleClick = false;
       }));
     }
+
+    ns.remove = function() {
+      console.log('removin')
+    }
+
     return ns
   }
 
@@ -875,8 +891,10 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     }
 
     vertex.removeSelfEdge = function() {
+      vertex.deleting = true;
       var isARootVertex = (stringManipulation.parsePath(path).obj_path === undefined);
-      isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name); //destroy if root vertex, remove edge if not
+      isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name);
+      //destroy if root vertex, remove edge if not
     }
 
     vertex.addProperty = function(prop, value) {
@@ -905,7 +923,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
 }
 
 })();
-
 (function(){
 angular
 .module("AppbaseDashboard")

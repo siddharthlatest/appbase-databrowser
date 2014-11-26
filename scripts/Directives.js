@@ -4,6 +4,7 @@ angular
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
 .directive('hideParent', HideParent)
+.directive('showParent', ShowParent)
 .directive('barchart', BarChart);
 
 
@@ -81,6 +82,17 @@ function HideParent() {
     link: function (scope, element) {
       if(!element.closest('.child').length) {
         element.hide();
+      }
+    }
+  }
+}
+
+function ShowParent() {
+  return {
+    restrict: 'C',
+    link: function (scope, element) {
+      if(!element.closest('.child').length) {
+        element.show();
       }
     }
   }

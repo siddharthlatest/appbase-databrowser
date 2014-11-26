@@ -1,18 +1,78 @@
 <div class="node" xmlns="http://www.w3.org/1999/html">
-    <div class="content"  hide-parent ng-mouseover="node.mouse = true;" ng-mouseleave="node.mouse = false;" background-color="node.color">
-        <span class="glyphicon glyphicon-plus-sign" ng-hide="!node || node.expanded" ng-click="node.expand()"></span>
-        <span class="glyphicon glyphicon-minus-sign" ng-show="node.expanded" ng-click="node.contract()"></span>
-        <a href="" ng-click="node.meAsRoot()" ng-bind="node.name"></a> <span ng-show="showPriorities && node.priority" class="badge">Priority: {{node.priority}}</span> <span ng-show="modifyEnabled && node.mouse && node.removeSelfEdge" ng-click="node.removeSelfEdge()" title="Remove edge '{{node.name}}'" class="glyphicon glyphicon-remove"></span>
-        <span ng-show="node.isNS" ng-click="node.toggleSearch()" ng-class="node.searchable? 'glyphicon-eye-open text-success' : 'glyphicon-eye-close text-danger';" class="glyphicon tooltipbal" style="cursor: pointer; font-size: 1em" onmouseenter="$(this).tooltip({ trigger: 'hover' })" title="Toggle search" data-toggle="tooltip" data-placement="right">
+    <div class="content" 
+         hide-parent ng-mouseover="node.mouse=true"
+         ng-mouseleave="node.mouse=false"
+         >
+    
+        <span class="fa fa-angle-right expand"
+              ng-class="{contract: node.expanded}"
+              ng-click="node.expanded?node.contract():node.expand()">
         </span>
-        <ul class="propertiesBox" ng-show="node.properties">
-            <form ng-show="modifyEnabled && node.mouse" ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''" class="form">
+
+        <a href=""
+           ng-click="node.meAsRoot()"
+           ng-bind="node.name"
+           class="node-name"
+           ng-class="{expanded: node.expanded}"></a>
+
+        <ul class="list-inline node-options-list" ng-show="node.mouse">
+
+            <span ng-click="addEdgeInto(node)"
+                  class="fa node-options"
+                  ng-class="node.loadingNs? 'fa-cog fa-spin' : 'fa-plus'"
+                  title="Add vertex"
+                  data-toggle="tooltip"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  data-placement="top" >
+            </span>
+
+            <span 
+                  ng-click="node.removeSelfEdge ? node.removeSelfEdge() : node.remove()" title="Delete"
+                  class="fa node-options"
+                  ng-class="node.deleting? 'fa-cog fa-spin' : 'fa-remove'"
+                  title="Remove edge"
+                  data-toggle="tooltip"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  data-placement="top" >
+            </span>
+
+            <span ng-show="node.isNS"
+                  ng-click="node.toggleSearch()"
+                  ng-class="node.toggling? 'fa-cog fa-spin' : (node.searchable? 'fa-eye' : 'fa-eye-slash');"
+                  class="fa node-options"
+                  title="Toggle search"
+                  data-toggle="tooltip"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  data-placement="top" >
+            </span>
+
+            <span ng-show="node.priority"
+                  class="label label-warning node-options"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  title="Priority: {{node.priority}}"
+                  data-toggle="tooltip"
+                  data-placement="top">P</span>
+        </ul>
+
+        
+
+        <ul class="propertiesBox"
+            ng-show="node.properties" >
+
+            <form ng-show="modifyEnabled && node.mouse"
+                  ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''"
+                  class="form" >
+
                 <div class="row form-group">
                     <div class="col-xs-4">
-                        <input ng-required="true" type="text" class="input-sm form-control" ng-model="newProp" placeholder="New Property">
+                        <input ng-required="true"
+                               type="text"
+                               class="input-sm form-control"
+                               ng-model="newProp"
+                               placeholder="New Property" />
                     </div>
                     <div class="col-xs-1">
-                        <span style="font-weight: bolder">: </span>
+                        <span>:</span>
                     </div>
                     <div class="col-xs-6">
                         <input ng-required="true" type="text" class="input-sm form-control" ng-model="newVal" placeholder="Value">
@@ -22,22 +82,41 @@
                     </div>
                 </div>
             </form>
-            <li class="property" ng-repeat="(prop, val) in node.properties | orderBy:'prop'" style="width: 100%;">
+            <li class="property"
+                ng-repeat="(prop, val) in node.properties | orderBy:'prop'" >
                 <div class="col-xs-11">
                     &#8226;  {{prop}}: {{val}}
                 </div>
-                <div ng-show="modifyEnabled && node.mouse" class="col-xs-1">
-                    <span ng-click="node.removeProperty(prop)" title="Remove '{{prop}}'" class="glyphicon glyphicon-remove pull-right"></span>
+                <div ng-show="node.mouse" class="col-xs-1">
+                    <span ng-click="node.removeProperty(prop)"
+                          title="Remove '{{prop}}'"
+                          class="glyphicon glyphicon-remove pull-right">
+                    </span>
                 </div>
             </li>
         </ul>
 
-        <ul ng-show="modifyEnabled && node.mouse" class="children">
-            <li class="child" ><button class="btn btn-xs btn-success" ng-click="addEdgeInto(node);">Add Vertex</button></li>
-        </ul>
     </div>
-
     <ul ng-show="node.expanded" class="children">
-        <li class="child" ng-repeat="node in node.children" ng-include="'html/node.html'"></li>
+        <li class="status" ng-show="node.loading">Loading...</li>
+        <li class="status empty" ng-show="!node.children.length && !node.loading">
+          Empty
+          <ul class="list-inline node-options-list">
+              <span ng-click="addEdgeInto(node)"
+                    class="fa fa-plus node-options"
+                    title="Add vertex"
+                    data-toggle="tooltip"
+                    onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                    data-placement="top" >
+              </span>
+          </ul>
+        </li>
+        <li class="child" ng-repeat="node in node.children">
+            <ng-include src="'html/node.html'"> </ng-include>
+        </li>
+        <li class="status show-parent" ng-hide="node.loading || !node.children.length">
+          <span class="fa fa-plus expand" ng-class="node.loadingNs? 'fa-cog fa-spin' : 'fa-plus'" ng-click="addEdgeInto(node)"></span>
+          <a class="node-name" href="" ng-click="addEdgeInto(node)">Add vertex</a>
+        </li>
     </ul>
 </div>

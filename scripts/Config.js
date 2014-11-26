@@ -48,7 +48,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
       $rootScope.logged = false;
     });
   });
-
 } 
 
 function Routes($routeProvider){
