@@ -604,7 +604,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   };
 
   data.namespaceSearchOptions = function (ns, bool, done) {
-    var request = {"namespace": [ns]};
+    var request = {"namespace": ns};
     if(bool) {
       request["enable"] = true;
     } else {
