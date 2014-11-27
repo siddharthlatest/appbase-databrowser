@@ -173,6 +173,9 @@ body.ngdialog-open {
   font-family: "Source Sans Pro Extra Light Italic";
   src: url('/styles/fonts/SourceSansPro-ExtraLightIt.otf'); }
 
+/************************
+* Colors for the browser icons
+************************/
 @-webkit-keyframes appear {
   0% {
     opacity: 0; }
@@ -180,6 +183,9 @@ body.ngdialog-open {
   100% {
     opacity: 1; } }
 
+/************************
+* Colors for the browser icons
+************************/
 @keyframes appear {
   0% {
     opacity: 0; }
@@ -450,9 +456,6 @@ body {
     #browser .node a.node-name.expanded {
       color: #2a6596; }
   #browser .node .node-options-list {
-    /************************
-			* Colors for the browser icons
-			************************/
     display: inline;
     padding-left: 10px; }
     #browser .node .node-options-list .node-options {
@@ -477,6 +480,10 @@ body {
       #browser .node .node-options-list .node-options.fa-cog {
         transition: color 0.2s ease-in-out;
         color: #ff851b; }
+      #browser .node .node-options-list .node-options.fa-pencil-square-o {
+        position: relative;
+        top: 2px;
+        color: #26be6d; }
     #browser .node .node-options-list .label {
       position: relative;
       top: -1px;
@@ -514,6 +521,50 @@ body {
     top: 1px; }
     #browser .node .fa.fa-plus {
       margin-right: 4px; }
+  #browser .propertiesBox {
+    margin-top: 7px; }
+    #browser .propertiesBox .panel {
+      border-color: #f47c3c; }
+      #browser .propertiesBox .panel .panel-heading {
+        background: #f47c3c;
+        padding: 5px 15px; }
+        #browser .propertiesBox .panel .panel-heading .panel-title {
+          font-family: "Source Sans Pro Bold";
+          font-size: 0.8em;
+          color: white;
+          text-transform: uppercase; }
+          #browser .propertiesBox .panel .panel-heading .panel-title .fa {
+            cursor: pointer;
+            position: relative;
+            left: 5px;
+            top: 0;
+            font-size: 0.9em; }
+            #browser .propertiesBox .panel .panel-heading .panel-title .fa:hover {
+              opacity: 0.85; }
+      #browser .propertiesBox .panel .panel-body {
+        color: #aaa;
+        font-size: 0.9em;
+        padding: 5px 15px; }
+        #browser .propertiesBox .panel .panel-body input {
+          font-family: "Source Sans Pro Regular";
+          color: black;
+          min-width: 10px;
+          width: auto;
+          border: none; }
+        #browser .propertiesBox .panel .panel-body .fa {
+          cursor: pointer;
+          transition: color 0.2s ease;
+          margin-right: 10px; }
+          #browser .propertiesBox .panel .panel-body .fa.fa-cog {
+            color: #ff851b;
+            margin-right: 9px; }
+          #browser .propertiesBox .panel .panel-body .fa.fa-remove:hover {
+            color: #ff4136; }
+          #browser .propertiesBox .panel .panel-body .fa.fa-pencil:hover {
+            color: #ff851b; }
+        #browser .propertiesBox .panel .panel-body span {
+          font-family: "Source Sans Pro Regular";
+          color: black; }
   #browser .breadcrumb {
     background-color: #aaa;
     border-radius: 0;

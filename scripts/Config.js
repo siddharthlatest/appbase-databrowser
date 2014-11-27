@@ -2,7 +2,12 @@
  * Created by Sagar on 30/8/14.
  */
 (function(){
-angular.module("AppbaseDashboard", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'easypiechart', 'ngAnimate', 'ngDialog'])
+angular.module("AppbaseDashboard", ['ngAppbase',
+                                    'ngRoute',
+                                    'ng-breadcrumbs',
+                                    'easypiechart',
+                                    'ngAnimate',
+                                    'ngDialog'])
   .run(FirstRun)
   .config(Routes);
 

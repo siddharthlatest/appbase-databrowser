@@ -200,6 +200,13 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   };
 
+  data.deleteNamespace = function(namespace, done) {
+    atomic.delete(atob(server)+'app/'+ appName +'/namespaces', {"namespace": namespace, "secret": secret})
+      .success(function(result){
+        done();
+      }).error(done);
+  }
+
   data.namespaceSearchOptions = function (ns, bool, done) {
     var request = {"namespace": ns};
     if(bool) {

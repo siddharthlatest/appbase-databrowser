@@ -67,6 +67,13 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       })
     }
 
+    $scope.deleteApp = function(app) {
+      data.deleteApp(app, function(error) {
+        if(error) throw error;
+        else fetchApps();
+      });
+    }
+
     document.addEventListener('logout', function() {
       $timeout(function(){
         $rootScope.logged = false;

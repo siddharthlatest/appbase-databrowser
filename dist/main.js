@@ -2,7 +2,12 @@
  * Created by Sagar on 30/8/14.
  */
 (function(){
-angular.module("AppbaseDashboard", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'easypiechart', 'ngAnimate', 'ngDialog'])
+angular.module("AppbaseDashboard", ['ngAppbase',
+                                    'ngRoute',
+                                    'ng-breadcrumbs',
+                                    'easypiechart',
+                                    'ngAnimate',
+                                    'ngDialog'])
   .run(FirstRun)
   .config(Routes);
 
@@ -147,6 +152,13 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
           fetchApps();
         } 
       })
+    }
+
+    $scope.deleteApp = function(app) {
+      data.deleteApp(app, function(error) {
+        if(error) throw error;
+        else fetchApps();
+      });
     }
 
     document.addEventListener('logout', function() {
@@ -387,6 +399,39 @@ function ShowParent() {
   }
 }
 
+// requires sanitize
+// function ContentEditable($sce) {
+//   return {
+//     restrict: 'A', // only activate on element attribute
+//     require: '?ngModel', // get a hold of NgModelController
+//     link: function(scope, element, attrs, ngModel) {
+//       if (!ngModel) return; // do nothing if no ng-model
+
+//       // Specify how UI should be updated
+//       ngModel.$render = function() {
+//         element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
+//       };
+
+//       // Listen for change events to enable binding
+//       element.on('blur keyup change', function() {
+//         scope.$evalAsync(read);
+//       });
+//       read(); // initialize
+
+//       // Write data to the model
+//       function read() {
+//         var html = element.html();
+//         // When we clear the content editable the browser leaves a <br> behind
+//         // If strip-br attribute is provided then we strip this out
+//         if ( attrs.stripBr && html == '<br>' ) {
+//           html = '';
+//         }
+//         ngModel.$setViewValue(html);
+//       }
+//     }
+//   }
+// }
+
 })();
 (function(){
 angular
@@ -590,6 +635,13 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   };
 
+  data.deleteNamespace = function(namespace, done) {
+    atomic.delete(atob(server)+'app/'+ appName +'/namespaces', {"namespace": namespace, "secret": secret})
+      .success(function(result){
+        done();
+      }).error(done);
+  }
+
   data.namespaceSearchOptions = function (ns, bool, done) {
     var request = {"namespace": ns};
     if(bool) {
@@ -737,9 +789,14 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
 (function(){
 angular
 .module("AppbaseDashboard")
-.factory('nodeBinding', ['data','stringManipulation','$timeout','$appbase','$rootScope','session','$log',NodeBinding]);
+.factory('nodeBinding',['data',
+  'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog',NodeBinding]);
 
-function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session) {
+function debug(a) {
+  return JSON.parse(JSON.stringify(a))
+}
+
+function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
   nodeBinding.childExists = function(node, childName) {
     for(var i=0 ; i<node.children.length; i++) {
@@ -816,7 +873,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       }, 500);
     },
     onComplete : function(){
-      console.timeEnd('Angular on complete fired')
+      
     }
   }
 
@@ -832,6 +889,8 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
         $timeout(function(){
           ns.loading = false;
         });
+        var children = JSON.parse(JSON.stringify(ns.children));
+
       }}));
     }
     ns.contract = function() {
@@ -855,19 +914,21 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     }
 
     ns.remove = function() {
-      console.log('removin')
+      ns.deleting = true;
+      data.deleteNamespace(ns.name, function(error){
+        if(error) throw error;
+        ns.deleting = false;
+      });
     }
 
     return ns
   }
 
   nodeBinding.bindAsVertex = function($scope, path, useThisVertex) {
-    
     var parsedPath = stringManipulation.parsePath(path);
     var vertex = useThisVertex || {
       ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
-    }
-
+    }    
     vertex.isV = true
 
     vertex.expand = function() {
@@ -886,8 +947,13 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       vertex.ref.unbindEdges();
     }
 
-    vertex.removeProperty = function(prop) {
-      vertex.ref.removeData([prop]);
+    vertex.removeProperty = function(prop, done) {
+      vertex.removingProp = prop;
+      vertex.ref.removeData([prop], function(error){
+         if(error) throw error;
+         $timeout(function(){vertex.removingProp = false;});
+         if(done) done();
+      });
     }
 
     vertex.removeSelfEdge = function() {
@@ -897,15 +963,57 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       //destroy if root vertex, remove edge if not
     }
 
+    vertex.addProp = function(){
+      ngDialog.open({
+        template: '/developer/html/prop.html',
+        controller: ['$scope', function($dialogScope) {
+          $dialogScope.done = function() {
+            if($dialogScope.prop && $dialogScope.val){
+              vertex.addProperty($dialogScope.prop, $dialogScope.val);
+              $dialogScope.closeThisDialog();
+            }
+          }
+        }],
+        className: 'ngdialog-theme-dialog-small'
+      });
+    }
+
+    vertex.editProp = function(prop, val){
+      ngDialog.open({
+        template: '/developer/html/prop.html',
+        controller: ['$scope', function($dialogScope) {
+          $dialogScope.prop = prop;
+          $dialogScope.val = val;
+          $dialogScope.done = function() {
+            if($dialogScope.prop && $dialogScope.val){
+              if($dialogScope.prop !== prop){
+                vertex.removeProperty(prop, function(){
+                  vertex.addProperty($dialogScope.prop, $dialogScope.val);
+                  $dialogScope.closeThisDialog();
+                });
+              } else {
+                vertex.addProperty($dialogScope.prop, $dialogScope.val);
+                $dialogScope.closeThisDialog();
+              }
+            }
+          }
+        }],
+        className: 'ngdialog-theme-dialog-small'
+      });
+    }
+
     vertex.addProperty = function(prop, value) {
       var vData = {};
       vData[prop] = value;
-      vertex.ref.setData(vData);
+      vertex.ref.setData(vData, function(){
+        $scope.$apply();
+      });
     }
 
     if(useThisVertex === undefined) {
       vertex.properties = vertex.ref.bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
+          console.log(properties)
           if(vertex.color == 'white')
             vertex.color = 'gold';
           done();
@@ -917,6 +1025,26 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       })
       vertex.name = path.slice(path.lastIndexOf('/') + 1);
     }
+
+    /* Future programmer: do not mess with this. You have no idea what you're getting into. 
+     * If you feel like optimizing something, I can point you to the minified file of the AngularJS library;
+     * it's actually safer to mess with stuff from there. Employ your adventurous spirit somewhere else.
+     * Consider yourself warned.
+     */
+    var uuid = 'a' + Appbase.uuid();
+    vertex.ref.bindProperties($scope, {
+      onProperties : function(scope, properties, ref, done) {
+        $timeout(function() {
+          $scope[uuid] = vertex.properties = properties;
+        });
+      }
+    })
+    $scope[uuid] = vertex.properties;
+    vertex.hasProps = Object.keys($scope[uuid]).length>0;
+    $scope.$watch(uuid, function(val){
+      vertex.hasProps = Object.keys($scope[uuid]).length>0;
+    });
+    
     return vertex;
   }
   return nodeBinding;

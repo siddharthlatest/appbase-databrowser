@@ -46,6 +46,15 @@
                   data-placement="top" >
             </span>
 
+            <span ng-show="!node.hasProps && node.properties"
+                  ng-click="node.addProp()"
+                  class="fa fa-pencil-square-o node-options"
+                  title="Add property"
+                  data-toggle="tooltip"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  data-placement="top" >
+            </span>
+
             <span ng-show="node.priority"
                   class="label label-warning node-options"
                   onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
@@ -56,44 +65,30 @@
 
         
 
-        <ul class="propertiesBox"
-            ng-show="node.properties" >
+        <ul class="propertiesBox" ng-show="node.hasProps" >
+          <div class="col-xs-12">
+            <div class="panel">
+              <div class="panel-heading">
+                <h3 class="panel-title">
+                  Properties <a class="fa fa-plus-square" ng-click="node.addProp()"></a>
+                </h3>
+              </div>
+              <div class="panel-body">
+                <div ng-repeat="(prop, val) in node.properties | orderBy:'prop'">
 
-            <form ng-show="modifyEnabled && node.mouse"
-                  ng-submit="node.addProperty(newProp, newVal); newProp=''; newVal=''"
-                  class="form" >
+                  <i class="fa"
+                    ng-class="node.removingProp===prop? 'fa-cog fa-spin':'fa-remove'"
+                    ng-click="node.removeProperty(prop)"></i>
 
-                <div class="row form-group">
-                    <div class="col-xs-4">
-                        <input ng-required="true"
-                               type="text"
-                               class="input-sm form-control"
-                               ng-model="newProp"
-                               placeholder="New Property" />
-                    </div>
-                    <div class="col-xs-1">
-                        <span>:</span>
-                    </div>
-                    <div class="col-xs-6">
-                        <input ng-required="true" type="text" class="input-sm form-control" ng-model="newVal" placeholder="Value">
-                    </div>
-                    <div class="col-xs-1">
-                        <button type="submit" class="form-control"><span class="glyphicon glyphicon-plus"></span></button>
-                    </div>
+                  <i class="fa fa-pencil"
+                     ng-click="node.editProp(prop, val)"></i>
+
+                  {&nbsp;&nbsp;&nbsp;"<span ng-bind="prop"></span>":&nbsp;&nbsp;&nbsp;"<span ng-bind="val"></span>"&nbsp;&nbsp;&nbsp;}
+                  <i ng-show="!$last">,</i>
                 </div>
-            </form>
-            <li class="property"
-                ng-repeat="(prop, val) in node.properties | orderBy:'prop'" >
-                <div class="col-xs-11">
-                    &#8226;  {{prop}}: {{val}}
-                </div>
-                <div ng-show="node.mouse" class="col-xs-1">
-                    <span ng-click="node.removeProperty(prop)"
-                          title="Remove '{{prop}}'"
-                          class="glyphicon glyphicon-remove pull-right">
-                    </span>
-                </div>
-            </li>
+              </div>
+            </div>
+          </div>
         </ul>
 
     </div>

@@ -1,4 +1,22 @@
 @import "../../styles/variables.scss";
+
+/************************
+* Colors for the browser icons
+************************/
+$db-add: darken($footer-color, 5%);
+$db-add-hover: lighten($db-add, 6%);
+
+$db-remove: #ff4136;
+$db-remove-hover: lighten($db-remove, 10%);
+
+$db-search-on: $db-add;
+$db-search-on-hover: $db-add-hover;
+
+$db-search-off: $db-remove;
+$db-search-off-hover: $db-remove-hover;
+
+$db-search-cog: #ff851b;
+
 @keyframes appear {
   0%   { opacity: 0; }
   100% { opacity: 1; }
@@ -314,22 +332,6 @@ body {
 			}
 		}
 		.node-options-list {
-		   /************************
-			* Colors for the browser icons
-			************************/
-			$db-add: darken($footer-color, 5%);
-			$db-add-hover: lighten($db-add, 6%);
-
-			$db-remove: #ff4136;
-			$db-remove-hover: lighten($db-remove, 10%);
-
-			$db-search-on: $db-add;
-			$db-search-on-hover: $db-add-hover;
-
-			$db-search-off: $db-remove;
-			$db-search-off-hover: $db-remove-hover;
-
-			$db-search-cog: #ff851b;
 
 			display:inline;
 			.node-options {
@@ -359,6 +361,11 @@ body {
 				&.fa-cog {
 					transition: color 0.2s ease-in-out;
 					color: $db-search-cog;
+				}
+				&.fa-pencil-square-o {
+					position: relative;
+					top: 2px;
+					color: $db-add;
 				}
 			}
 			padding-left: 10px;
@@ -402,7 +409,67 @@ body {
 			}
 		}
 	}
-
+	.propertiesBox {
+		margin-top:7px;
+		.panel {
+			border-color: #f47c3c;
+			.panel-heading {
+				background: #f47c3c;
+				padding: 5px 15px;
+				.panel-title {
+					font-family: $font-bold;
+					font-size: 0.8em;
+					color: white;
+					text-transform: uppercase;
+					.fa {
+						cursor: pointer;
+						position: relative;
+						left: 5px;
+						top:0;
+						font-size: 0.9em;
+						&:hover {
+							opacity: 0.85;
+						}
+					}
+				}
+			}
+			.panel-body {
+				color: #aaa;
+				font-size: 0.9em;
+				padding: 5px 15px;
+				input {
+					font-family: $font-regular;
+					color: black;
+					min-width: 10px;
+					width: auto;
+					border:none;
+				}
+				.fa {
+					cursor: pointer;
+					transition: color 0.2s ease;
+					margin-right: 10px;
+					&.fa-cog {
+						color: $db-search-cog;
+						margin-right: 9px;
+					}
+					&.fa-remove {
+						&:hover {
+							color: $db-remove;
+						}
+					}
+					&.fa-pencil {
+						&:hover {
+							color: $db-search-cog;
+						}
+					}
+				}
+				span {
+					font-family: $font-regular;
+					color: black;
+				}
+			}
+		}
+	}
 	.breadcrumb {
 		background-color: #aaa;
 		border-radius: 0;
