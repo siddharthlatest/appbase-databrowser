@@ -58,13 +58,14 @@
                     </div>
                 </div>
                 <div class="form-group input-line manage-url">
-                    <div class="col-lg-9 col-xs-9 url">
+                    <div class="col-lg-7 col-md-6 col-xs-7 url">
                         <div>
                             <a ng-click="goToBrowser(appToURL(app, api));$rootScope.currentApp=app;"
                                ng-bind="appToURL(app, api)"> </a>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-xs-3 text-right">
+                    <div class="col-lg-5 col-md-6 col-xs-5 text-right">
+                        <a class="btn btn-sm delete" href="" ng-click="deleteApp(app)">Delete</a>
                         <a class="btn btn-sm manage" ng-href="/developer#/{{app}}/stats">Manage</a>
                     </div>
                 </div>

@@ -247,8 +247,8 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   }
   
-  data.deleteApp = function(done) {
-    atomic.delete(atob(server)+'app/'+ app)
+  data.deleteApp = function(app, done) {
+    atomic.delete(atob(server)+'app/'+ app, {'kill':true})
       .success(function(response) {
         if(typeof response === "string") {
           done(response)

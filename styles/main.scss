@@ -16,6 +16,7 @@ $db-search-off: $db-remove;
 $db-search-off-hover: $db-remove-hover;
 
 $db-search-cog: #ff851b;
+$red: lighten(#d9534f, 3%); 
 
 @keyframes appear {
   0%   { opacity: 0; }
@@ -226,7 +227,6 @@ body {
 			&#createuserapp {
 				background-color: $footer-color;
 				border: none;
-				text-transform: uppercase;
 				box-shadow: none;
 				&:hover {
 					background-color: lighten($footer-color, 5%);
@@ -236,16 +236,29 @@ body {
 				}
 			}
 
-			&.manage {
-				background-color: $blue;
+			&.manage, &.delete {
 				color: white;
 				font-family: $font-light;
 				text-transform: uppercase;
+			}
+
+			&.manage {
+				background-color: $blue;
 				&:hover {
 					background-color: lighten($blue, 5%);
 				}
 				&:active {
 					background-color: darken($blue, 10%);
+				}
+			}
+
+			&.delete {
+				background-color: $red;
+				&:hover {
+					background-color: lighten($red, 5%);
+				}
+				&:active {
+					background-color: darken($red, 10%);
 				}
 			}
 		}
@@ -861,5 +874,49 @@ body {
 	height: 100%;
 	width: 100%;
 	top: 40vh;
+	background: white;
 	z-index:99999; 
+}
+
+.confirm-del {
+	.modal-content {
+		border-radius: 0;
+		font-family: $font-light;
+		font-size: 1.2em;
+		.btn {
+			color: white;
+			text-transform: uppercase;
+		}
+		.btn-yes {
+			background: darken($red, 5%);
+			&:hover {
+				background: $red;
+			}
+			&:active {
+				background: darken($red, 10%);
+			}
+		}
+		.btn-no{
+			background: #888;
+			&:hover {
+				background: #999;
+			}
+			&:active {
+				background: #777;
+			}
+		}
+		.modal-footer {
+			border:0;
+		}
+	}
+	.modal-header {
+		background: darken($red, 5%);
+		padding: 15px 15px;
+		.bootstrap-dialog-title {
+			font-family: $font-bold;
+			font-size: 1.2em;
+			color: white;
+			text-transform: uppercase;
+		}
+	}
 }

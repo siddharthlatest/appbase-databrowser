@@ -68,10 +68,32 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     }
 
     $scope.deleteApp = function(app) {
-      data.deleteApp(app, function(error) {
-        if(error) throw error;
-        else fetchApps();
-      });
+
+      var a = new BootstrapDialog({
+          title: 'Delete app',
+          message: 'Are you sure you want to delete ' + app + '?',
+          closable: false,
+          cssClass: 'confirm-del',
+          buttons: [{
+              label: 'Cancel',
+              cssClass: 'btn-no',
+              action: function(dialog) {
+                  dialog.close();
+              }
+          }, {
+              label: 'Yes',
+              cssClass: 'btn-yes',
+              action: function(dialog) {
+                  console.log('oy')
+                  data.deleteApp(app, function(error) {
+                    console.log('oys')
+                    if(error) throw error;
+                    else fetchApps();
+                  });
+                  dialog.close();
+              }
+          }]
+      }).open();
     }
 
     document.addEventListener('logout', function() {
