@@ -84,13 +84,11 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
               label: 'Yes',
               cssClass: 'btn-yes',
               action: function(dialog) {
-                  console.log('oy')
-                  data.deleteApp(app, function(error) {
-                    console.log('oys')
-                    if(error) throw error;
-                    else fetchApps();
-                  });
-                  dialog.close();
+                data.deleteApp(app, function(error) {
+                  if(error) throw error;
+                  else fetchApps();
+                });
+                dialog.close();
               }
           }]
       }).open();

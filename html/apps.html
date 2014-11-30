@@ -32,9 +32,12 @@
                 </form>
             </div>
         </div>
-        <div class="form-horizontal col-md-6 col-xs-12 loading" ng-hide="!fetching">
-            <div class="row wrapper well">
+        <div class="form-horizontal col-md-6 col-xs-12 loading" ng-show="fetching || noApps">
+            <div class="row wrapper well" ng-show="fetching">
             Loading...
+            </div>
+            <div class="row wrapper well" ng-show="noApps">
+            You don't have any apps.
             </div>
         </div>
         <div class="form-horizontal col-md-6 col-xs-12 appear" ng-repeat="(app, obj) in apps">
@@ -72,4 +75,7 @@
             </div>
         </div>
     </div>
+</div>
+<div ng-show="noApps">
+    NO APPS CONTENT
 </div>

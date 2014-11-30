@@ -248,26 +248,37 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   }
   
   data.deleteApp = function(app, done) {
-    atomic.delete(atob(server)+'app/'+ app, {'kill':true})
+    atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
-        if(typeof response === "string") {
-          done(response)
-        } else if(typeof response === "object") {
-          atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
-            .success(function(result) {
-              done(null)
-            })
-            .error(function(error) {
-              throw error
-            })
-        } else {
-          throw 'Server Error, try again.'
-        }
+        done();
       })
       .error(function(error) {
-        throw error
+        throw error;
       })
   }
+
+  // not sure
+  // data.deleteApp = function(app, done) {
+  //   atomic.delete(atob(server)+'app/'+ app, {'kill':true})
+  //     .success(function(response) {
+  //       if(typeof response === "string") {
+  //         done(response)
+  //       } else if(typeof response === "object") {
+  //         atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+  //           .success(function(result) {
+  //             done(null)
+  //           })
+  //           .error(function(error) {
+  //             throw error
+  //           })
+  //       } else {
+  //         throw 'Server Error, try again.'
+  //       }
+  //     })
+  //     .error(function(error) {
+  //       throw error
+  //     })
+  // }
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
@@ -305,6 +316,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   data.getDevsAppsWithEmail = function(done) {
     atomic.get(atob(server)+'user/'+ session.getProfile().email)
       .success(function(apps) {
+        console.log('h', apps)
         var appsAndSecrets = {};
         var appsArrived = 0;
         var secretArrived = function(app, secret, metrics) {
@@ -325,10 +337,17 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
           });
         });
         $rootScope.fetching = false;
+        $rootScope.noApps = false;
         $rootScope.$apply();
       })
       .error(function(error) {
-        throw error
+        if(error.message === "Not Found") {
+          $timeout(function(){
+            $rootScope.fetching = false;
+            $rootScope.noApps = true;
+          });
+          done({});
+        } else throw error;
       })
   }
 

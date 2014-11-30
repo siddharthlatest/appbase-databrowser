@@ -74,6 +74,10 @@ $red: lighten(#d9534f, 3%);
 	height: 100%;
 }
 
+.view-wrapper {
+	$others: $navbar-height + $footer-height;
+	min-height: calc(100vh - 170px);
+}
 #nav {
 	position: fixed;
 	width: 100%;
@@ -140,7 +144,7 @@ body {
 	padding-left: 0;
 	padding-right: 0;
 	div[ng-view] {
-		min-height: calc(100vh - #{$navbar-height + $footer-height + $manage-height + 30px});
+		//min-height: calc(100vh - #{$navbar-height + $footer-height + $manage-height + 30px});
 	}
 }
 
@@ -311,9 +315,13 @@ body {
 					height: $manage-height;
 					line-height: $manage-height;
 					padding: 0 20px;
+					background-color: #888;
 					color: white;
 					&:hover {
 						background-color: #666;
+					}
+					&:active{
+
 					}
 				}
 			}
@@ -838,7 +846,7 @@ body {
 #not-logged {
 	display:table;
 	text-align: center;
-	min-height: calc(100vh - (#{$navbar-height + $footer-height + 41px}));
+	min-height: calc(100vh - 270px);
 	&>div{
 		display: table-cell;
 		vertical-align:middle;
