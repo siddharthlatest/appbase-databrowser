@@ -2,7 +2,12 @@
  * Created by Sagar on 30/8/14.
  */
 (function(){
-angular.module("AppbaseDashboard", ['ngAppbase', 'ngRoute', 'ng-breadcrumbs', 'easypiechart', 'ngAnimate', 'ngDialog'])
+angular.module("AppbaseDashboard", ['ngAppbase',
+                                    'ngRoute',
+                                    'ng-breadcrumbs',
+                                    'easypiechart',
+                                    'ngAnimate',
+                                    'ngDialog'])
   .run(FirstRun)
   .config(Routes);
 
@@ -48,7 +53,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
       $rootScope.logged = false;
     });
   });
-
 } 
 
 function Routes($routeProvider){
@@ -150,6 +154,33 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       })
     }
 
+    $scope.deleteApp = function(app) {
+
+      var a = new BootstrapDialog({
+          title: 'Delete app',
+          message: 'Are you sure you want to delete ' + app + '?',
+          closable: false,
+          cssClass: 'confirm-del',
+          buttons: [{
+              label: 'Cancel',
+              cssClass: 'btn-no',
+              action: function(dialog) {
+                  dialog.close();
+              }
+          }, {
+              label: 'Yes',
+              cssClass: 'btn-yes',
+              action: function(dialog) {
+                data.deleteApp(app, function(error) {
+                  if(error) throw error;
+                  else fetchApps();
+                });
+                dialog.close();
+              }
+          }]
+      }).open();
+    }
+
     document.addEventListener('logout', function() {
       $timeout(function(){
         $rootScope.logged = false;
@@ -171,14 +202,12 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
 angular
 .module("AppbaseDashboard")
 .controller("browser",
-             ['$scope', '$appbase', '$timeout', '$routeParams', '$location',
+             ['$scope', '$appbase', '$timeout', '$location',
               'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
               'session', '$rootScope', BrowserCtrl]);
 
-function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, stringManipulation, breadcrumbs, ngDialog, nodeBinding, session, $rootScope){
+function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
   $rootScope.db_loading = true;
-  $scope.alertType = 'danger';
-  $scope.goToBrowser = $rootScope.goToBrowser;
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
   if(!appName || !session.getApps() || !session.getApps()[appName]) {
     $rootScope.goToApps();
@@ -193,23 +222,8 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
     session.setBrowserURL(URL);
   }
 
-  //URL = stringManipulation.cutLeadingTrailingSlashes($routeParams.urlToPath)
-  //appName = stringManipulation.parseURL(URL).appName; 
-  // if(appName === undefined){
-  //   if((appName = stringManipulation.parseURL(URL = session.getBrowserURL()).appName) === undefined) {
-  //     $scope.alert = 'The URL is not proper, or, you are not logged in.';
-  //     return;
-  //   } else {
-  //     $rootScope.goToBrowser(URL);
-  //   }
-  // } else {
-  //   session.setBrowserURL(URL);
-  // }
-
-
   if(!data.init(appName)) {
-    $scope.alert = 'You are not allowed to browse this data. Go to the developer page and try logging in again.'
-    return
+    $rootScope.goToApps();
   }
 
   $scope.url = URL;
@@ -233,81 +247,75 @@ function BrowserCtrl($scope, $appbase, $timeout, $routeParams, $location, data, 
   $rootScope.db_loading = false;
   
   $scope.addEdgeInto = function(node) {
-    ngDialog.open({
-      template: '/developer/html/dialog-new-vertex.html',
-      controller: ['$scope', function($dialogScope) {
-        $dialogScope.node = node
-        if (!node.isV) {
-          $dialogScope.title = "Add Vertex"
-        } else {
-          $dialogScope.title = "Add Out-vertex at path: " + node.ref.path();
-        }
-        if(node.isNS) {
-          $dialogScope.namespaceSelected = node.name
-        }
-        $dialogScope.text = "in " + node.name
-        $dialogScope.vTypeOptions = ['New Vertex', 'Existing Vertex']
-        $dialogScope.vType = $dialogScope.vTypeOptions[0]
+    var namespaces = [];
+    node.loadingNs = true;
+    data.getNamespaces(function(array) {
+      node.loadingNs = false;
+      array.forEach(function(each){
+        namespaces.push(each.name);
+      });
+      ngDialog.open({
+        template: '/developer/html/dialog-new-vertex.html',
+        controller: ['$scope', function($dialogScope) {
+          $dialogScope.namespaces = namespaces;
+          $dialogScope.node = node;
+          if (!node.isV) {
+            $dialogScope.title = "Add Vertex"
+          } else {
+            $dialogScope.title = "Add Out-vertex at path: " + node.ref.path();
+          }
+          if(node.isNS) {
+            $dialogScope.namespaceSelected = node.name;
+          }
+          $dialogScope.text = "in " + node.name
+          $dialogScope.vTypeOptions = ['New Vertex', 'Existing Vertex']
+          $dialogScope.vType = $dialogScope.vTypeOptions[0]
 
-        $dialogScope.namespaces = ['Loading..']
-        data.getNamespaces(function(array) {
-          $timeout(function() {
-            $dialogScope.namespaces = [];
-            for(var i=0; i< array.length; i++) {
-              $dialogScope.namespaces.push(array[i].name);
+          $dialogScope.done = function() {
+            var prepareParams = function() {
+              var params = {}
+              if($dialogScope.vType === $dialogScope.vTypeOptions[0]) { // New Vertex
+                params.namespace =
+                  ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
+                  $dialogScope.namespaceNew : $dialogScope.namespaceSelected
+                params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? $appbase.uuid() : $dialogScope.vId
+                params.ref = $appbase.ns(params.namespace).v(params.vId)
+              } else {
+                params.vPath = $dialogScope.vPath
+                var parsedPath = stringManipulation.parsePath(params.vPath);
+                params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
+              }
+
+              params.eName = 
+                ($dialogScope.eName === undefined || $dialogScope.eName === "") ?
+                (params.vId === undefined? $appbase.uuid() : params.vId) : $dialogScope.eName
+              params.pR = ($dialogScope.pR === undefined || $dialogScope.pR === null) ? undefined : $dialogScope.pR
+
+              return params
             }
-          })
-        })
 
-        //prevents user from choosing 'Loading..'
-        $dialogScope.$watch( function() {
-          return $dialogScope.namespaceSelected
-        }, function(val) {
-          $dialogScope.namespaceSelected = (val === 'Loading..' ? null : val)
-        })
-
-        $dialogScope.done = function() {
-          var prepareParams = function() {
-            var params = {}
-            if($dialogScope.vType === $dialogScope.vTypeOptions[0]) { // New Vertex
-              params.namespace =
-                ($dialogScope.namespaceSelected === undefined || $dialogScope.namespaceSelected === null) ?
-                $dialogScope.namespaceNew : $dialogScope.namespaceSelected
-              params.vId = ($dialogScope.vId === undefined || $dialogScope.vId === "") ? $appbase.uuid() : $dialogScope.vId
-              params.ref = $appbase.ns(params.namespace).v(params.vId)
-            } else {
-              params.vPath = $dialogScope.vPath
-              var parsedPath = stringManipulation.parsePath(params.vPath);
-              params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
+            var params = prepareParams()
+            if(node.isV) {
+              if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
+              else node.ref.setEdge(params.eName, params.ref)
+            } else if(node.isR) {
+              if(!nodeBinding.childExists(node, params.namespace)) {
+                node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
+              }
             }
-
-            params.eName = 
-              ($dialogScope.eName === undefined || $dialogScope.eName === "") ?
-              (params.vId === undefined? $appbase.uuid() : params.vId) : $dialogScope.eName
-            params.pR = ($dialogScope.pR === undefined || $dialogScope.pR === null) ? undefined : $dialogScope.pR
-
-            return params
+            $dialogScope.closeThisDialog()
           }
 
-          var params = prepareParams()
-          if(node.isV) {
-            if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
-            else node.ref.setEdge(params.eName, params.ref)
-          } else if(node.isR) {
-            if(!nodeBinding.childExists(node, params.namespace)) {
-              node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
-            }
+          $dialogScope.no = function() {
+            $dialogScope.closeThisDialog()
           }
-          $dialogScope.closeThisDialog()
-        }
+        }],
+        className: 'ngdialog-theme-dialog-small',
+        showClose: false
+      });
 
-        $dialogScope.no = function() {
-          $dialogScope.closeThisDialog()
-        }
-      }],
-      className: 'ngdialog-theme-dialog-small',
-      showClose: false
-    })
+
+    });
   }
 }
 })();
@@ -317,6 +325,7 @@ angular
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
 .directive('hideParent', HideParent)
+.directive('showParent', ShowParent)
 .directive('barchart', BarChart);
 
 
@@ -399,13 +408,56 @@ function HideParent() {
   }
 }
 
+function ShowParent() {
+  return {
+    restrict: 'C',
+    link: function (scope, element) {
+      if(!element.closest('.child').length) {
+        element.show();
+      }
+    }
+  }
+}
+
+// requires sanitize
+// function ContentEditable($sce) {
+//   return {
+//     restrict: 'A', // only activate on element attribute
+//     require: '?ngModel', // get a hold of NgModelController
+//     link: function(scope, element, attrs, ngModel) {
+//       if (!ngModel) return; // do nothing if no ng-model
+
+//       // Specify how UI should be updated
+//       ngModel.$render = function() {
+//         element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
+//       };
+
+//       // Listen for change events to enable binding
+//       element.on('blur keyup change', function() {
+//         scope.$evalAsync(read);
+//       });
+//       read(); // initialize
+
+//       // Write data to the model
+//       function read() {
+//         var html = element.html();
+//         // When we clear the content editable the browser leaves a <br> behind
+//         // If strip-br attribute is provided then we strip this out
+//         if ( attrs.stripBr && html == '<br>' ) {
+//           html = '';
+//         }
+//         ngModel.$setViewValue(html);
+//       }
+//     }
+//   }
+// }
+
 })();
 (function(){
 angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
 .factory('session', ['stringManipulation', '$rootScope', SessionFactory])
-.factory('nodeBinding', ['data', 'stringManipulation', '$timeout', '$appbase', '$rootScope', 'session', NodeBinding])
 .factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', 'session', '$rootScope', DataFactory]);
 
 function SessionFactory(stringManipulation, $rootScope){
@@ -603,8 +655,15 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   };
 
+  data.deleteNamespace = function(namespace, done) {
+    atomic.delete(atob(server)+'app/'+ appName +'/namespaces', {"namespace": namespace, "secret": secret})
+      .success(function(result){
+        done();
+      }).error(done);
+  }
+
   data.namespaceSearchOptions = function (ns, bool, done) {
-    var request = {"namespace": [ns]};
+    var request = {"namespace": ns};
     if(bool) {
       request["enable"] = true;
     } else {
@@ -643,27 +702,38 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   }
   
-  data.deleteApp = function(done) {
-    atomic.delete(atob(server)+'app/'+ app)
+  data.deleteApp = function(app, done) {
+    atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
-        if(typeof response === "string") {
-          done(response)
-        } else if(typeof response === "object") {
-          atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
-            .success(function(result) {
-              done(null)
-            })
-            .error(function(error) {
-              throw error
-            })
-        } else {
-          throw 'Server Error, try again.'
-        }
+        done();
       })
       .error(function(error) {
-        throw error
+        throw error;
       })
   }
+
+  // not sure
+  // data.deleteApp = function(app, done) {
+  //   atomic.delete(atob(server)+'app/'+ app, {'kill':true})
+  //     .success(function(response) {
+  //       if(typeof response === "string") {
+  //         done(response)
+  //       } else if(typeof response === "object") {
+  //         atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+  //           .success(function(result) {
+  //             done(null)
+  //           })
+  //           .error(function(error) {
+  //             throw error
+  //           })
+  //       } else {
+  //         throw 'Server Error, try again.'
+  //       }
+  //     })
+  //     .error(function(error) {
+  //       throw error
+  //     })
+  // }
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
@@ -701,6 +771,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   data.getDevsAppsWithEmail = function(done) {
     atomic.get(atob(server)+'user/'+ session.getProfile().email)
       .success(function(apps) {
+        console.log('h', apps)
         var appsAndSecrets = {};
         var appsArrived = 0;
         var secretArrived = function(app, secret, metrics) {
@@ -721,10 +792,17 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
           });
         });
         $rootScope.fetching = false;
+        $rootScope.noApps = false;
         $rootScope.$apply();
       })
       .error(function(error) {
-        throw error
+        if(error.message === "Not Found") {
+          $timeout(function(){
+            $rootScope.fetching = false;
+            $rootScope.noApps = true;
+          });
+          done({});
+        } else throw error;
       })
   }
 
@@ -745,8 +823,19 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   return data;
 }
 
-function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session) {
-  var ctx = this;
+})();
+
+(function(){
+angular
+.module("AppbaseDashboard")
+.factory('nodeBinding',['data',
+  'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog',NodeBinding]);
+
+function debug(a) {
+  return JSON.parse(JSON.stringify(a))
+}
+
+function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
   nodeBinding.childExists = function(node, childName) {
     for(var i=0 ; i<node.children.length; i++) {
@@ -756,7 +845,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     }
     return false;
   };
-  
+
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();
@@ -766,19 +855,28 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     root.expand = function() {
       root.children = [];
       root.expanded = true;
-      setInterval(data.getNamespaces.bind(null, function(namespaceObjs) {
+      root.loading = true;
+      pollNamespaces(function(){
+        root.loading = false;
+      });
+      setInterval(pollNamespaces, 2000);
+    }
+    root.contract = function(){
+      root.expanded = false;
+      root.children = [];
+    }
+
+    function pollNamespaces(cb){
+      data.getNamespaces(function(namespaceObjs){
         $timeout(function() {
           namespaceObjs.forEach(function(namespaceObj) {
             if(!nodeBinding.childExists(root, namespaceObj.name)) {
               root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
             }
-          })
-        })
-      }), 2000)
-    }
-    root.contract = function(){
-      root.expanded = false;
-      root.children = [];
+          });
+        });
+        if(cb) cb();
+      });
     }
 
     return root
@@ -798,7 +896,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     },
     onRemove : function(scope, vData, vRef, done) {
       $timeout(function() {
-        vData.color = 'tomato';
+        $('[data-toggle="tooltip"]').tooltip('destroy');
       });
 
       $timeout(function() {
@@ -812,6 +910,9 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       $timeout(function() {
         vData.color = 'white';
       }, 500);
+    },
+    onComplete : function(){
+      
     }
   }
 
@@ -821,10 +922,16 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace));
     }
     ns.expand = function() {
-      ns.children = ns.ref.bindVertices($scope, vertexBindCallbacks);
       ns.expanded = true;
+      ns.loading = true;
+      ns.children = ns.ref.bindVertices($scope, $.extend({}, vertexBindCallbacks, { onComplete: function(){
+        $timeout(function(){
+          ns.loading = false;
+        });
+        var children = JSON.parse(JSON.stringify(ns.children));
+
+      }}));
     }
-    
     ns.contract = function() {
       ns.expanded = false;
       ns.ref.unbindVertices();
@@ -834,24 +941,33 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     var ignoreToggleClick = false;
 
     ns.toggleSearch = function() {
+      ns.toggling = true;
       // prevents multiple clicks
       if(ignoreToggleClick) return;
       ignoreToggleClick = true;
       data.namespaceSearchOptions(namespace, !ns.searchable, $timeout.bind(null, function() {
+        ns.toggling = false;
         ns.searchable = !ns.searchable;
         ignoreToggleClick = false;
       }));
     }
+
+    ns.remove = function() {
+      ns.deleting = true;
+      data.deleteNamespace(ns.name, function(error){
+        if(error) throw error;
+        ns.deleting = false;
+      });
+    }
+
     return ns
   }
 
   nodeBinding.bindAsVertex = function($scope, path, useThisVertex) {
-    
     var parsedPath = stringManipulation.parsePath(path);
     var vertex = useThisVertex || {
       ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
-    }
-
+    }    
     vertex.isV = true
 
     vertex.expand = function() {
@@ -870,24 +986,73 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       vertex.ref.unbindEdges();
     }
 
-    vertex.removeProperty = function(prop) {
-      vertex.ref.removeData([prop]);
+    vertex.removeProperty = function(prop, done) {
+      vertex.removingProp = prop;
+      vertex.ref.removeData([prop], function(error){
+         if(error) throw error;
+         $timeout(function(){vertex.removingProp = false;});
+         if(done) done();
+      });
     }
 
     vertex.removeSelfEdge = function() {
+      vertex.deleting = true;
       var isARootVertex = (stringManipulation.parsePath(path).obj_path === undefined);
-      isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name); //destroy if root vertex, remove edge if not
+      isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name);
+      //destroy if root vertex, remove edge if not
+    }
+
+    vertex.addProp = function(){
+      ngDialog.open({
+        template: '/developer/html/prop.html',
+        controller: ['$scope', function($dialogScope) {
+          $dialogScope.done = function() {
+            if($dialogScope.prop && $dialogScope.val){
+              vertex.addProperty($dialogScope.prop, $dialogScope.val);
+              $dialogScope.closeThisDialog();
+            }
+          }
+        }],
+        className: 'ngdialog-theme-dialog-small'
+      });
+    }
+
+    vertex.editProp = function(prop, val){
+      ngDialog.open({
+        template: '/developer/html/prop.html',
+        controller: ['$scope', function($dialogScope) {
+          $dialogScope.prop = prop;
+          $dialogScope.val = val;
+          $dialogScope.done = function() {
+            if($dialogScope.prop && $dialogScope.val){
+              if($dialogScope.prop !== prop){
+                vertex.removeProperty(prop, function(){
+                  vertex.addProperty($dialogScope.prop, $dialogScope.val);
+                  $dialogScope.closeThisDialog();
+                });
+              } else {
+                vertex.addProperty($dialogScope.prop, $dialogScope.val);
+                $dialogScope.closeThisDialog();
+              }
+            }
+          }
+        }],
+        className: 'ngdialog-theme-dialog-small'
+      });
     }
 
     vertex.addProperty = function(prop, value) {
       var vData = {};
       vData[prop] = value;
-      vertex.ref.setData(vData);
+      vertex.ref.setData(vData, function(){
+        $scope.$apply();
+      });
     }
 
     if(useThisVertex === undefined) {
       vertex.properties = vertex.ref.bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
+          console.log(properties)
           if(vertex.color == 'white')
             vertex.color = 'gold';
           done();
@@ -899,13 +1064,32 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       })
       vertex.name = path.slice(path.lastIndexOf('/') + 1);
     }
+
+    /* Future programmer: do not mess with this. You have no idea what you're getting into. 
+     * If you feel like optimizing something, I can point you to the minified file of the AngularJS library;
+     * it's actually safer to mess with stuff from there. Employ your adventurous spirit somewhere else.
+     * Consider yourself warned.
+     */
+    var uuid = 'a' + Appbase.uuid();
+    vertex.ref.bindProperties($scope, {
+      onProperties : function(scope, properties, ref, done) {
+        $timeout(function() {
+          $scope[uuid] = vertex.properties = properties;
+        });
+      }
+    })
+    $scope[uuid] = vertex.properties;
+    vertex.hasProps = Object.keys($scope[uuid]).length>0;
+    $scope.$watch(uuid, function(val){
+      vertex.hasProps = Object.keys($scope[uuid]).length>0;
+    });
+    
     return vertex;
   }
   return nodeBinding;
 }
 
 })();
-
 (function(){
 angular
 .module("AppbaseDashboard")

@@ -1,5 +1,5 @@
 <div class="dev-browser" id="browser">
-    <div ng-show='alert && alert !== "" ' class="alert alert-{{alertType}}" role="alert" style="opacity: 0.6;">{{alert}}</div>
+<!--     <div ng-show='alert && alert !== "" ' class="alert alert-{{alertType}}" role="alert" style="opacity: 0.6;">{{alert}}</div> -->
 
     <ol ng-show="node" class="breadcrumb">
         <li>
@@ -9,20 +9,6 @@
             <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl + breadcrumb.path)" ng-bind="breadcrumb.label" class="margin-right-xs"></a>
             <span ng-if="$last" ng-bind="breadcrumb.label"></span>
         </li>
-
-        <div class="form-group form-inline pull-right">
-            <div class="checkbox"><button class="btn btn-xs btn-warning" ng-click="addEdgeInto(node);">Add Vertex</button></div>
-            <div class="checkbox">
-                <label style="font-size: 1em">
-                    <input type="checkbox" ng-model="modifyEnabled"> Enable modifications
-                </label>
-            </div>
-            <div class="checkbox">
-                <label style="font-size: 1em">
-                    <input type="checkbox" ng-model="showPriorities"> Show Priorities
-                </label>
-            </div>
-        </div>
     </ol>
 
     <div ng-show="node" class="tree" ng-include="'/developer/html/node.html'"></div>    

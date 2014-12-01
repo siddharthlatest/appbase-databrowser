@@ -1,58 +1,6 @@
 .morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
 .morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
 
-.ngdialog.ngdialog-theme-dialog-small {
-  padding-bottom: 5vh;
-  padding-top: 5vh;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
-  background: #fff;
-  color: #444;
-  line-height: 1.5em;
-  margin: 0 auto;
-  max-width: 100%;
-  padding: 1em;
-  position: relative;
-  width: 60%;
-  max-height: 85vh;
-  overflow: auto;
-  border-radius:5px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
-  cursor: pointer;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
-  background: transparent;
-  color: #bbb;
-  content: "\00D7";
-  font-size: 26px;
-  font-weight: 400;
-  height: 30px;
-  line-height: 26px;
-  position: absolute;
-  right: 3px;
-  text-align: center;
-  top: 3px;
-  width: 30px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
-  color: #777;
-}
-
-@media (max-width: 568px) {
-  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
-    -webkit-animation: none;
-    animation: none;
-  }
-}
 /* console */
 @font-face {
   font-family: "Source Sans Pro Light";
@@ -74,6 +22,9 @@
   font-family: "Source Sans Pro Extra Light Italic";
   src: url('/styles/fonts/SourceSansPro-ExtraLightIt.otf'); }
 
+/************************
+* Colors for the browser icons
+************************/
 @-webkit-keyframes appear {
   0% {
     opacity: 0; }
@@ -81,6 +32,9 @@
   100% {
     opacity: 1; } }
 
+/************************
+* Colors for the browser icons
+************************/
 @keyframes appear {
   0% {
     opacity: 0; }
@@ -116,6 +70,42 @@
   to {
     opacity: 1; } }
 
+@-webkit-keyframes slideIn {
+  from {
+    -webkit-transform: translateX(50%);
+    transform: translateX(50%); }
+
+  to {
+    -webkit-transform: translateX(0);
+    transform: translateX(0); } }
+
+@keyframes slideIn {
+  from {
+    -webkit-transform: translateX(50%);
+    transform: translateX(50%); }
+
+  to {
+    -webkit-transform: translateX(0);
+    transform: translateX(0); } }
+
+@-webkit-keyframes slideOut {
+  from {
+    -webkit-transform: translateX(0);
+    transform: translateX(0); }
+
+  to {
+    -webkit-transform: translateX(50%);
+    transform: translateX(50%); } }
+
+@keyframes slideOut {
+  from {
+    -webkit-transform: translateX(0);
+    transform: translateX(0); }
+
+  to {
+    -webkit-transform: translateX(50%);
+    transform: translateX(50%); } }
+
 .ng-enter {
   -webkit-animation: slideInRight 0.3s both ease-in-out 0.31s;
   animation: slideInRight 0.3s both ease-in-out 0.31s; }
@@ -124,12 +114,15 @@
   -webkit-animation: slideOutLeft 0.3s both ease-in-out;
   animation: slideOutLeft 0.3s both ease-in-out; }
 
-#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #manage.ng-leave, #manage.ng-enter {
+#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #browser.ng-enter, #browser.ng-leave, #manage.ng-leave, #manage.ng-enter {
   -webkit-animation: none;
   animation: none; }
 
 .view-wrapper, body {
   height: 100%; }
+
+.view-wrapper {
+  min-height: calc(100vh - 170px); }
 
 #nav {
   position: fixed;
@@ -181,8 +174,6 @@ body {
   margin-bottom: 5vh;
   padding-left: 0;
   padding-right: 0; }
-  #view div[ng-view] {
-    min-height: calc(100vh - 260px); }
 
 #applications {
   font-family: "Source Sans Pro Extra Light Italic";
@@ -213,6 +204,16 @@ body {
       height: 30px; }
       #applications .well .tip .text-info {
         color: #888; }
+    @media screen and (min-width: 992px) and (max-width: 1190px) {
+      #applications .well {
+        margin: 10px 3px;
+        padding: 25px 20px 15px; }
+        #applications .well .tip {
+          font-size: 0.8em; } }
+    @media screen and (min-width: 1190px) and (max-width: 1285px) {
+      #applications .well {
+        margin: 10px 3px;
+        padding: 25px 20px 15px; } }
     #applications .well input {
       border: none; }
       #applications .well input:not([readonly]) {
@@ -220,27 +221,39 @@ body {
       #applications .well input[readonly] {
         background-color: #e5e5e5;
         cursor: default; }
+    #applications .well .manage-url {
+      margin-bottom: 0; }
     #applications .well .url {
       line-height: 2;
       cursor: pointer; }
+      #applications .well .url div {
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis; }
     #applications .well button#createuserapp, #applications .well a#createuserapp {
       background-color: #2AD37A;
       border: none;
-      text-transform: uppercase;
       box-shadow: none; }
       #applications .well button#createuserapp:hover, #applications .well a#createuserapp:hover {
         background-color: #3ed986; }
       #applications .well button#createuserapp:active, #applications .well a#createuserapp:active {
         background-color: #26be6d; }
-    #applications .well button.manage, #applications .well a.manage {
-      background-color: #50BAEF;
+    #applications .well button.manage, #applications .well button.delete, #applications .well a.manage, #applications .well a.delete {
       color: white;
       font-family: "Source Sans Pro Light";
       text-transform: uppercase; }
+    #applications .well button.manage, #applications .well a.manage {
+      background-color: #50BAEF; }
       #applications .well button.manage:hover, #applications .well a.manage:hover {
         background-color: #67c3f1; }
       #applications .well button.manage:active, #applications .well a.manage:active {
         background-color: #21a8eb; }
+    #applications .well button.delete, #applications .well a.delete {
+      background-color: #dc5e5c; }
+      #applications .well button.delete:hover, #applications .well a.delete:hover {
+        background-color: #e07171; }
+      #applications .well button.delete:active, #applications .well a.delete:active {
+        background-color: #d33232; }
     #applications .well .manage-button {
       text-align: right; }
 
@@ -276,6 +289,7 @@ body {
         height: 60px;
         line-height: 60px;
         padding: 0 20px;
+        background-color: #888;
         color: white; }
         #manage .container-fluid .navbar-right li a:hover {
           background-color: #666; }
@@ -284,7 +298,130 @@ body {
 
 #browser {
   font-family: "Source Sans Pro Light";
-  font-size: 1.1em; }
+  font-size: 1.22em; }
+  #browser .child.ng-enter {
+    -webkit-animation: slideIn 0.2s both ease-in-out;
+    animation: slideIn 0.2s both ease-in-out; }
+  #browser .child.ng-leave {
+    -webkit-animation: slideOut 0.2 both ease-in-out;
+    animation: slideOut 0.2 both ease-in-out; }
+  #browser .node .status {
+    color: #666; }
+  #browser .node a.node-name {
+    transition: color 0.5s;
+    color: #28aaeb; }
+    #browser .node a.node-name.expanded {
+      color: #2a6596; }
+  #browser .node .node-options-list {
+    display: inline;
+    padding-left: 10px; }
+    #browser .node .node-options-list .node-options {
+      transition: opacity 0.5s;
+      cursor: pointer;
+      margin: 0 4px;
+      color: #888;
+      opacity: 0.5; }
+      #browser .node .node-options-list .node-options:hover {
+        color: #222;
+        opacity: 1; }
+      #browser .node .node-options-list .node-options.fa-plus {
+        color: #26be6d; }
+      #browser .node .node-options-list .node-options.fa-remove {
+        color: #ff4136; }
+      #browser .node .node-options-list .node-options.fa-eye {
+        transition: color 0.2s ease-in-out;
+        color: #26be6d; }
+      #browser .node .node-options-list .node-options.fa-eye-slash {
+        transition: color 0.2s ease-in-out;
+        color: #ff4136; }
+      #browser .node .node-options-list .node-options.fa-cog {
+        transition: color 0.2s ease-in-out;
+        color: #ff851b; }
+      #browser .node .node-options-list .node-options.fa-pencil-square-o {
+        position: relative;
+        top: 2px;
+        color: #26be6d; }
+    #browser .node .node-options-list .label {
+      position: relative;
+      top: -1px;
+      cursor: default;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      padding: 0 2px 1px 3px;
+      border: 0.2em solid #f0ad4e;
+      border-radius: 15px;
+      color: white;
+      font-family: "Source Sans Pro Regular";
+      transition: color 0.2s; }
+      #browser .node .node-options-list .label:hover {
+        color: #f0ad4e;
+        background: white;
+        font-family: "Source Sans Pro Bold";
+        border: 0.2em solid #f0ad4e; }
+  #browser .node .expand {
+    position: relative;
+    top: 3px;
+    margin-right: 2px;
+    color: #666;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: -webkit-transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out; }
+  #browser .node .contract {
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+    margin-right: 7px; }
+  #browser .node .fa {
+    position: relative;
+    top: 1px; }
+    #browser .node .fa.fa-plus {
+      margin-right: 4px; }
+  #browser .propertiesBox {
+    margin-top: 7px; }
+    #browser .propertiesBox .panel {
+      border-color: #f47c3c; }
+      #browser .propertiesBox .panel .panel-heading {
+        background: #f47c3c;
+        padding: 5px 15px; }
+        #browser .propertiesBox .panel .panel-heading .panel-title {
+          font-family: "Source Sans Pro Bold";
+          font-size: 0.8em;
+          color: white;
+          text-transform: uppercase; }
+          #browser .propertiesBox .panel .panel-heading .panel-title .fa {
+            cursor: pointer;
+            position: relative;
+            left: 5px;
+            top: 0;
+            font-size: 0.9em; }
+            #browser .propertiesBox .panel .panel-heading .panel-title .fa:hover {
+              opacity: 0.85; }
+      #browser .propertiesBox .panel .panel-body {
+        color: #aaa;
+        font-size: 0.9em;
+        padding: 5px 15px; }
+        #browser .propertiesBox .panel .panel-body input {
+          font-family: "Source Sans Pro Regular";
+          color: black;
+          min-width: 10px;
+          width: auto;
+          border: none; }
+        #browser .propertiesBox .panel .panel-body .fa {
+          cursor: pointer;
+          transition: color 0.2s ease;
+          margin-right: 10px; }
+          #browser .propertiesBox .panel .panel-body .fa.fa-cog {
+            color: #ff851b;
+            margin-right: 9px; }
+          #browser .propertiesBox .panel .panel-body .fa.fa-remove:hover {
+            color: #ff4136; }
+          #browser .propertiesBox .panel .panel-body .fa.fa-pencil:hover {
+            color: #ff851b; }
+        #browser .propertiesBox .panel .panel-body span {
+          font-family: "Source Sans Pro Regular";
+          color: black; }
   #browser .breadcrumb {
     background-color: #aaa;
     border-radius: 0;
@@ -309,7 +446,7 @@ body {
     list-style: none;
     padding-left: 30px; }
     #browser ul li {
-      padding: 2px 0; }
+      padding: 3px 0; }
   #browser .tree > .node > ul {
     padding: 15px 20px; }
   #browser .glyphicon {
@@ -324,6 +461,16 @@ body {
   #browser .glyphicon-remove {
     color: red;
     font-weight: bolder; }
+  #browser .show-parent {
+    display: none;
+    margin-left: -3px; }
+    #browser .show-parent .expand {
+      font-size: 1em; }
+    #browser .show-parent .node-name {
+      position: relative;
+      left: -1px;
+      top: 1px;
+      font-size: 1em; }
 
 #stats {
   font-family: "Source Sans Pro Extra Light";
@@ -509,7 +656,7 @@ body {
 #not-logged {
   display: table;
   text-align: center;
-  min-height: calc(100vh - (211px)); }
+  min-height: calc(100vh - 270px); }
   #not-logged > div {
     display: table-cell;
     vertical-align: middle; }
@@ -539,8 +686,92 @@ body {
   margin: 0 auto;
   height: 100%;
   width: 100%;
-  top: 40vh; }
+  top: 40vh;
+  background: white;
+  z-index: 99999; }
 
+.confirm-del .modal-content {
+  border-radius: 0;
+  font-family: "Source Sans Pro Light";
+  font-size: 1.2em; }
+  .confirm-del .modal-content .btn {
+    color: white;
+    text-transform: uppercase; }
+  .confirm-del .modal-content .btn-yes {
+    background: #d74747; }
+    .confirm-del .modal-content .btn-yes:hover {
+      background: #dc5e5c; }
+    .confirm-del .modal-content .btn-yes:active {
+      background: #d33232; }
+  .confirm-del .modal-content .btn-no {
+    background: #888; }
+    .confirm-del .modal-content .btn-no:hover {
+      background: #999; }
+    .confirm-del .modal-content .btn-no:active {
+      background: #777; }
+  .confirm-del .modal-content .modal-footer {
+    border: 0; }
+.confirm-del .modal-header {
+  background: #d74747;
+  padding: 15px 15px; }
+  .confirm-del .modal-header .bootstrap-dialog-title {
+    font-family: "Source Sans Pro Bold";
+    font-size: 1.2em;
+    color: white;
+    text-transform: uppercase; }
+
+.ngdialog.ngdialog-theme-dialog-small {
+  padding-bottom: 5vh;
+  padding-top: 5vh;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
+  background: #fff;
+  color: #444;
+  line-height: 1.5em;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 1em;
+  position: relative;
+  width: 60%;
+  max-height: 85vh;
+  overflow: auto;
+  border-radius:5px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
+  background: transparent;
+  color: #bbb;
+  content: "\00D7";
+  font-size: 26px;
+  font-weight: 400;
+  height: 30px;
+  line-height: 26px;
+  position: absolute;
+  right: 3px;
+  text-align: center;
+  top: 3px;
+  width: 30px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
+  color: #777;
+}
+
+@media (max-width: 568px) {
+  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
+    -webkit-animation: none;
+    animation: none;
+  }
+}
 @-webkit-keyframes ngdialog-fadeout {
   0% {
     opacity: 1;
