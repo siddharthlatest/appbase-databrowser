@@ -628,3 +628,30 @@ body {
 	width: 100%;
 	top: 40vh;
 }
+
+#invite {
+	font-family: $font-extra-light;
+	.main-title {
+		h1 {
+			text-align: center;
+			font-family: $font-extra-light;
+			font-size: 3.5em;
+			color: #888;
+			padding: 50px 0 30px;
+		}
+	}
+}
+
+#billing {
+	min-height:530px;
+	font-family: $font-extra-light;
+	.main-title {
+		h1 {
+			text-align: center;
+			font-family: $font-extra-light;
+			font-size: 3.5em;
+			color: #888;
+			padding: 50px 0 30px;
+		}
+	}
+}

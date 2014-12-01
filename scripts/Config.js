@@ -18,6 +18,14 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.$watch('currentApp', function(app){
     sessionStorage.setItem('URL', stringManipulation.appToURL(app));
   });
+  $rootScope.goToInvite = function() {
+    $location.path('/invite');
+  }
+
+  $rootScope.goToBilling = function() {
+    $location.path('/billing');
+  }
+
   $rootScope.goToApps = function() {
     $location.path('/');
   }
@@ -36,8 +44,8 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     else path = $rootScope.currentApp;
     $location.path('/' + path + '/oauth/');
   }
-  $rootScope.where = function(){
-    return $location.path().split('/')[2];
+  $rootScope.where = function(here){
+    return $location.path().slice(1) === here;
   }
   document.addEventListener('login', function() {
     $rootScope.logged = true;
@@ -67,10 +75,18 @@ function Routes($routeProvider){
   }, oauth = {
     controller: 'oauthd',
     templateUrl: '/developer/html/oauth.html'
+  }, invite = {
+    controller: 'invite',
+    templateUrl: '/developer/html/invite.html'
+  }, billing = {
+    controller: 'billing',
+    templateUrl: '/developer/html/billing.html'
   };
 
   $routeProvider
     .when('/', apps)
+    .when('/invite', invite)
+    .when('/billing', billing)
     .when('/signup', signup)
     .when('/:path/browser', browser)
     .when('/:path/stats', stats)
