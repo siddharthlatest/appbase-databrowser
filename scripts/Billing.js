@@ -4,6 +4,8 @@ angular
 .controller('billing', BillingCtrl);
 
 function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
+  var stripeKey = 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv';//test key
+  //var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     $.getScript("https://js.stripe.com/v2/");
@@ -12,7 +14,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
     
     function loaded(){ 
       $.ajax({
-        url:['http://localhost:3000/getCustomer/',userProfile.email].join(''),
+        url:['https://transactions.appbase.io/getCustomer/',userProfile.email].join(''),
         type: 'get',
         success: function(data){
           //if user just signed up, show credit card stuff.
@@ -28,10 +30,10 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
 
           if(data.stripeId != null && data.customer.subscription != null){
             $('#plans button').filter(['[data-plan != "',data.plan,'"]'].join(''))
-            .html('Change Plan')
-            .removeAttr('disabled')
-            .addClass('btn-success')
-            .removeClass('btn-primary');
+              .html('Change Plan')
+              .removeAttr('disabled')
+              .addClass('btn-success')
+              .removeClass('btn-primary');
             $('.button-subscribe').off('click');
             $('.button-subscribe').on('click',function(e){     
               $this = $(this);
@@ -40,7 +42,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                 stripeId = data.stripeId; 
                 subscriptionId = data.customer.subscriptions.data[0].id;
                 $.ajax({
-                  url:'http://localhost:3000/changePlan',
+                  url:'https://transactions.appbase.io/changePlan',
                   type: 'post',
                   beforeSend: function(){
                     $this.html('Changing Plan...');
@@ -67,7 +69,12 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                 $('#my-subscription').removeClass('hide');
                 $('#subscription-start').html(dateStart.toDateString());
                 $('#period-start').html(datePeriodStart.toDateString());
-                $('#period-end').html(datePeriodEnd.toDateString());
+                
+                if(!subscriptions.data[0].cancel_at_period_end){
+                  $('#period-end').html(datePeriodEnd.toDateString());
+                } else {
+                  $('#period-end').html(['<strong>',datePeriodEnd.toDateString(),'</strong> - The subscription will be canceled at this date.'].join(''));
+                }
               }
             }
           }
@@ -81,11 +88,11 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
       var $button;
       //Stripe.setPublishableKey('pk_SdFKltkp5kyf3nih2EypYgFVOqIRv');
       handler = StripeCheckout.configure({
-        key: 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv',
+        key: stripeKey,
         //image: '/square-image.png',
         token: function(token) {
           $.ajax({
-            url:'http://localhost:3000/subscribe',
+            url:'https://transactions.appbase.io/subscribe',
             type: 'post',
             data: {token: token.id, email: token.email, plan: plan},
             beforeSend: function(){
@@ -108,7 +115,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
         subscriptionId = customer.customer.subscriptions.data[0].id;
         
         $.ajax({
-          url:'http://localhost:3000/cancelSubscription',
+          url:'https://transactions.appbase.io/cancelSubscription',
           type: 'post',
           beforeSend: function(){
             $this.html('Canceling Subscription...');
@@ -120,7 +127,9 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
             $('#plans button')
               .html('Subscribe')
               .removeClass('btn-success')
-              .addClass('btn-primary');
+              .addClass('btn-primary')
+              .removeAttr('disabled');
+            $this.html('Cancel Subscription');
             loaded();
           }
         });
@@ -130,7 +139,8 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
         $button = $(this);
         handler.open({
           name: 'Appbase.io',
-          description: 'Subscription',
+          description: [$button.data('text'),' - Subscription'].join(''),
+          image: '/developer/images/appbase.png',
           panelLabel : 'Subscribe now ({{amount}})',
           amount: $(this).data('amount'),
           allowRememberMe: false,

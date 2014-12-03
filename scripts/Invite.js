@@ -15,10 +15,13 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
     var inviteLink = ['http://appbase.io/?utm_campaign=viral&utm_content=',btoa(userProfile.email),'&utm_medium=share_link&utm_source=appbase'].join('');
     $("#subject").val('You have been invited to try Appbase by ' + userProfile.email)
     $('#invite-link').val(inviteLink);
+    $('#link').val(inviteLink);
+    $('#from').val(userProfile.email);
 
     $('#invited-users').on('click','.resend',function(e){
       $('#email').val($(this).data('email'));
       $('#form-invite-friends').submit();
+      e.preventDefault();
     });
 
     userV.on('edge_added', function onComplete(err, vref,eref) {
@@ -33,7 +36,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
                 
                 $('#invited-users').append('<li id="'+eref.priority()+'"">'+ userSnap.properties().email +': <span class="pull-right resend-link"></span> <em class="status">'+userSnap.properties().status+'<em> <span class="pull-right resend-link"></span>');
                 if(userSnap.properties().status == 'invited') {
-                  $('#'+eref.priority()+' > .resend-link').html('<a class="resend" data-email="'+userSnap.properties().email+'" >Resed Invitation</a>');
+                  $('#'+eref.priority()+' > .resend-link').html('<a class="resend" href="#" data-email="'+userSnap.properties().email+'" >Resed Invitation</a>');
                 }
               } else {
                 $('#'+eref.priority()+' > .status').text(userSnap.properties().status);
@@ -50,7 +53,8 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
     $(function(){
       $('#form-invite-friends').submit( function(event) {
 
-        $('#final-text').val([$('#text').val(),'<br><br> <a href="',inviteLink,'">Click here to join Appbase now.</a> or open this link on your browser: ', inviteLink, '.'].join(''));
+        //$('#final-text').val([$('#text').val(),'<br><br> <a href="',inviteLink,'">Click here to join Appbase now.</a> or open this link on your browser: ', inviteLink, '.'].join(''));
+        $('#final-text').val($('#text').val());
 
         //send form data to server
         $.ajax({
@@ -71,7 +75,6 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
             if(data.accepted){
               data.accepted.forEach(function(element,index){
                 vertex = [email,element.replace(/@/g,'')].join('');
-
                 //create new invited vertex and edge it to user
                 var inviteV = inviteNS.v(vertex);
                 inviteData = {
