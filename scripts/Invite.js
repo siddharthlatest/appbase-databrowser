@@ -7,7 +7,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     Appbase.credentials("inviteafriend", "f1f5e9662a9bae3ce3d7f2b2b8869f4a");
-    var userProfile = JSON.parse(localStorage.getItem('devProfile'));
+    var userProfile = $scope.devProfile;
     var email = userProfile.email.replace('@','');
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
