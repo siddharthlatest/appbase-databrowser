@@ -1,43 +1,48 @@
 <div class="container-fluid" id="invite">
-    <div class="row">
-      <div class="main-title">
-        <h1>Get <strong>1M API Calls</strong> for every friend that signs up and make one valid API call.</h1>
+  <div class="row">
+    <div class="col-xs-12 main-title">
+      <h1>
+        Get <strong>1M API Credits</strong>
+        for every friend that signs up and make one valid API call.
+      </h1>
+    </div>
+  </div>
+  <div class="form-horizontal col-xs-12 col-md-6">
+    <div class="wrapper well">
+      <form role="form" action="https://transactions.appbase.io/inviteFriend" id="form-invite-friends">
+        <div>
+          <h2>
+            <label for="email">Invite friends to Appbase via email</label>
+          </h2>
+          <input type="text" class="form-control" id="email" name="emails" placeholder="Enter email adresses separated by ; e.g: friend@gmail.com; otherfriend@gmail.com"></div>
+        <ul id="email-error" class="bg-danger"></ul>
+        <div>
+          <label for="subject">Subject line</label>
+          <input type="text" class="form-control" id="subject" name="subject" value="You've been invited to Appbase by"></div>
+        <div>
+          <textarea class="form-control" id="text" rows="8">
+            I recently discovered a great new tool called Appbase. It's an awesome Database as a Serivce, which is a real time graph database.
+          </textarea>
+        </div>
+        <button type="submit" id="btn-submit" class="btn btn-primary">
+          <img alt="Sending..." class="hide" src="/images/ajax-loader.gif" id="ajax-loader">SEND INVITE</button>
+        <ul id="email-sent" class="bg-success"></ul>
+        <input type="hidden" name="text" id="final-text">
+        <input type="hidden" name="from" id="from">
+        <input type="hidden" name="link" id="link"></form>
+    </div>
+  </div>
+  <div class="list col-xs-12 col-md-6">
+    <div class="wrapper well">
+      <h2>Invited users:</h2>
+      <ul id="invited-users"></ul>
+      <h2>Personalized referral link</h2>
+      <p>
+        Share on social media and get a 1M API calls for every friend that signs up and make the first API call!
+      </p>
+      <div>
+        <input type="text" class="form-control" id="invite-link" value="http://appbase.io/">
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-6">
-        <h2>Invited users:</h2>
-        <ul id="invited-users"></ul>
-      </div>
-      <div class="col-md-6">
-        <form role="form" action="https://transactions.appbase.io/inviteFriend" id="form-invite-friends"> 
-          <div class="form-group">
-            <h2>
-              <label for="email">Invite friends to Appbase via email</label>
-            </h2>
-            <input type="text" class="form-control" id="email" name="emails" placeholder="Enter email adresses separated by ; e.g: friend@gmail.com; otherfriend@gmail.com"></div>
-            <ul id="email-error" class="bg-danger"></ul>
-          <div class="form-group">
-            <label for="subject">Subject line</label>
-            <input type="text" class="form-control" id="subject" name="subject" value="You've been invited to Appbase by"></div>
-          <div class="form-group">
-            <textarea class="form-control" id="text" rows="8">
-I recently discovered a great new tool called Appbase. It's an awesome Database as a Serivce, which is a real time graph database.
-            </textarea>
-          </div>
-          <button type="submit" id="btn-submit" class="btn btn-primary"><img alt="Sending..." class="hide" src="/images/ajax-loader.gif" id="ajax-loader"> Send Invite</button>
-          <ul id="email-sent" class="bg-success"></ul>
-          <input type="hidden" name="text" id="final-text">
-          <input type="hidden" name="from" id="from">
-          <input type="hidden" name="link" id="link">
-        </form>
-        <hr>
-        <h2>Personalized referral link</h2>
-        <p>
-          Share on social media and get a 1M API calls for every friend that signs up and make the first API call!
-        </p>
-        <div class="form-group">
-          <input type="text" class="form-control" id="invite-link" value="http://appbase.io/"></div>
-      </div>
-    </div>
+  </div>
 </div>

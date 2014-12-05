@@ -40,7 +40,6 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
                 }
               } else {
                 $('#'+eref.priority()+' > .status').text(userSnap.properties().status);
-
                 if(userSnap.properties().status == 'registered') {
                   $('#'+eref.priority()+' > .resend-link').remove();
                 }

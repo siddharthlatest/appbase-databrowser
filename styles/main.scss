@@ -899,6 +899,65 @@ body {
 	form ul {
 		margin-top:5px;
 	}
+	.well {
+		background-color: #F2F2F2;
+		box-shadow: none;
+		border:none;
+		margin: 30px;
+		padding: 25px 30px 15px;
+		border-radius: 15px;
+		color: #888;
+		min-height:480px;
+
+		@media screen and (min-width: 992px) and (max-width: 1190px) {
+		    margin: 10px 3px;
+		    padding: 25px 20px 15px;
+		}
+
+		@media screen and (min-width: 1190px) and (max-width: 1285px) {
+		    margin: 10px 3px;
+		    padding: 25px 20px 15px;
+		}
+
+		input,textarea {
+			border: none;
+		}
+		textarea {
+			margin-top:5px;
+		}
+
+		#invited-users {
+			height:240px;
+			list-style:none;
+			padding:15px; 
+			background-color:white;
+			border-radius: 15px;
+			overflow:scroll;
+
+		}
+		#invited-users li {
+			border-bottom:0.2em solid #F2F2F2;
+			padding-bottom:10px;
+			font-family: "Source Sans Pro Light";
+		}
+
+		button {
+			background-color:#7DD3F4;
+			border-color:#7DD3F4;
+			font-family: "Source Sans Pro Light";
+			margin-top:10px;
+		}
+
+		h2 {
+			font-size:1.9em;
+		}
+
+		label {
+			font-size:1.3em;
+		}
+
+	}
+	
 }
 
 #billing {
