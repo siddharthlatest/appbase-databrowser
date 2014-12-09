@@ -102,6 +102,19 @@ function Routes($routeProvider){
 
 
 (function(){
+angular.module("AppbaseDashboard")
+  .run(['$rootScope', '$location', '$window',Analytics]);
+
+function Analytics($rootScope, $location) {
+    $rootScope.$on('$routeChangeSuccess', function(){
+    	if(typeof(ga) === 'function'){
+        	ga('send', 'pageview', $location.path());
+    	}
+    });
+};
+
+});
+(function(){
 angular
 .module("AppbaseDashboard")
 .controller("apps",[ '$scope',
@@ -1011,7 +1024,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     Appbase.credentials("inviteafriend", "f1f5e9662a9bae3ce3d7f2b2b8869f4a");
-    var userProfile = JSON.parse(localStorage.getItem('devProfile'));
+    var userProfile = $scope.devProfile;
     var email = userProfile.email.replace('@','');
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
@@ -1044,7 +1057,6 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
                 }
               } else {
                 $('#'+eref.priority()+' > .status').text(userSnap.properties().status);
-
                 if(userSnap.properties().status == 'registered') {
                   $('#'+eref.priority()+' > .resend-link').remove();
                 }
@@ -1810,19 +1822,19 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
   })   
 }
 
-function NavbarCtrl($rootScope, $scope){
-  $(function(){
-  Appbase.credentials("inviteafriend", "f1f5e9662a9bae3ce3d7f2b2b8869f4a");
-  var userProfile = JSON.parse(localStorage.getItem('devProfile'));
-  var email = userProfile.email.replace('@','');
-  var usersNS = Appbase.ns("users");
-  var inviteNS = Appbase.ns("sentinvites");
-  var userV = usersNS.v(email);
+function NavbarCtrl($rootScope, $scope, session){
+  if($scope.devProfile = session.getProfile()) {
+    Appbase.credentials("inviteafriend", "f1f5e9662a9bae3ce3d7f2b2b8869f4a");
+    var userProfile = JSON.parse(localStorage.getItem('devProfile'));
+    var email = userProfile.email.replace('@','');
+    var usersNS = Appbase.ns("users");
+    var inviteNS = Appbase.ns("sentinvites");
+    var userV = usersNS.v(email);
 
-  userV.on('properties', function (err,ref,userSnap) {
-    $('#user-balance').html([userSnap.properties().invites,'Million API Calls'].join(''));
-  });
-  });
+    userV.on('properties', function (err,ref,userSnap) {
+      $('#user-balance').html([userSnap.properties().invites,'Million API Calls'].join(''));
+    });
+  }
 }
 
 })();
