@@ -33,24 +33,23 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
         vref.isValid(function(err,bool){
           if(bool) {
             vref.on('properties', function (err,ref,userSnap) {
-            if (err) {
-              console.log(err);
-            } else {
-              if(!$('#'+eref.priority()).length) {
-                
-                $('#invited-users').append('<li id="'+eref.priority()+'"">'+ userSnap.properties().email +': <span class="pull-right resend-link"></span> <em class="status">'+userSnap.properties().status+'<em> <span class="pull-right resend-link"></span>');
-                if(userSnap.properties().status == 'invited') {
-                  $('#'+eref.priority()+' > .resend-link').html('<a class="resend" href="#" data-email="'+userSnap.properties().email+'" >Resed Invitation</a>');
-                }
+              if (err) {
+                console.log(err);
               } else {
-                $('#'+eref.priority()+' > .status').text(userSnap.properties().status);
-                if(userSnap.properties().status == 'registered') {
-                  $('#'+eref.priority()+' > .resend-link').remove();
+                if(!$('#'+eref.priority()).length) {    
+                  $('#invited-users').append('<li id="'+eref.priority()+'"">'+ userSnap.properties().email +': <span class="pull-right resend-link"></span> <em class="status">'+userSnap.properties().status+'<em> <span class="pull-right resend-link"></span>');
+                  if(userSnap.properties().status == 'invited') {
+                    $('#'+eref.priority()+' > .resend-link').html('<a class="resend" href="#" data-email="'+userSnap.properties().email+'" >Resed Invitation</a>');
+                  }
+                } else {
+                  $('#'+eref.priority()+' > .status').text(userSnap.properties().status);
+                  if(userSnap.properties().status == 'registered') {
+                    $('#'+eref.priority()+' > .resend-link').remove();
+                  }
                 }
               }
-            }
-          });
-        }
+            });
+          }
         });
        }
     });
@@ -84,7 +83,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
                     status : 'invited',
                     email: element
                 }
-                
+
                 inviteV.setData(inviteData,function(error,vref){
                   userV.setEdge(vref.name(),inviteV);
                   $('#email-sent').html(['<li>Invitation sent to: ',element,'</li>'].join(''));
