@@ -50,7 +50,8 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $location.path('/' + path + '/oauth/');
   }
   $rootScope.where = function(here){
-    return $location.path().slice(1) === here;
+    if(here) return $location.path().slice(1) === here;
+    else return $location.path().split('/')[2];
   }
   document.addEventListener('login', function() {
     $rootScope.logged = true;
@@ -890,12 +891,16 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       .error(function(error) {
         throw error
       })
-  }
+  } 
   
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
-        done();
+        atomic.delete(atob(server)+'user/' + session.getProfile().email, {'appname' : app})
+          .success(function(response){
+            console.log(response)
+            done();
+          })
       })
       .error(function(error) {
         throw error;
@@ -1133,15 +1138,26 @@ function debug(a) {
 
 function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
-  nodeBinding.childExists = function(node, childName) {
+
+  function addNamespaces(node, childName) {
     for(var i=0 ; i<node.children.length; i++) {
        if(node.children[i].name === childName) {
          return true;
        }
     }
     return false;
-  };
+  }
 
+  function removeNamespaces(array, name){
+    var found = false;
+    array.forEach(function(each){
+      if(each.name === name) {
+        found = true;
+        return;
+      }
+    });
+    return found;
+  }
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();
@@ -1161,12 +1177,30 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       root.expanded = false;
       root.children = [];
     }
-
     function pollNamespaces(cb){
       data.getNamespaces(function(namespaceObjs){
         $timeout(function() {
+          // removes old ones. saves the indexes to avoid modifying looping array
+          var toRemove = [];
+          root.children.forEach(function(each, index){
+            var found = false;
+            namespaceObjs.forEach(function(obj){
+              if(each.name === obj.name) {
+                found = true;
+                return;
+              }
+            });
+            if(!found) {
+              toRemove.push(index);
+            }
+          });
+          toRemove.forEach(function(each){
+            root.children.splice(each, 1);
+            $('[data-toggle="tooltip"]').tooltip('destroy');
+          });
+          //adds new ones
           namespaceObjs.forEach(function(namespaceObj) {
-            if(!nodeBinding.childExists(root, namespaceObj.name)) {
+            if(!addNamespaces(root, namespaceObj.name)) {
               root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
             }
           });
