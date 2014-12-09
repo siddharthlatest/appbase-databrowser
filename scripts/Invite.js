@@ -54,53 +54,49 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
        }
     });
 
-    $(function(){
-      $('#form-invite-friends').submit( function(event) {
-        //$('#final-text').val([$('#text').val(),'<br><br> <a href="',inviteLink,'">Click here to join Appbase now.</a> or open this link on your browser: ', inviteLink, '.'].join(''));
-        $('#final-text').val($('#text').val());
-        //send form data to server
-        $.ajax({
-          type: "POST",
-          url: $(this).attr('action'),
-          data: $( this ).serialize(),
-          dataType: 'json',
-          beforeSend: function(jqXHR,settings) {
-            $('#ajax-loader').hide().removeClass('hide').slideDown('fast');
-            $('#email-error').html('');
-            console.log(jqXHR);
-            console.log(settings);
-          },
-          complete: function(){
-            $('#ajax-loader').hide();
-          },
-          success: function(data, status) {
-            if(data.accepted){
-              data.accepted.forEach(function(element,index){
-                vertex = [email,element.replace(/@/g,'')].join('');
-                //create new invited vertex and edge it to user
-                var inviteV = inviteNS.v(vertex);
-                inviteData = {
-                    status : 'invited',
-                    email: element
-                }
+    $('#form-invite-friends').submit( function(event) {
+      //$('#final-text').val([$('#text').val(),'<br><br> <a href="',inviteLink,'">Click here to join Appbase now.</a> or open this link on your browser: ', inviteLink, '.'].join(''));
+      $('#final-text').val($('#text').val());
+      //send form data to server
+      $.ajax({
+        type: "POST",
+        url: $(this).attr('action'),
+        data: $( this ).serialize(),
+        dataType: 'json',
+        beforeSend: function(jqXHR,settings) {
+          $('#ajax-loader').hide().removeClass('hide').slideDown('fast');
+          $('#email-error').html('');
+        },
+        complete: function(){
+          $('#ajax-loader').hide();
+        },
+        success: function(data, status) {
+          if(data.accepted){
+            data.accepted.forEach(function(element,index){
+              vertex = [email,element.replace(/@/g,'')].join('');
+              //create new invited vertex and edge it to user
+              var inviteV = inviteNS.v(vertex);
+              inviteData = {
+                  status : 'invited',
+                  email: element
+              }
 
-                inviteV.setData(inviteData,function(error,vref){
-                  userV.setEdge(vref.name(),inviteV);
-                  $('#email-sent').html(['<li>Invitation sent to: ',element,'</li>'].join(''));
-                });
-                
+              inviteV.setData(inviteData,function(error,vref){
+                userV.setEdge(vref.name(),inviteV);
+                $('#email-sent').html(['<li>Invitation sent to: ',element,'</li>'].join(''));
               });
-            } else if (data.rejected) {
-              data.accepted.forEach(function(element,index){
-                $('#email-error').append(['<li>',element,'</li>'].join(''));
-              });
-            } else {
-              $('#email-error').html('<li>An error has happened.</li>');
-            }
+              
+            });
+          } else if (data.rejected) {
+            data.accepted.forEach(function(element,index){
+              $('#email-error').append(['<li>',element,'</li>'].join(''));
+            });
+          } else {
+            $('#email-error').html('<li>An error has happened.</li>');
           }
-        });
-        event.preventDefault();
+        }
       });
+      event.preventDefault();
     });
   } {
     $rootScope.db_loading = false;
