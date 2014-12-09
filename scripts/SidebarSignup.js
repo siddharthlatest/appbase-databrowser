@@ -76,7 +76,10 @@ function NavbarCtrl($rootScope, $scope, session){
     var userV = usersNS.v(email);
 
     userV.on('properties', function (err,ref,userSnap) {
-      $('#user-balance').html([userSnap.properties().invites,'Million API Calls'].join(''));
+      if(userSnap.properties().invites)
+        $('#user-balance').html([userSnap.properties().invites,'M API Credits'].join(''));
+      else
+        $('#user-balance').html('0 API Credits');
     });
   }
 }
