@@ -245,12 +245,16 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       .error(function(error) {
         throw error
       })
-  }
+  } 
   
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
-        done();
+        atomic.delete(atob(server)+'user/' + session.getProfile().email, {'appname' : app})
+          .success(function(response){
+            console.log(response)
+            done();
+          })
       })
       .error(function(error) {
         throw error;
