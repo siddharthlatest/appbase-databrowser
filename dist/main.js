@@ -1036,6 +1036,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
     var userV = usersNS.v(email);
+    console.log(email);
     var inviteLink = ['https://appbase.io/?utm_campaign=viral&utm_content=',btoa(userProfile.email),'&utm_medium=share_link&utm_source=appbase'].join('');
    
     $("#subject").val('You have been invited to try Appbase by ' + userProfile.email)
@@ -1062,7 +1063,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
                 if(!$('#'+eref.priority()).length) {    
                   $('#invited-users').append('<li id="'+eref.priority()+'"">'+ userSnap.properties().email +': <span class="pull-right resend-link"></span> <em class="status">'+userSnap.properties().status+'<em> <span class="pull-right resend-link"></span>');
                   if(userSnap.properties().status == 'invited') {
-                    $('#'+eref.priority()+' > .resend-link').html('<a class="resend" href="#" data-email="'+userSnap.properties().email+'" >Resed Invitation</a>');
+                    $('#'+eref.priority()+' > .resend-link').html('<a class="resend" href="#" data-email="'+userSnap.properties().email+'" >Resend Invitation</a>');
                   }
                 } else {
                   $('#'+eref.priority()+' > .status').text(userSnap.properties().status);
