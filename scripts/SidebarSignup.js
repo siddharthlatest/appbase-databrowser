@@ -77,7 +77,7 @@ function NavbarCtrl($rootScope, $scope, session){
 
     userV.on('properties', function (err,ref,userSnap) {
       if(userSnap.properties().invites)
-        $('#user-balance').html([userSnap.properties().invites,'.1M API Credits'].join(''));
+        $('#user-balance').html([userSnap.properties().invites,'.1M'].join(''));
       else
         $('#user-balance').html('100K');
     });
