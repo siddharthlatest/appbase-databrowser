@@ -896,6 +896,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
+        console.log('success')
         atomic.delete(atob(server)+'user/' + session.getProfile().email, {'appname' : app})
           .success(function(response){
             console.log(response)
