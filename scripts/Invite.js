@@ -13,7 +13,6 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
     var userV = usersNS.v(email);
-    console.log(email);
     var inviteLink = ['https://appbase.io/?utm_campaign=viral&utm_content=',btoa(userProfile.email),'&utm_medium=share_link&utm_source=appbase'].join('');
    
     $("#subject").val('You have been invited to try Appbase by ' + userProfile.email)
