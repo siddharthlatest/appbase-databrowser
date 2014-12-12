@@ -899,6 +899,7 @@ body {
 	form ul {
 		margin-top:5px;
 	}
+	
 	.well {
 		background-color: #F2F2F2;
 		box-shadow: none;
@@ -1021,3 +1022,36 @@ body {
 		}
 	}
 }
+
+#payment_modal {   
+	.modal-title {
+		text-align:center;
+	}
+	.modal-sm {
+		width:312px;
+	}
+    .modal-body{
+        text-align: left;
+       
+        .well {
+			background-color: #F2F2F2;
+			box-shadow: none;
+			border:none;
+			padding: 25px 10px 15px;
+			border-radius: 15px;
+			color: #888;
+
+			button {
+				background-color: $light-blue;
+				border-color: $light-blue;
+				font-family: "Source Sans Pro Light";
+				margin-top:10px;
+			}
+
+			h2 {
+				font-size:1.9em;
+			}
+		}
+    }
+}
+

@@ -23,7 +23,7 @@
 							<td>$0/month</td>
 							<td>100k API Calls</td>
 							<td>
-								<button class="btn btn-success button-subscribe" data-plan="free" data-text="Free Plan" data-amount="0">Subscribe</button>
+								<button class="btn btn-success button-subscribe" data-toggle="modal" data-target="#payment_modal" data-plan="free" data-text="Free Plan" data-amount="0">Subscribe</button>
 							</td>
 						</tr>
 
@@ -33,7 +33,7 @@
 							<td>1M API Calls</td>
 							<td>
 								<form action="http://localhost:3000/subscribe" method="POST">
-									<button class="btn btn-success button-subscribe" data-plan="hacker" data-text="Hacker Plan" data-amount="2000">Subscribe</button>
+									<button class="btn btn-success button-subscribe" data-plan="hacker" data-toggle="modal" data-target="#payment_modal" data-text="Hacker Plan" data-amount="2000">Subscribe</button>
 								</form>
 							</td>
 						</tr>
@@ -44,7 +44,7 @@
 							<td>5M API Calls</td>
 							<td>
 								<form action="http://localhost:3000/subscribe" method="POST">
-									<button class="btn btn-success button-subscribe" data-plan="startup" data-text="Start Up Plan" data-amount="6000">Subscribe</button>
+									<button class="btn btn-success button-subscribe" data-plan="startup" data-toggle="modal" data-target="#payment_modal" data-text="Start Up Plan" data-amount="6000">Subscribe</button>
 								</form>
 							</td>
 						</tr>
@@ -55,7 +55,7 @@
 							<td>20M API Calls</td>
 							<td>
 								<form action="http://localhost:3000/subscribe" method="POST">
-									<button class="btn btn-success button-subscribe" data-plan="growth" data-text="Growth Plan" data-amount="15000">Subscribe</button>
+									<button class="btn btn-success button-subscribe" data-plan="growth" data-toggle="modal" data-target="#payment_modal" data-text="Growth Plan" data-amount="15000">Subscribe</button>
 								</form>
 							</td>
 						</tr>

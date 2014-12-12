@@ -8,11 +8,14 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
   //var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
-    $.getScript("https://js.stripe.com/v2/");
-    $.getScript("https://checkout.stripe.com/checkout.js",loaded);
+    $.getScript("https://js.stripe.com/v2/",loaded);
+    //$.getScript("https://checkout.stripe.com/checkout.js",loaded);
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
     
+
     function loaded(){ 
+      Stripe.setPublishableKey(stripeKey);  
+
       $.ajax({
         url:['https://transactions.appbase.io/getCustomer/',userProfile.email].join(''),
         type: 'get',
@@ -28,38 +31,40 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
             .removeClass('btn-success')
             .addClass('btn-primary');
 
-          if(data.stripeId != null && data.customer.subscription != null){
-            $('#plans button').filter(['[data-plan != "',data.plan,'"]'].join(''))
-              .html('Change Plan')
-              .removeAttr('disabled')
-              .addClass('btn-success')
-              .removeClass('btn-primary');
-            $('.button-subscribe').off('click');
-            $('.button-subscribe').on('click',function(e){     
-              $this = $(this);
-              if(data.customer.subscriptions.data[0]){
-                plan = $(this).data('plan');
-                stripeId = data.stripeId; 
-                subscriptionId = data.customer.subscriptions.data[0].id;
-                $.ajax({
-                  url:'https://transactions.appbase.io/changePlan',
-                  type: 'post',
-                  beforeSend: function(){
-                    $this.html('Changing Plan...');
-                  },
-                  data: {stripeId:stripeId,subscriptionId:subscriptionId,plan:plan,email:userProfile.email},
-                  success: function(){
-                    if(typeof(ga) === 'function')
-                      ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
-                    loaded();
-                  }
-                });
-              }
-              e.preventDefault();
-            });
+          if(data.customer) {
+            if(data.stripeId != null && data.customer.subscription != null){
+              $('#plans button').filter(['[data-plan != "',data.plan,'"]'].join(''))
+                .html('Change Plan')
+                .removeAttr('disabled')
+                .addClass('btn-success')
+                .removeClass('btn-primary');
+              
+              /*$('.button-subscribe').off('click');
+              $('.button-subscribe').on('click',function(e){     
+                $this = $(this);
+                if(data.customer.subscriptions.data[0]){
+                  plan = $(this).data('plan');
+                  stripeId = data.stripeId; 
+                  subscriptionId = data.customer.subscriptions.data[0].id;
+                  $.ajax({
+                    url:'https://transactions.appbase.io/changePlan',
+                    type: 'post',
+                    beforeSend: function(){
+                      $this.html('Changing Plan...');
+                    },
+                    data: {stripeId:stripeId,subscriptionId:subscriptionId,plan:plan,email:userProfile.email},
+                    success: function(){
+                      if(typeof(ga) === 'function')
+                        ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
+                      loaded();
+                    }
+                  });
+                }
+                e.preventDefault();
+              });*/
 
-            //build subscription info
-            if(data.customer) {
+              //build subscription info
+            
               subscriptions = data.customer.subscriptions;
               if(subscriptions.data.length){
                 var dateStart = new Date(subscriptions.data[0].start * 1000);
@@ -86,10 +91,8 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
 
       var plan;
       var $button;
-      //Stripe.setPublishableKey('pk_SdFKltkp5kyf3nih2EypYgFVOqIRv');
-      handler = StripeCheckout.configure({
+      /*handler = StripeCheckout.configure({
         key: stripeKey,
-        //image: '/square-image.png',
         token: function(token) {
           $.ajax({
             url:'https://transactions.appbase.io/subscribe',
@@ -105,7 +108,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
             }
           });
         }
-      });
+      });*/
 
       $('#cancel-subscription').on('click',function(e){
         e.preventDefault();
@@ -135,23 +138,56 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
         });
       });
 
+      $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
       $('.button-subscribe').on('click',function(e){
         $button = $(this);
-        handler.open({
-          name: 'Appbase.io',
-          description: [$button.data('text'),' - Subscription'].join(''),
-          image: '/developer/images/appbase.png',
-          panelLabel : 'Subscribe now ({{amount}})',
-          amount: $(this).data('amount'),
-          allowRememberMe: false,
-          email: userProfile.email,
-        });
-
         plan = $(this).data('plan');
-
+        $('#modal-plan').html($(this).data('text'));
+        $('#email').val(userProfile.email);
+        $('#modal-price').html(['$',(parseFloat($(this).data('amount'))/100).toFixed(2)].join(''));
         e.preventDefault();
       });
 
+      $('body').on('submit','#payment-form',function(event) {
+        var $form = $(this);
+
+        // Disable the submit button to prevent repeated clicks
+        $form.find('button').prop('disabled', true);
+
+        Stripe.card.createToken($form, stripeResponseHandler);
+
+        // Prevent the form from submitting with the default action
+        return false;
+      });
+
+      function stripeResponseHandler(status, response) {
+        var $form = $('#payment-form');
+        if (response.error) {
+          // Show the errors on the form
+          $form.find('.payment-errors').text(response.error.message);
+          $form.find('button').prop('disabled', false);
+        } else {
+          $('#payment_modal').modal('hide');
+          $form.find('button').prop('disabled', false);
+          // response contains id and card, which contains additional card details
+          var token = response.id;
+        
+          $.ajax({
+            url:'https://transactions.appbase.io/subscribe',
+            type: 'post',
+            data: {token: token, email: userProfile.email, plan: plan},
+            beforeSend: function(){
+              $button.html('Subscribing...');
+            },
+            success: function(data){
+              if(typeof(ga) === 'function')
+                ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
+              loaded();
+            }
+          });
+          
+        }
+      };
     } 
   } else {
       $rootScope.db_loading = false;
