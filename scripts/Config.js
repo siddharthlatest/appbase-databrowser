@@ -50,8 +50,9 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $location.path('/' + path + '/oauth/');
   }
   $rootScope.where = function(here){
-    if(here) return $location.path().slice(1) === here;
-    else return $location.path().split('/')[2];
+    if($location.path() === '/') return 'apps';
+    if($location.path() === '/invite') return 'invite';
+    return $location.path().split('/')[2];
   }
   document.addEventListener('login', function() {
     $rootScope.logged = true;

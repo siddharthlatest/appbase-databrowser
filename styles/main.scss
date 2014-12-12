@@ -42,6 +42,15 @@ $red: lighten(#d9534f, 3%);
 	from 	{ transform:translateX(0); }
 	to 		{ transform: translateX(50%); }
 }
+@keyframes slideDown {
+	from 	{ transform:translateY(-100%);}
+	to 		{ transform: translateY(0); }
+}
+@keyframes slideUp {
+	from 	{ transform:translateY(0);}
+	to 		{ transform: translateY(-100%);display: none!important; }
+}
+
 
 // @keyframes rotate {
 // 	to {
@@ -65,11 +74,24 @@ $red: lighten(#d9534f, 3%);
 #nav.ng-enter, #nav.ng-leave,
 .footer.ng-enter, .footer.ng-leave,
 #sidebar.ng-enter,  #sidebar.ng-leave,
-#browser.ng-enter,  #browser.ng-leave,
-#manage.ng-leave, #manage.ng-enter{
+#browser.ng-enter,  #browser.ng-leave{
 	animation: none;
 }
- 
+
+#manage {
+	position: absolute;
+	width: 100%;
+	transition: all 0.5s ease-in-out;
+}
+
+#manage.man-hide {
+	top: -$manage-height;
+}
+
+.man-show {
+	top: 0;
+}
+
 .view-wrapper, body {
 	height: 100%;
 }
@@ -144,11 +166,13 @@ body {
 	padding-left: 0;
 	padding-right: 0;
 	div[ng-view] {
+		margin-top: $manage-height+2px;
 		//min-height: calc(100vh - #{$navbar-height + $footer-height + $manage-height + 30px});
 	}
 }
 
 #applications {
+	margin-top: -$manage-height;
 	font-family: $font-extra-light-i;
 	margin-bottom: 50px;
 	.main-title {
@@ -1058,3 +1082,6 @@ body {
     }
 }
 
+.nav > li > a:focus {
+	background-color: transparent;
+}

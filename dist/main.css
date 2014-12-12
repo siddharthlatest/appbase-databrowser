@@ -53,6 +53,105 @@
     animation: none;
   }
 }
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}
 /* console */
 @font-face {
   font-family: "Source Sans Pro Light";
@@ -158,6 +257,44 @@
     -webkit-transform: translateX(50%);
     transform: translateX(50%); } }
 
+@-webkit-keyframes slideDown {
+  from {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%); }
+
+  to {
+    -webkit-transform: translateY(0);
+    transform: translateY(0); } }
+
+@keyframes slideDown {
+  from {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%); }
+
+  to {
+    -webkit-transform: translateY(0);
+    transform: translateY(0); } }
+
+@-webkit-keyframes slideUp {
+  from {
+    -webkit-transform: translateY(0);
+    transform: translateY(0); }
+
+  to {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
+    display: none !important; } }
+
+@keyframes slideUp {
+  from {
+    -webkit-transform: translateY(0);
+    transform: translateY(0); }
+
+  to {
+    -webkit-transform: translateY(-100%);
+    transform: translateY(-100%);
+    display: none !important; } }
+
 .ng-enter {
   -webkit-animation: slideInRight 0.3s both ease-in-out 0.31s;
   animation: slideInRight 0.3s both ease-in-out 0.31s; }
@@ -166,9 +303,20 @@
   -webkit-animation: slideOutLeft 0.3s both ease-in-out;
   animation: slideOutLeft 0.3s both ease-in-out; }
 
-#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #browser.ng-enter, #browser.ng-leave, #manage.ng-leave, #manage.ng-enter {
+#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #browser.ng-enter, #browser.ng-leave {
   -webkit-animation: none;
   animation: none; }
+
+#manage {
+  position: absolute;
+  width: 100%;
+  transition: all 0.5s ease-in-out; }
+
+#manage.man-hide {
+  top: -60px; }
+
+.man-show {
+  top: 0; }
 
 .view-wrapper, body {
   height: 100%; }
@@ -226,8 +374,11 @@ body {
   margin-bottom: 5vh;
   padding-left: 0;
   padding-right: 0; }
+  #view div[ng-view] {
+    margin-top: 62px; }
 
 #applications {
+  margin-top: -60px;
   font-family: "Source Sans Pro Extra Light Italic";
   margin-bottom: 50px; }
   #applications .main-title {
@@ -859,102 +1010,5 @@ body {
     #payment_modal .modal-body .well i {
       font-size: 2em; }
 
-@-webkit-keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ngdialog {
-  position: fixed;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 10000;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.ngdialog-overlay {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.4);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-content {
-  background: white;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-content {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-close:before {
-  content: '\00D7';
-  cursor: pointer;
-}
-
-body.ngdialog-open {
-  overflow: hidden;
-}
+.nav > li > a:focus {
+  background-color: transparent; }

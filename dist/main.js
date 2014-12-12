@@ -50,8 +50,9 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $location.path('/' + path + '/oauth/');
   }
   $rootScope.where = function(here){
-    if(here) return $location.path().slice(1) === here;
-    else return $location.path().split('/')[2];
+    if($location.path() === '/') return 'apps';
+    if($location.path() === '/invite') return 'invite';
+    return $location.path().split('/')[2];
   }
   document.addEventListener('login', function() {
     $rootScope.logged = true;
@@ -134,25 +135,8 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   $rootScope.db_loading = true;
   $scope.api = false;
   Prism.highlightAll();
-  if($scope.devProfile = session.getProfile()) {
-    console.log($scope.devProfile)
-    $.post('http://162.243.5.104:8080/u', {user: $scope.devProfile.uid}).done(function(data){
-      $rootScope.code = (data == "true");
-      $rootScope.$apply();
-      if($rootScope.code) console.log('User has $50 coupon.');
-    });
-    $rootScope.affiliate = false; 
-    $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
-      data: JSON.stringify({email: $scope.devProfile.email}), contentType:"application/json; charset=utf-8",
-      dataType:"json",
-      success: function(data){
-        console.log($scope.devProfile.email, ': ', data)
-        $timeout(function(){
-           if(data) $rootScope.affiliate = true;
-        });
-      }
-    });
-    
+  $scope.devProfile = session.getProfile();
+  if($scope.devProfile) {
     var fetchApps = function() {
       $scope.fetching = true;
       data.getDevsApps(function(apps) {
@@ -1893,10 +1877,6 @@ function SidebarCtrl($scope, $rootScope){
   $rootScope.$watch('hide', function(data){
     if(typeof data !== 'undefined') $scope.hide = data;
   });
-
-  $rootScope.$watch('code', function(data){
-    $scope.code = data ? '$50' : '$0';
-  })
   
   $rootScope.$watch('logged', function(data){
     $scope.logged = data;

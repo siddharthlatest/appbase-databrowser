@@ -17,25 +17,8 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   $rootScope.db_loading = true;
   $scope.api = false;
   Prism.highlightAll();
-  if($scope.devProfile = session.getProfile()) {
-    console.log($scope.devProfile)
-    $.post('http://162.243.5.104:8080/u', {user: $scope.devProfile.uid}).done(function(data){
-      $rootScope.code = (data == "true");
-      $rootScope.$apply();
-      if($rootScope.code) console.log('User has $50 coupon.');
-    });
-    $rootScope.affiliate = false; 
-    $.ajax({url:'http://162.243.5.104:8088/e', type:"POST",
-      data: JSON.stringify({email: $scope.devProfile.email}), contentType:"application/json; charset=utf-8",
-      dataType:"json",
-      success: function(data){
-        console.log($scope.devProfile.email, ': ', data)
-        $timeout(function(){
-           if(data) $rootScope.affiliate = true;
-        });
-      }
-    });
-    
+  $scope.devProfile = session.getProfile();
+  if($scope.devProfile) {
     var fetchApps = function() {
       $scope.fetching = true;
       data.getDevsApps(function(apps) {

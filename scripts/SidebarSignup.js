@@ -16,10 +16,6 @@ function SidebarCtrl($scope, $rootScope){
   $rootScope.$watch('hide', function(data){
     if(typeof data !== 'undefined') $scope.hide = data;
   });
-
-  $rootScope.$watch('code', function(data){
-    $scope.code = data ? '$50' : '$0';
-  })
   
   $rootScope.$watch('logged', function(data){
     $scope.logged = data;
