@@ -238,11 +238,13 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
   //var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
+    $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
     $.getScript("https://js.stripe.com/v2/",loaded);
     //$.getScript("https://checkout.stripe.com/checkout.js",loaded);
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
+    var plan;
+    var $button;
     
-
     function loaded(){ 
       Stripe.setPublishableKey(stripeKey);  
 
@@ -269,29 +271,51 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                 .addClass('btn-success')
                 .removeClass('btn-primary');
               
-              /*$('.button-subscribe').off('click');
-              $('.button-subscribe').on('click',function(e){     
+              $('.button-subscribe').off('click');
+              
+              $('.button-subscribe').on('click',function(e){
                 $this = $(this);
-                if(data.customer.subscriptions.data[0]){
-                  plan = $(this).data('plan');
-                  stripeId = data.stripeId; 
-                  subscriptionId = data.customer.subscriptions.data[0].id;
-                  $.ajax({
-                    url:'https://transactions.appbase.io/changePlan',
-                    type: 'post',
-                    beforeSend: function(){
-                      $this.html('Changing Plan...');
-                    },
-                    data: {stripeId:stripeId,subscriptionId:subscriptionId,plan:plan,email:userProfile.email},
-                    success: function(){
-                      if(typeof(ga) === 'function')
-                        ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
-                      loaded();
-                    }
-                  });
-                }
+                var a = new BootstrapDialog({
+                    title: 'Change plan',
+                    message: 'Are you sure you want to change your plan to '+ $(this).data('text')+'?',
+                    closable: false,
+                    cssClass: 'confirm-del',
+                    buttons: [{
+                        label: 'No',
+                        cssClass: 'btn-no',
+                        action: function(dialog) {
+                            dialog.close();
+                        }
+                    }, {
+                        label: 'Yes',
+                        cssClass: 'btn-yes',
+                        action: function(dialog) {
+                          if(data.customer.subscriptions.data[0]){
+                            plan = $(this).data('plan');
+                            stripeId = data.stripeId; 
+                            subscriptionId = data.customer.subscriptions.data[0].id;
+                            $.ajax({
+                              url:'https://transactions.appbase.io/changePlan',
+                              type: 'post',
+                              beforeSend: function(){
+                                $this.html('Changing Plan...');
+                              },
+                              data: {stripeId:stripeId,subscriptionId:subscriptionId,plan:plan,email:userProfile.email},
+                              success: function(){
+                                if(typeof(ga) === 'function')
+                                  ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
+                                loaded();
+                              }
+                            });
+                          }
+                          dialog.close();
+                        }
+                    }]
+                }).open();     
+                
+                
                 e.preventDefault();
-              });*/
+              });
 
               //build subscription info
             
@@ -312,70 +336,70 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                 }
               }
             }
+          } else {
+            $('.button-subscribe').on('click',function(e){
+              $('#payment_modal').modal();
+              $button = $(this);
+              plan = $(this).data('plan');
+              $('#modal-plan').html($(this).data('text'));
+              $('#email').val(userProfile.email);
+              $('#modal-price').html(['$',(parseFloat($(this).data('amount'))/100).toFixed(2)].join(''));
+              e.preventDefault();
+            });
           }
         },
         complete: $timeout.bind($timeout, function(){
           $rootScope.db_loading = false;
         })
       });
-
-      var plan;
-      var $button;
-      /*handler = StripeCheckout.configure({
-        key: stripeKey,
-        token: function(token) {
-          $.ajax({
-            url:'https://transactions.appbase.io/subscribe',
-            type: 'post',
-            data: {token: token.id, email: token.email, plan: plan},
-            beforeSend: function(){
-              $button.html('Subscribing...');
-            },
-            success: function(data){
-              if(typeof(ga) === 'function')
-                ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
-              loaded();
-            }
-          });
-        }
-      });*/
-
+      
       $('#cancel-subscription').on('click',function(e){
         e.preventDefault();
         $this = $(this);
-        var customer = JSON.parse(localStorage.getItem('customer'));
-        stripeId = customer.stripeId; 
-        subscriptionId = customer.customer.subscriptions.data[0].id;
-        
-        $.ajax({
-          url:'https://transactions.appbase.io/cancelSubscription',
-          type: 'post',
-          beforeSend: function(){
-            $this.html('Canceling Subscription...');
-          },
-          data: {stripeId:stripeId,subscriptionId:subscriptionId,email:userProfile.email},
-          success: function(data){
-            if(typeof(ga) === 'function')
-              ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'cancel', eventLabel: customer.plan});
-            $('#plans button')
-              .html('Subscribe')
-              .removeClass('btn-success')
-              .addClass('btn-primary')
-              .removeAttr('disabled');
-            $this.html('Cancel Subscription');
-            loaded();
-          }
-        });
-      });
 
-      $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
-      $('.button-subscribe').on('click',function(e){
-        $button = $(this);
-        plan = $(this).data('plan');
-        $('#modal-plan').html($(this).data('text'));
-        $('#email').val(userProfile.email);
-        $('#modal-price').html(['$',(parseFloat($(this).data('amount'))/100).toFixed(2)].join(''));
-        e.preventDefault();
+        var a = new BootstrapDialog({
+            title: 'Change plan',
+            message: 'Are you sure you want to cancel your subscription?',
+            closable: false,
+            cssClass: 'confirm-del',
+            buttons: [{
+                label: 'No',
+                cssClass: 'btn-no',
+                action: function(dialog) {
+                    dialog.close();
+                }
+            }, {
+                label: 'Yes',
+                cssClass: 'btn-yes',
+                action: function(dialog) {
+                  var customer = JSON.parse(localStorage.getItem('customer'));
+                  var stripeId = customer.stripeId; 
+                  var subscriptionId = customer.customer.subscriptions.data[0].id;
+                  
+                  $.ajax({
+                    url:'https://transactions.appbase.io/cancelSubscription',
+                    type: 'post',
+                    beforeSend: function(){
+                      $this.html('Canceling Subscription...');
+                    },
+                    data: {stripeId:stripeId,subscriptionId:subscriptionId,email:userProfile.email},
+                    success: function(data){
+                      if(typeof(ga) === 'function')
+                        ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'cancel', eventLabel: customer.plan});
+                      $('#plans button')
+                        .html('Subscribe')
+                        .removeClass('btn-success')
+                        .addClass('btn-primary')
+                        .removeAttr('disabled');
+                      $this.html('Cancel Subscription');
+                      loaded();
+                    }
+                  });
+                  dialog.close();
+                }
+            }]
+        }).open();  
+        
       });
 
       $('body').on('submit','#payment-form',function(event) {
@@ -387,7 +411,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
         Stripe.card.createToken($form, stripeResponseHandler);
 
         // Prevent the form from submitting with the default action
-        return false;
+        event.preventDefault();
       });
 
       function stripeResponseHandler(status, response) {

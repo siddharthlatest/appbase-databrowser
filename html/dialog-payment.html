@@ -18,13 +18,17 @@
             </div>
             <div class="form-group">
               <input class="form-control" placeholder="Card Number" type="text" size="20" id="number" data-stripe="number"/>
+              <i class="fa fa-cc-visa"></i>
+              <i class="fa fa-cc-mastercard"></i>
+              <i class="fa fa-cc-amex"></i>
+              <i class="fa fa-cc-discover"></i>
             </div>
 
             <div class="form-group">
               <div class="form-inline">
-                <input type="text" class="form-control" placeholder="MM" size="2" id="exp-month" data-stripe="exp-month"/>
+                <input type="text" class="form-control" placeholder="MM" maxlength="2" size="2" id="exp-month" data-stripe="exp-month"/>
                 <span>/</span>
-                <input type="text" class="form-control" placeholder="YY" size="4" id="exp-year" data-stripe="exp-year"/>
+                <input type="text" class="form-control" placeholder="YY" size="2" maxlength="2" id="exp-year" data-stripe="exp-year"/>
                 <input class="form-control" type="text" size="4" id="cvc" placeholder="CVC" data-stripe="cvc"/>
               </div>
             </div>
