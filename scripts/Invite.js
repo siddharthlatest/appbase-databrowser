@@ -26,15 +26,30 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
       e.preventDefault();
     });
 
+    userV.commitData(function(previousData) {
+      if(!previousData.invites) {
+        newData = {
+          invites : 0
+        }
+      } else {
+        newData = previousData;
+      }
+      return newData;
+    }, function(error, vref) {
+      //do nothing
+    });
+
     userV.on('edge_added', function onComplete(err, vref,eref) {
-      if (err) 
-        console.log(err);
+      console.log('edge added', vref.path());
+      if (err) {
+        //console.log(err);
+      }
       else {
         vref.isValid(function(err,bool){
           if(bool) {
             vref.on('properties', function (err,ref,userSnap) {
               if (err) {
-                console.log(err);
+                //console.log(err);
               } else {
                 if(!$('#'+eref.priority()).length) {    
                   $('#invited-users').append('<li id="'+eref.priority()+'"">'+ userSnap.properties().email +': <span class="pull-right resend-link"></span> <em class="status">'+userSnap.properties().status+'<em> <span class="pull-right resend-link"></span>');
@@ -92,7 +107,12 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
               $('#email-error').append(['<li>',element,'</li>'].join(''));
             });
           } else {
-            $('#email-error').html('<li>An error has happened.</li>');
+            if(data.error) {
+              $('#email-error').html(['<li>',data.message,'</li>'].join(''));
+            } else {
+              $('#email-error').html('<li>An error has happened.</li>');  
+            }
+            
           }
         }
       });
