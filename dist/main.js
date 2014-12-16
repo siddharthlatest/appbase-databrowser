@@ -332,7 +332,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                 if(!subscriptions.data[0].cancel_at_period_end){
                   $('#period-end').html(datePeriodEnd.toDateString());
                 } else {
-                  $('#period-end').html(['<strong>',datePeriodEnd.toDateString(),'</strong> - The subscription will be canceled at this date.'].join(''));
+                  $('#period-end').html(['<strong>',datePeriodEnd.toDateString(),'</strong> - The subscription will be canceled at this date. <br><strong>You can still change your plan before billing cycle is over.</strong>'].join(''));
                 }
               }
             }
@@ -421,22 +421,28 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
           $form.find('.payment-errors').text(response.error.message);
           $form.find('button').prop('disabled', false);
         } else {
-          $('#payment_modal').modal('hide');
-          $form.find('button').prop('disabled', false);
+          var coupon = $('#coupon').val();
           // response contains id and card, which contains additional card details
           var token = response.id;
         
           $.ajax({
             url:'https://transactions.appbase.io/subscribe',
             type: 'post',
-            data: {token: token, email: userProfile.email, plan: plan},
+            data: {token: token, email: userProfile.email, plan: plan, coupon: coupon},
             beforeSend: function(){
               $button.html('Subscribing...');
             },
             success: function(data){
+              $('#payment_modal').modal('hide');
               if(typeof(ga) === 'function')
                 ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
               loaded();
+              $form.find('button').prop('disabled', false);
+            },
+            error: function(jqXHR,data,errorThrown){
+              $form.find('button').prop('disabled', false);
+              $form.find('.payment-errors').text(jqXHR.responseText);
+              $button.html('Subscribe');
             }
           });
           
@@ -1152,7 +1158,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
        }
     });
 
-    $('#form-invite-friends').submit( function(event) {
+    $('#form-invite-friends').on('submit', function(event) {
       //$('#final-text').val([$('#text').val(),'<br><br> <a href="',inviteLink,'">Click here to join Appbase now.</a> or open this link on your browser: ', inviteLink, '.'].join(''));
       $('#final-text').val($('#text').val());
       //send form data to server
