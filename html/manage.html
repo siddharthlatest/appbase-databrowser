@@ -1,4 +1,4 @@
-<nav class="navbar" id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || $parent.where()==='invite' || $parent.where()==='apps')?'man-hide':'man-show'">
+<nav class="navbar" id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['stats', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
   <div class="container-fluid">
     <div class="navbar-header">
     	<div class="app-title" ng-bind="$parent.currentApp"></div>

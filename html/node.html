@@ -66,8 +66,9 @@
         
 
         <ul class="propertiesBox" ng-show="node.hasProps" >
-          <div class="col-xs-12">
-            <div class="panel">
+          <div>
+            <div class="panel"
+                 ng-class="{'mod': node.pstmod, 'new': node.pstcreate, 'del': node.pstdel}">
               <div class="panel-heading">
                 <h3 class="panel-title">
                   Properties <a class="fa fa-plus-square" ng-click="node.addProp()"></a>

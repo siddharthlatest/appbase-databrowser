@@ -1,7 +1,7 @@
 <div class="dev-browser" id="browser">
 <!--     <div ng-show='alert && alert !== "" ' class="alert alert-{{alertType}}" role="alert" style="opacity: 0.6;">{{alert}}</div> -->
 
-    <ol ng-show="node" class="breadcrumb">
+    <ol ng-show="node && $parent.where()==='browser'" class="breadcrumb">
         <li>
             <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl)" ng-bind="baseUrl" class="margin-right-xs"></a>
         </li>
@@ -11,6 +11,6 @@
         </li>
     </ol>
 
-    <div ng-show="node" class="tree" ng-include="'/developer/html/node.html'"></div>    
+    <div ng-show="node && $parent.where()==='browser'" class="tree" ng-include="'/developer/html/node.html'"></div>    
 
 </div>

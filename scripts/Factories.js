@@ -341,18 +341,18 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
               });
           });
         });
-        $rootScope.fetching = false;
-        $rootScope.noApps = false;
+        if(apps.length === 0){
+          done({});
+          $rootScope.noApps = true;
+          $rootScope.noCalls = $rootScope.noCalls || true;
+        } else {
+          $rootScope.noApps = false;
+          $rootScope.noCalls = $rootScope.noCalls || false;
+        }
         $rootScope.$apply();
       })
       .error(function(error) {
-        if(error.message === "Not Found") {
-          $timeout(function(){
-            $rootScope.fetching = false;
-            $rootScope.noApps = true;
-          });
-          done({});
-        } else throw error;
+        throw error;
       })
   }
 

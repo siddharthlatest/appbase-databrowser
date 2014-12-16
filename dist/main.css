@@ -53,105 +53,6 @@
     animation: none;
   }
 }
-@-webkit-keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ngdialog {
-  position: fixed;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 10000;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.ngdialog-overlay {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.4);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-content {
-  background: white;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-content {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-close:before {
-  content: '\00D7';
-  cursor: pointer;
-}
-
-body.ngdialog-open {
-  overflow: hidden;
-}
 /* console */
 @font-face {
   font-family: "Source Sans Pro Light";
@@ -176,23 +77,6 @@ body.ngdialog-open {
 /************************
 * Colors for the browser icons
 ************************/
-@-webkit-keyframes appear {
-  0% {
-    opacity: 0; }
-
-  100% {
-    opacity: 1; } }
-
-/************************
-* Colors for the browser icons
-************************/
-@keyframes appear {
-  0% {
-    opacity: 0; }
-
-  100% {
-    opacity: 1; } }
-
 @-webkit-keyframes slideOutLeft {
   100% {
     display: none; }
@@ -200,6 +84,9 @@ body.ngdialog-open {
   to {
     opacity: 0; } }
 
+/************************
+* Colors for the browser icons
+************************/
 @keyframes slideOutLeft {
   100% {
     display: none; }
@@ -259,41 +146,17 @@ body.ngdialog-open {
 
 @-webkit-keyframes slideDown {
   from {
-    -webkit-transform: translateY(-100%);
-    transform: translateY(-100%); }
+    top: -60px; }
 
   to {
-    -webkit-transform: translateY(0);
-    transform: translateY(0); } }
+    top: 0; } }
 
 @keyframes slideDown {
   from {
-    -webkit-transform: translateY(-100%);
-    transform: translateY(-100%); }
+    top: -60px; }
 
   to {
-    -webkit-transform: translateY(0);
-    transform: translateY(0); } }
-
-@-webkit-keyframes slideUp {
-  from {
-    -webkit-transform: translateY(0);
-    transform: translateY(0); }
-
-  to {
-    -webkit-transform: translateY(-100%);
-    transform: translateY(-100%);
-    display: none !important; } }
-
-@keyframes slideUp {
-  from {
-    -webkit-transform: translateY(0);
-    transform: translateY(0); }
-
-  to {
-    -webkit-transform: translateY(-100%);
-    transform: translateY(-100%);
-    display: none !important; } }
+    top: 0; } }
 
 .ng-enter {
   -webkit-animation: slideInRight 0.3s both ease-in-out 0.31s;
@@ -309,14 +172,14 @@ body.ngdialog-open {
 
 #manage {
   position: absolute;
-  width: 100%;
-  transition: all 0.5s ease-in-out; }
+  width: 100%; }
 
 #manage.man-hide {
-  top: -60px; }
+  top: -200vh; }
 
 .man-show {
-  top: 0; }
+  -webkit-animation: slideDown 0.5s both ease-in-out;
+  animation: slideDown 0.5s both ease-in-out; }
 
 .view-wrapper, body {
   height: 100%; }
@@ -390,9 +253,29 @@ body {
   #applications .loading {
     line-height: 128px;
     text-align: center; }
-  #applications .appear {
-    -webkit-animation: appear 0.5s ease-in-out;
-    animation: appear 0.5s ease-in-out; }
+  #applications .fetching {
+    position: absolute;
+    left: 50%;
+    top: 90px;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    color: #ddd;
+    font-size: 2em; }
+    #applications .fetching .ab-spin {
+      -webkit-animation: fa-spin 1s infinite ease-in-out;
+      animation: fa-spin 1s infinite ease-in-out; }
+  #applications .create-app {
+    transition: margin-left 0.3s ease; }
+  @media (min-width: 992px) {
+    #applications .one {
+      margin-left: 25%; }
+    #applications .many {
+      margin-left: 0%; } }
+  #applications .grayed {
+    opacity: 0.5; }
+  #applications .desc {
+    font-size: 1.2em; }
   #applications .well {
     background-color: #F2F2F2;
     box-shadow: none;
@@ -459,6 +342,46 @@ body {
         background-color: #d33232; }
     #applications .well .manage-button {
       text-align: right; }
+  #applications .get-started {
+    font-family: "Source Sans Pro Extra Light"; }
+    #applications .get-started .title {
+      text-align: center;
+      font-size: 2em;
+      color: #666;
+      margin-top: 20px; }
+    #applications .get-started .steps div {
+      text-align: center;
+      margin-top: 30px; }
+      #applications .get-started .steps div .circle {
+        transition: all 0.3s ease;
+        line-height: 150px;
+        background-color: #fbfbfb;
+        margin: 0 auto;
+        width: 150px;
+        height: 150px;
+        border-radius: 75px;
+        border: 1px solid #d0d0d0;
+        color: #aaa;
+        font-size: 68.18182px; }
+        #applications .get-started .steps div .circle:not(.first):after {
+          position: absolute;
+          top: 18.75px;
+          left: 0;
+          font: normal normal normal 14px/1 FontAwesome;
+          font-size: 1.5em;
+          content: '\f105';
+          color: #dddddd; }
+        #applications .get-started .steps div .circle:hover {
+          color: white; }
+        #applications .get-started .steps div .circle:hover.learn {
+          background-color: #ff4136;
+          border-color: #ff1003; }
+        #applications .get-started .steps div .circle:hover.api {
+          background-color: #26be6d;
+          border-color: #1d9354; }
+        #applications .get-started .steps div .circle:hover.etc {
+          background-color: #ff851b;
+          border-color: #e76800; }
 
 #manage {
   min-height: 60px;
@@ -582,11 +505,16 @@ body {
     #browser .node .fa.fa-plus {
       margin-right: 4px; }
   #browser .propertiesBox {
-    margin-top: 7px; }
-    #browser .propertiesBox .panel {
+    margin-top: 7px;
+    width: 50%; }
+    #browser .propertiesBox .panel.modify {
       border-color: #f47c3c; }
+      #browser .propertiesBox .panel.modify .panel-heading {
+        background: #f47c3c; }
+    #browser .propertiesBox .panel {
+      border-color: #aaa; }
       #browser .propertiesBox .panel .panel-heading {
-        background: #f47c3c;
+        background: #aaa;
         padding: 5px 15px; }
         #browser .propertiesBox .panel .panel-heading .panel-title {
           font-family: "Source Sans Pro Bold";
@@ -1012,3 +940,103 @@ body {
 
 .nav > li > a:focus {
   background-color: transparent; }
+
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}

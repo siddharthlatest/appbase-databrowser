@@ -137,7 +137,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   Prism.highlightAll();
   $scope.devProfile = session.getProfile();
   if($scope.devProfile) {
-    var fetchApps = function() {
+    var fetchApps = function(done) {
       $scope.fetching = true;
       data.getDevsApps(function(apps) {
         $timeout(function(){
@@ -149,6 +149,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
               throw data;
             });
           }
+          if(done) done();
           $scope.fetching = false;
 
           $scope.apps = apps;
@@ -159,17 +160,20 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     }
 
     $scope.createApp = function (app) {
+      $scope.creating = true;
       data.createApp(app, function(error) {
         if(error) {
+          $scope.creating = false;
           alert('Name taken. Try another name.');
         } else {
-          fetchApps();
+          fetchApps(function(){
+            $scope.creating = false;
+          });
         } 
       })
     }
 
     $scope.deleteApp = function(app) {
-
       var a = new BootstrapDialog({
           title: 'Delete app',
           message: 'Are you sure you want to delete ' + app + '?',
@@ -185,14 +189,28 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
               label: 'Yes',
               cssClass: 'btn-yes',
               action: function(dialog) {
+                $scope.deleting = app;
                 data.deleteApp(app, function(error) {
-                  if(error) throw error;
-                  else fetchApps();
+                  if(error){
+                    $scope.deleting = '';
+                    throw error;
+                  }
+                  else fetchApps(function(){
+                    $scope.deleting = '';
+                  });
                 });
                 dialog.close();
               }
           }]
       }).open();
+    }
+
+    $scope.firstAPICall = function() {
+      alert('this is an html5 super duper modal')
+    }
+
+    $scope.examplesModal = function() {
+      alert('this is an html5 super duper modal')
     }
 
     document.addEventListener('logout', function() {
@@ -1037,18 +1055,18 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
               });
           });
         });
-        $rootScope.fetching = false;
-        $rootScope.noApps = false;
+        if(apps.length === 0){
+          done({});
+          $rootScope.noApps = true;
+          $rootScope.noCalls = $rootScope.noCalls || true;
+        } else {
+          $rootScope.noApps = false;
+          $rootScope.noCalls = $rootScope.noCalls || false;
+        }
         $rootScope.$apply();
       })
       .error(function(error) {
-        if(error.message === "Not Found") {
-          $timeout(function(){
-            $rootScope.fetching = false;
-            $rootScope.noApps = true;
-          });
-          done({});
-        } else throw error;
+        throw error;
       })
   }
 
@@ -1253,22 +1271,24 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
         $timeout(function() {
           // removes old ones. saves the indexes to avoid modifying looping array
           var toRemove = [];
-          root.children.forEach(function(each, index){
-            var found = false;
-            namespaceObjs.forEach(function(obj){
-              if(each.name === obj.name) {
-                found = true;
-                return;
+          if(root.children) {
+            root.children.forEach(function(each, index){
+              var found = false;
+              namespaceObjs.forEach(function(obj){
+                if(each.name === obj.name) {
+                  found = true;
+                  return;
+                }
+              });
+              if(!found) {
+                toRemove.push(index);
               }
             });
-            if(!found) {
-              toRemove.push(index);
-            }
-          });
-          toRemove.forEach(function(each){
-            root.children.splice(each, 1);
-            $('[data-toggle="tooltip"]').tooltip('destroy');
-          });
+            toRemove.forEach(function(each){
+              root.children.splice(each, 1);
+              $('[data-toggle="tooltip"]').tooltip('destroy');
+            });
+          }
           //adds new ones
           namespaceObjs.forEach(function(namespaceObj) {
             if(!addNamespaces(root, namespaceObj.name)) {
@@ -1311,9 +1331,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       $timeout(function() {
         vData.color = 'white';
       }, 500);
-    },
-    onComplete : function(){
-      
     }
   }
 
@@ -1329,8 +1346,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
         $timeout(function(){
           ns.loading = false;
         });
-        var children = JSON.parse(JSON.stringify(ns.children));
-
       }}));
     }
     ns.contract = function() {
@@ -1373,14 +1388,17 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
 
     vertex.expand = function() {
       vertex.expanded = true;
-      vertex.children = vertex.ref.bindEdges($scope, vertexBindCallbacks);
+      vertex.loading = true;
+      vertex.children = vertex.ref.bindEdges($scope, $.extend({}, vertexBindCallbacks, { onComplete: function(){
+        $timeout(function(){
+          vertex.loading = false;
+        });
+      }}));
     }
 
     vertex.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(path));
     }
-
-    vertex.color = 'yellowgreen';
 
     vertex.contract = function() {
       vertex.expanded = false;
@@ -1453,7 +1471,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     if(useThisVertex === undefined) {
       vertex.properties = vertex.ref.bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
-          console.log(properties)
           if(vertex.color == 'white')
             vertex.color = 'gold';
           done();

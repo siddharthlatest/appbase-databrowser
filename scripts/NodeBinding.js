@@ -54,22 +54,24 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
         $timeout(function() {
           // removes old ones. saves the indexes to avoid modifying looping array
           var toRemove = [];
-          root.children.forEach(function(each, index){
-            var found = false;
-            namespaceObjs.forEach(function(obj){
-              if(each.name === obj.name) {
-                found = true;
-                return;
+          if(root.children) {
+            root.children.forEach(function(each, index){
+              var found = false;
+              namespaceObjs.forEach(function(obj){
+                if(each.name === obj.name) {
+                  found = true;
+                  return;
+                }
+              });
+              if(!found) {
+                toRemove.push(index);
               }
             });
-            if(!found) {
-              toRemove.push(index);
-            }
-          });
-          toRemove.forEach(function(each){
-            root.children.splice(each, 1);
-            $('[data-toggle="tooltip"]').tooltip('destroy');
-          });
+            toRemove.forEach(function(each){
+              root.children.splice(each, 1);
+              $('[data-toggle="tooltip"]').tooltip('destroy');
+            });
+          }
           //adds new ones
           namespaceObjs.forEach(function(namespaceObj) {
             if(!addNamespaces(root, namespaceObj.name)) {
@@ -112,9 +114,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       $timeout(function() {
         vData.color = 'white';
       }, 500);
-    },
-    onComplete : function(){
-      
     }
   }
 
@@ -130,8 +129,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
         $timeout(function(){
           ns.loading = false;
         });
-        var children = JSON.parse(JSON.stringify(ns.children));
-
       }}));
     }
     ns.contract = function() {
@@ -174,14 +171,17 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
 
     vertex.expand = function() {
       vertex.expanded = true;
-      vertex.children = vertex.ref.bindEdges($scope, vertexBindCallbacks);
+      vertex.loading = true;
+      vertex.children = vertex.ref.bindEdges($scope, $.extend({}, vertexBindCallbacks, { onComplete: function(){
+        $timeout(function(){
+          vertex.loading = false;
+        });
+      }}));
     }
 
     vertex.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(path));
     }
-
-    vertex.color = 'yellowgreen';
 
     vertex.contract = function() {
       vertex.expanded = false;
@@ -254,7 +254,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     if(useThisVertex === undefined) {
       vertex.properties = vertex.ref.bindProperties($scope, {
         onProperties : function(scope, properties, ref, done) {
-          console.log(properties)
           if(vertex.color == 'white')
             vertex.color = 'gold';
           done();

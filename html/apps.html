@@ -1,9 +1,14 @@
 <div class="container-fluid" id="applications">
     <div class="row">
         <div class="col-xs-12 main-title">
-            <span ng-bind="devProfile.name"></span>'s Apps
+            <span ng-bind="devProfile.name"></span>{{devProfile.name ? "'s" : "Your" }} Apps
         </div>
-        <div class="form-horizontal col-md-6 col-xs-12">
+        <div class="fetching">
+            <div ng-show="fetching">
+                <span class="fa fa-refresh ab-spin"></span>
+            </div>
+        </div>
+        <div class="form-horizontal col-md-6 col-xs-12 create-app" ng-class="noApps?'one':'many' ">
             <div class="row wrapper well test" ng-submit="createApp(newAppname); newAppname ='' ;">
                 <form>
                     <div class="form-group new-app input-line">
@@ -32,15 +37,7 @@
                 </form>
             </div>
         </div>
-        <div class="form-horizontal col-md-6 col-xs-12 loading" ng-show="fetching || noApps">
-            <div class="row wrapper well" ng-show="fetching">
-            Loading...
-            </div>
-            <div class="row wrapper well" ng-show="noApps">
-            You don't have any apps.
-            </div>
-        </div>
-        <div class="form-horizontal col-md-6 col-xs-12 appear" ng-repeat="(app, obj) in apps">
+        <div class="form-horizontal col-md-6 col-xs-12" ng-repeat="(app, obj) in apps" ng-class="fetching ? 'grayed':''" ng-show="deleting !== app">
             <div class="row wrapper well">
                 <div class="form-group input-line">
                     <label class="col-lg-3 col-xs-4 control-label">App name</label>
@@ -75,7 +72,42 @@
             </div>
         </div>
     </div>
-</div>
-<div ng-show="noApps">
-    NO APPS CONTENT
+    <div class="get-started">
+        <div class="title" ng-show="noCalls">
+            <span>Get started now!</span>
+        </div>
+        <div class="steps">
+            <div class="col-xs-12 col-sm-4" ng-hide="noCalls">
+                <a href="http://docs.appbase.io/docs/getting-started.html">
+                    <div class="circle api first"><span class="fa fa-rocket"></span></div>
+                </a>
+                <h2>Quick start</h2>
+                <span class="desc">Tips on getting started with Appbase</span>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <a ng-href="{{noCalls?'/tutorial.html':'https://docs.appbase.io'}}">
+                    <div class="circle learn" ng-class="noCalls?'first':''">
+                        <span class="fa" ng-class="noCalls ? 'fa-list-ol' : 'fa-book'"></span>
+                    </div>
+                </a>
+                <h2>{{noCalls ? 'Tutorial' : 'Docs'}}</h2>
+                <span class="desc">Quickly get a hold of Appbase<br>with the help of our {{noCalls ? 'interactive tutorial' : 'documentation'}}</span>
+            </div>
+            <div class="col-xs-12 col-sm-4" ng-show="noCalls">
+                <a href="" ng-click="firstAPICall()">
+                    <div class="circle api"><span class="fa fa-check-square-o"></span></div>
+                </a>
+                <h2>First API Call</h2>
+                <span class="desc">Make your first API call in minutes</span>
+            </div>
+
+            <div class="col-xs-12 col-sm-4">
+                <a href="" ng-click="examplesModal()">
+                    <div class="circle etc"><span class="fa fa-file-code-o"></span></div>
+                </a>
+                <h2>Examples</h2>
+                <span class="desc">Check out our extensive collection</span>
+            </div>
+        </div>
+    </div>
 </div>
