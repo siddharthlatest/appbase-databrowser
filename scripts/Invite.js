@@ -69,7 +69,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
        }
     });
 
-    $('#form-invite-friends').submit( function(event) {
+    $('#form-invite-friends').on('submit', function(event) {
       //$('#final-text').val([$('#text').val(),'<br><br> <a href="',inviteLink,'">Click here to join Appbase now.</a> or open this link on your browser: ', inviteLink, '.'].join(''));
       $('#final-text').val($('#text').val());
       //send form data to server
