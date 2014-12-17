@@ -6,7 +6,7 @@ angular
 function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
-    Appbase.credentials("inviteafriend", "ce60da146cc2d6fe6bc0ff96204eb3da");
+    Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");
    
     var userProfile = $scope.devProfile;
     var email = userProfile.email.replace('@','');
