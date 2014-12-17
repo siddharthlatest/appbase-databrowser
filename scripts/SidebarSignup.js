@@ -72,10 +72,15 @@ function NavbarCtrl($rootScope, $scope, session){
     var userV = usersNS.v(email);
 
     userV.on('properties', function (err,ref,userSnap) {
-      if(userSnap.properties().invites)
+      if(userSnap && userSnap.properties() && userSnap.properties().invites){
         $('#user-balance').html([userSnap.properties().invites,'.1M'].join(''));
-      else
+        $rootScope.balance = (userSnap.properties().invites * 1000000) + 100000 ;
+      }
+      else{
         $('#user-balance').html('100K');
+        $rootScope.balance = 100000;
+      }
+      $rootScope.$apply();
     });
   }
 }

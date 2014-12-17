@@ -11,9 +11,12 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
   } else {
     $rootScope.currentApp = appName;
   }
-
-  $scope.cap = 500000;
+  $scope.cap = 100000;
+  $rootScope.$watch('balance', function(val){
+    $scope.cap = val || 100000;
+  });
   $scope.chart = {};
+  $scope.chart.month = $scope.chart.week = $scope.chart.day = 0;
   $scope.chartOptions = {
     animate:{
         duration:0,

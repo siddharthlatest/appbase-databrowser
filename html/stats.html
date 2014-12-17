@@ -9,24 +9,14 @@
 				<div>Edges: <span ng-bind="edges"></span></div>
 				<div>Vertices: <span ng-bind="vert"></span></div>
 				<div>Total API calls: <span ng-bind="total"></span></div>
+				<div>This week: <span ng-bind="chart.month"></span></div>
+				<div>Today: <span ng-bind="chart.week"></span></div>
 			</div>
 		</div>
-		<div class="col-md-3 text-center">
+		<div class="col-md-offset-6 col-md-3 text-center">
 			<span>This month</span><br>
 			<div class="chart" easypiechart options="chartOptions" percent="(chart.month*100)/cap">
 				<span class="percent" ng-bind="chart.month"></span>
-			</div>
-		</div>
-		<div class="col-md-3 text-center">
-			<span>This week</span><br>
-			<div class="chart" easypiechart options="chartOptions" percent="(chart.week*100)/(cap/4)">
-				<span class="percent" ng-bind="chart.week"></span>
-			</div>
-		</div>
-		<div class="col-md-3 text-center">
-			<span>Today</span><br>
-			<div class="chart" easypiechart options="chartOptions" percent="(chart.day*100)/(cap/30)">
-				<span class="percent" ng-bind="chart.day"></span>
 			</div>
 		</div>
 		<div class="col-md-12">

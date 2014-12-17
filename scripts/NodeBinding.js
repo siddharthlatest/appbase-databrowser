@@ -10,7 +10,7 @@ function debug(a) {
 
 function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
-
+  nodeBinding.creating = [];
   function addNamespaces(node, childName) {
     for(var i=0 ; i<node.children.length; i++) {
        if(node.children[i].name === childName) {
@@ -20,16 +20,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     return false;
   }
 
-  function removeNamespaces(array, name){
-    var found = false;
-    array.forEach(function(each){
-      if(each.name === name) {
-        found = true;
-        return;
-      }
-    });
-    return found;
-  }
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();
@@ -63,7 +53,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
                   return;
                 }
               });
-              if(!found) {
+              if(!found && nodeBinding.creating.indexOf(each.name) === -1) {
                 toRemove.push(index);
               }
             });
@@ -74,9 +64,11 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
           }
           //adds new ones
           namespaceObjs.forEach(function(namespaceObj) {
-            if(!addNamespaces(root, namespaceObj.name)) {
-              root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
+            if(nodeBinding.creating.indexOf(namespaceObj.name) !== -1) {
+              nodeBinding.creating.splice(nodeBinding.creating.indexOf(namespaceObj.name), 1);
             }
+            if(!addNamespaces(root, namespaceObj.name))
+            root.children.push(nodeBinding.bindAsNamespace($scope,namespaceObj.name,namespaceObj.searchable));
           });
         });
         if(cb) cb();
@@ -88,12 +80,14 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
   
   var vertexBindCallbacks = {
     onAdd :function(scope, vData, vRef, done) {
+      vData.added = true;
+      console.log(vData)
       nodeBinding.bindAsVertex(scope, vRef.path(), vData);
       done();
 
       $timeout(function() {
-        vData.color = 'white';
-      }, 500);
+        vData.added = false;
+      }, 2000);
     },
     onUnbind : function(scope, vData, vRef) {
       vData.ref && vData.ref.unbind();
@@ -118,6 +112,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
   }
 
   nodeBinding.bindAsNamespace = function($scope, namespace, searchable) {
+    nodeBinding.creating.push(namespace);
     var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace));
@@ -172,7 +167,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     vertex.expand = function() {
       vertex.expanded = true;
       vertex.loading = true;
-      vertex.children = vertex.ref.bindEdges($scope, $.extend({}, vertexBindCallbacks, { onComplete: function(){
+      vertex.children = vertex.ref.bindEdges($scope,$.extend({}, vertexBindCallbacks,{onComplete: function(){
         $timeout(function(){
           vertex.loading = false;
         });
@@ -272,21 +267,29 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
      * Consider yourself warned.
      */
     var uuid = 'a' + Appbase.uuid();
+    var initial = true;
     vertex.ref.bindProperties($scope, {
       onProperties : function(scope, properties, ref, done) {
         $timeout(function() {
+          if(!initial) {
+            vertex.propchange = true;
+            $timeout(function(){
+              vertex.propchange = false;
+            }, 2000);
+          }
+          initial = false;
           $scope[uuid] = vertex.properties = properties;
         });
       }
     })
-    $scope[uuid] = vertex.properties;
-    vertex.hasProps = Object.keys($scope[uuid]).length>0;
     $scope.$watch(uuid, function(val){
+      if(!val) return;
       vertex.hasProps = Object.keys($scope[uuid]).length>0;
     });
     
     return vertex;
   }
+  nodeBinding.addNamespaces = addNamespaces;
   return nodeBinding;
 }
 

@@ -186,13 +186,15 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
           return console.error("Unexpected response from server for namespaces:", result);
         }
         var namespaces = []
-        result.namespaces.forEach(function(obj) {
-          obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
-          if(obj.name !== 'system.indexes') {
-            obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
-            namespaces.push(obj)
-          }
-        })
+        if(result.namespaces) {
+          result.namespaces.forEach(function(obj) {
+            obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
+            if(obj.name !== 'system.indexes') {
+              obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
+              namespaces.push(obj)
+            }
+          })
+        }
         done(namespaces)
       })
       .error(function(error) {

@@ -206,11 +206,27 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     }
 
     $scope.firstAPICall = function() {
-      alert('this is an html5 super duper modal')
+      BootstrapDialog.show({
+        message: " <ul><li>Create an app from the dashboard.</li><li>Paste the tutorial code from step 4 (link to step 4) into your favorite editor. Make sure to use the app credentials from step 1.<li>That's it. You now have a chat app completely working on the client side. You can add this chat app on your server, on github pages, anywhere.</li><li>Make sure to make an API call.</li></ul>",
+        cssClass: 'confirm-del',
+        title: "Let's get kicking"
+      });
     }
 
     $scope.examplesModal = function() {
-      alert('this is an html5 super duper modal')
+      BootstrapDialog.show({
+        message: "<ul><li>Twitter: A realtime twitter clone written in ~400 lines of JS (app link, blog post link, github link)</li><li>Hooli: Slack meets Trello - A minimalistic realtime collaboration tool to keep your team in sync (app link)</li><li>Jam with friends - Play live piano with your friends (app link, blog link, github link)</li><li>Jam with friends on NodeJS - Doing analytics on NodeJS (blog link, github link)</li></ul>",
+        cssClass: 'confirm-del',
+        title: "Example Recipes"
+      });
+    }
+
+    $scope.docsModal = function() {
+      BootstrapDialog.show({
+        message: '<ul><li><a href="http://docs.appbase.io/docs/datamodel.html">Data model</a></li><li><a href="http://docs.appbase.io/docs/rest.html">REST API</a></li><li><a href="http://docs.appbase.io/docs/js.html">JS API</a></li><li><a href="http://docs.appbase.io/docs/angular.html">AngularJS binding</a></li><li> <a href="http://docs.appbase.io/docs/authentications.html">Authentications</a></li></ul>',
+        cssClass: 'confirm-del',
+        title: "Docs"
+      });
     }
 
     document.addEventListener('logout', function() {
@@ -552,13 +568,16 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
 
               return params
             }
-
             var params = prepareParams()
             if(node.isV) {
-              if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
-              else node.ref.setEdge(params.eName, params.ref)
+              if(params.pR !== undefined) {
+                node.ref.setEdge(params.eName, params.ref, params.pR)
+              }
+              else {
+                node.ref.setEdge(params.eName, params.ref)
+              }
             } else if(node.isR) {
-              if(!nodeBinding.childExists(node, params.namespace)) {
+              if(!nodeBinding.addNamespaces(node, params.namespace)) {
                 node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
               }
             }
@@ -900,13 +919,15 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
           return console.error("Unexpected response from server for namespaces:", result);
         }
         var namespaces = []
-        result.namespaces.forEach(function(obj) {
-          obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
-          if(obj.name !== 'system.indexes') {
-            obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
-            namespaces.push(obj)
-          }
-        })
+        if(result.namespaces) {
+          result.namespaces.forEach(function(obj) {
+            obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
+            if(obj.name !== 'system.indexes') {
+              obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
+              namespaces.push(obj)
+            }
+          })
+        }
         done(namespaces)
       })
       .error(function(error) {
@@ -1227,7 +1248,7 @@ function debug(a) {
 
 function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
-
+  nodeBinding.creating = [];
   function addNamespaces(node, childName) {
     for(var i=0 ; i<node.children.length; i++) {
        if(node.children[i].name === childName) {
@@ -1237,16 +1258,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     return false;
   }
 
-  function removeNamespaces(array, name){
-    var found = false;
-    array.forEach(function(each){
-      if(each.name === name) {
-        found = true;
-        return;
-      }
-    });
-    return found;
-  }
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
     root.name = stringManipulation.getBaseUrl();
@@ -1280,7 +1291,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
                   return;
                 }
               });
-              if(!found) {
+              if(!found && nodeBinding.creating.indexOf(each.name) === -1) {
                 toRemove.push(index);
               }
             });
@@ -1291,9 +1302,11 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
           }
           //adds new ones
           namespaceObjs.forEach(function(namespaceObj) {
-            if(!addNamespaces(root, namespaceObj.name)) {
-              root.children.push(nodeBinding.bindAsNamespace($scope, namespaceObj.name, namespaceObj.searchable));
+            if(nodeBinding.creating.indexOf(namespaceObj.name) !== -1) {
+              nodeBinding.creating.splice(nodeBinding.creating.indexOf(namespaceObj.name), 1);
             }
+            if(!addNamespaces(root, namespaceObj.name))
+            root.children.push(nodeBinding.bindAsNamespace($scope,namespaceObj.name,namespaceObj.searchable));
           });
         });
         if(cb) cb();
@@ -1305,12 +1318,14 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
   
   var vertexBindCallbacks = {
     onAdd :function(scope, vData, vRef, done) {
+      vData.added = true;
+      console.log(vData)
       nodeBinding.bindAsVertex(scope, vRef.path(), vData);
       done();
 
       $timeout(function() {
-        vData.color = 'white';
-      }, 500);
+        vData.added = false;
+      }, 2000);
     },
     onUnbind : function(scope, vData, vRef) {
       vData.ref && vData.ref.unbind();
@@ -1335,6 +1350,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
   }
 
   nodeBinding.bindAsNamespace = function($scope, namespace, searchable) {
+    nodeBinding.creating.push(namespace);
     var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
       $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace));
@@ -1389,7 +1405,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     vertex.expand = function() {
       vertex.expanded = true;
       vertex.loading = true;
-      vertex.children = vertex.ref.bindEdges($scope, $.extend({}, vertexBindCallbacks, { onComplete: function(){
+      vertex.children = vertex.ref.bindEdges($scope,$.extend({}, vertexBindCallbacks,{onComplete: function(){
         $timeout(function(){
           vertex.loading = false;
         });
@@ -1489,21 +1505,29 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
      * Consider yourself warned.
      */
     var uuid = 'a' + Appbase.uuid();
+    var initial = true;
     vertex.ref.bindProperties($scope, {
       onProperties : function(scope, properties, ref, done) {
         $timeout(function() {
+          if(!initial) {
+            vertex.propchange = true;
+            $timeout(function(){
+              vertex.propchange = false;
+            }, 2000);
+          }
+          initial = false;
           $scope[uuid] = vertex.properties = properties;
         });
       }
     })
-    $scope[uuid] = vertex.properties;
-    vertex.hasProps = Object.keys($scope[uuid]).length>0;
     $scope.$watch(uuid, function(val){
+      if(!val) return;
       vertex.hasProps = Object.keys($scope[uuid]).length>0;
     });
     
     return vertex;
   }
+  nodeBinding.addNamespaces = addNamespaces;
   return nodeBinding;
 }
 
@@ -1950,10 +1974,15 @@ function NavbarCtrl($rootScope, $scope, session){
     var userV = usersNS.v(email);
 
     userV.on('properties', function (err,ref,userSnap) {
-      if(userSnap.properties().invites)
+      if(userSnap && userSnap.properties() && userSnap.properties().invites){
         $('#user-balance').html([userSnap.properties().invites,'.1M'].join(''));
-      else
+        $rootScope.balance = (userSnap.properties().invites * 1000000) + 100000 ;
+      }
+      else{
         $('#user-balance').html('100K');
+        $rootScope.balance = 100000;
+      }
+      $rootScope.$apply();
     });
   }
 }
@@ -1972,9 +2001,12 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
   } else {
     $rootScope.currentApp = appName;
   }
-
-  $scope.cap = 500000;
+  $scope.cap = 100000;
+  $rootScope.$watch('balance', function(val){
+    $scope.cap = val || 100000;
+  });
   $scope.chart = {};
+  $scope.chart.month = $scope.chart.week = $scope.chart.day = 0;
   $scope.chartOptions = {
     animate:{
         duration:0,

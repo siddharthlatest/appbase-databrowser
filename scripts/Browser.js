@@ -93,13 +93,16 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
 
               return params
             }
-
             var params = prepareParams()
             if(node.isV) {
-              if(params.pR !== undefined) node.ref.setEdge(params.eName, params.ref, params.pR)
-              else node.ref.setEdge(params.eName, params.ref)
+              if(params.pR !== undefined) {
+                node.ref.setEdge(params.eName, params.ref, params.pR)
+              }
+              else {
+                node.ref.setEdge(params.eName, params.ref)
+              }
             } else if(node.isR) {
-              if(!nodeBinding.childExists(node, params.namespace)) {
+              if(!nodeBinding.addNamespaces(node, params.namespace)) {
                 node.children.unshift(nodeBinding.bindAsNamespace($scope, params.namespace))
               }
             }

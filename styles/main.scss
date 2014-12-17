@@ -18,6 +18,9 @@ $db-search-off-hover: $db-remove-hover;
 $db-search-cog: #ff851b;
 $red: lighten(#d9534f, 3%); 
 
+$perfect-orange: #f47c3c;
+$rip-good-orange: #aaa;
+
 @keyframes slideOutLeft {
 	100% {
 		display: none;
@@ -41,6 +44,17 @@ $red: lighten(#d9534f, 3%);
 @keyframes slideDown {
 	from 	{ top: -$manage-height;}
 	to 		{ top: 0; }
+}
+@keyframes propModify {
+	0% 	{ background-color: $rip-good-orange }
+	50% { background-color: $perfect-orange }
+	100% { background-color: $rip-good-orange }
+}
+
+@keyframes propModifyB {
+	0% 	{ border-color: $rip-good-orange }
+	50% { border-color: $perfect-orange }
+	100% { border-color: $rip-good-orange }
 }
 
 // @keyframes rotate {
@@ -534,25 +548,12 @@ body {
 		}
 	}
 	.propertiesBox {
-		$perfect-orange: #f47c3c;
-		$rip-good-orange: #aaa;
 		margin-top:7px;
-		width: 50%;
-		// @keyframes propModify {
-		// 	from 	{ opacity: 0; }
-		// 	to 		{ opacity: 1; }
-		// }
-
-		// @keyframes propModifyB {
-		// 	from 	{ opacity: 0; }
-		// 	to 		{ opacity: 1; }
-		// }
-		.panel.modify{
-			border-color: $perfect-orange;
-			//animation: propModify 1s ease;
+		width: 65%;
+		.panel.mod{
+			animation: propModifyB 1s infinite ease;
 			.panel-heading {
-				background: $perfect-orange;
-				//animation: propModifyB 1s ease;
+				animation: propModify 1s infinite ease;
 			}
 		}
 
@@ -690,6 +691,9 @@ body {
  			left: -1px;
  			top: 1px;
  			font-size: 1em;
+ 			&.added {
+ 				color: green;
+ 			}
  		}
  	}
 }
@@ -699,7 +703,7 @@ body {
 	margin-top: 15px;
 	.st-sum {
 		font-size: 1.2em;
-		margin-top: 40px;
+		margin-top: 10px;
 	}
 	.no-data { 
 		padding-top: 20vh;
