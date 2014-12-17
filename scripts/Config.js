@@ -52,6 +52,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.where = function(here){
     if($location.path() === '/') return 'apps';
     if($location.path() === '/invite') return 'invite';
+    if($location.path() === '/billing') return 'billing';
     return $location.path().split('/')[2];
   }
   document.addEventListener('login', function() {

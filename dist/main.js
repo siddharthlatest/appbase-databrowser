@@ -52,6 +52,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.where = function(here){
     if($location.path() === '/') return 'apps';
     if($location.path() === '/invite') return 'invite';
+    if($location.path() === '/billing') return 'billing';
     return $location.path().split('/')[2];
   }
   document.addEventListener('login', function() {
@@ -252,8 +253,8 @@ angular
 .controller('billing', BillingCtrl);
 
 function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
-  var stripeKey = 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv';//test key
-  //var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
+  //var stripeKey = 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv';//test key
+  var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
@@ -309,7 +310,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                         cssClass: 'btn-yes',
                         action: function(dialog) {
                           if(data.customer.subscriptions.data[0]){
-                            plan = $(this).data('plan');
+                            plan = $this.data('plan');
                             stripeId = data.stripeId; 
                             subscriptionId = data.customer.subscriptions.data[0].id;
                             $.ajax({
@@ -323,6 +324,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                                 if(typeof(ga) === 'function')
                                   ga('send', 'event', { eventCategory: 'subscribe', eventAction: 'plan', eventLabel: plan});
                                 loaded();
+                                $('#cancel-subscription').prop('disabled', false);
                               }
                             });
                           }
@@ -350,6 +352,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
                 if(!subscriptions.data[0].cancel_at_period_end){
                   $('#period-end').html(datePeriodEnd.toDateString());
                 } else {
+                  $('#cancel-subscription').prop('disabled', true);
                   $('#period-end').html(['<strong>',datePeriodEnd.toDateString(),'</strong> - The subscription will be canceled at this date. <br><strong>You can still change your plan before billing cycle is over.</strong>'].join(''));
                 }
               }
