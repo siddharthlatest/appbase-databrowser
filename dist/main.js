@@ -1121,7 +1121,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
     Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");
    
     var userProfile = $scope.devProfile;
-    var email = userProfile.email.replace('@','');
+    var email = userProfile.email.replace('@','').replace('.','');
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
     var userV = usersNS.v(email);
@@ -1152,7 +1152,6 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
     });
 
     userV.on('edge_added', function onComplete(err, vref,eref) {
-      console.log('edge added', vref.path());
       if (err) {
         //console.log(err);
       }
@@ -1200,7 +1199,7 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
         success: function(data, status) {
           if(data.accepted){
             data.accepted.forEach(function(element,index){
-              vertex = [email,element.replace(/@/g,'')].join('');
+              vertex = [email,element.replace(/@/g,'').replace('.','')].join('');
               //create new invited vertex and edge it to user
               var inviteV = inviteNS.v(vertex);
               inviteData = {
@@ -1968,7 +1967,7 @@ function NavbarCtrl($rootScope, $scope, session){
   if($scope.devProfile = session.getProfile()) {
     Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
-    var email = userProfile.email.replace('@','');
+    var email = userProfile.email.replace('@','').replace('.','');
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
     var userV = usersNS.v(email);

@@ -66,7 +66,7 @@ function NavbarCtrl($rootScope, $scope, session){
   if($scope.devProfile = session.getProfile()) {
     Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
-    var email = userProfile.email.replace('@','');
+    var email = userProfile.email.replace('@','').replace('.','');
     var usersNS = Appbase.ns("users");
     var inviteNS = Appbase.ns("sentinvites");
     var userV = usersNS.v(email);
