@@ -1118,7 +1118,7 @@ angular
 function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
-    Appbase.credentials("inviteafriend", "f1f5e9662a9bae3ce3d7f2b2b8869f4a");
+    Appbase.credentials("inviteafriend", "ce60da146cc2d6fe6bc0ff96204eb3da");
    
     var userProfile = $scope.devProfile;
     var email = userProfile.email.replace('@','');
@@ -1966,7 +1966,7 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
 
 function NavbarCtrl($rootScope, $scope, session){
   if($scope.devProfile = session.getProfile()) {
-    Appbase.credentials("inviteafriend", "f1f5e9662a9bae3ce3d7f2b2b8869f4a");
+    Appbase.credentials("inviteafriend", "ce60da146cc2d6fe6bc0ff96204eb3da");
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
     var email = userProfile.email.replace('@','');
     var usersNS = Appbase.ns("users");
