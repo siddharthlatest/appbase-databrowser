@@ -1108,7 +1108,7 @@ body {
 	}
 }
 
-.confirm-del {
+.modal-custom {
 	.modal-content {
 		border-radius: 0;
 		font-family: $font-light;
@@ -1147,6 +1147,43 @@ body {
 			font-size: 1.2em;
 			color: white;
 			text-transform: uppercase;
+		}
+	}
+	&.modal-examples { 
+		a {
+			&:focus  {
+				outline: none;
+				text-decoration: none;
+			}
+		}
+		.content-block {
+			overflow: hidden;
+			text-align: center;
+			margin-bottom: 20px; 
+			.icon {
+				overflow: hidden;
+				width: 50px;
+				height: 50px;
+				transition: background 0.3s ease-out;
+				margin: auto;
+			}
+			.docs {
+				width: 80px;
+				height: 80px;
+			}
+			.docs { background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain}
+			.graph { background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain }
+			.auth { background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain }
+			.auth_providers { background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain }
+			.angular { background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain }
+			.js { background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain }
+			.fa-search { font-size: 2em; padding-top: 10px;}
+		}
+		.modal-header {
+			background: $dark-blue;
+		}
+		ul {
+			list-style: square;
 		}
 	}
 }

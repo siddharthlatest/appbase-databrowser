@@ -179,7 +179,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
           title: 'Delete app',
           message: 'Are you sure you want to delete ' + app + '?',
           closable: false,
-          cssClass: 'confirm-del',
+          cssClass: 'modal-custom',
           buttons: [{
               label: 'Cancel',
               cssClass: 'btn-no',
@@ -208,24 +208,24 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
 
     $scope.firstAPICall = function() {
       BootstrapDialog.show({
-        message: " <ul><li>Create an app from the dashboard.</li><li>Paste the tutorial code from step 4 (link to step 4) into your favorite editor. Make sure to use the app credentials from step 1.<li>That's it. You now have a chat app completely working on the client side. You can add this chat app on your server, on github pages, anywhere.</li><li>Make sure to make an API call.</li></ul>",
-        cssClass: 'confirm-del',
+        message: $('<div></div>').load('/include/modal-api.html'),
+        cssClass: 'modal-custom modal-examples',
         title: "Let's get kicking"
       });
     }
 
     $scope.examplesModal = function() {
       BootstrapDialog.show({
-        message: "<ul><li>Twitter: A realtime twitter clone written in ~400 lines of JS (app link, blog post link, github link)</li><li>Hooli: Slack meets Trello - A minimalistic realtime collaboration tool to keep your team in sync (app link)</li><li>Jam with friends - Play live piano with your friends (app link, blog link, github link)</li><li>Jam with friends on NodeJS - Doing analytics on NodeJS (blog link, github link)</li></ul>",
-        cssClass: 'confirm-del',
+        message: $('<div></div>').load('/include/modal-examples.html'),
+        cssClass: 'modal-custom modal-examples',
         title: "Example Recipes"
       });
     }
 
     $scope.docsModal = function() {
       BootstrapDialog.show({
-        message: '<ul><li><a href="http://docs.appbase.io/docs/datamodel.html">Data model</a></li><li><a href="http://docs.appbase.io/docs/rest.html">REST API</a></li><li><a href="http://docs.appbase.io/docs/js.html">JS API</a></li><li><a href="http://docs.appbase.io/docs/angular.html">AngularJS binding</a></li><li> <a href="http://docs.appbase.io/docs/authentications.html">Authentications</a></li></ul>',
-        cssClass: 'confirm-del',
+        message: $('<div></div>').load('/include/modal-docs.html'),
+        cssClass: 'modal-custom modal-examples',
         title: "Docs"
       });
     }

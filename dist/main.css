@@ -1,58 +1,6 @@
 .morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
 .morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
 
-.ngdialog.ngdialog-theme-dialog-small {
-  padding-bottom: 5vh;
-  padding-top: 5vh;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
-  background: #fff;
-  color: #444;
-  line-height: 1.5em;
-  margin: 0 auto;
-  max-width: 100%;
-  padding: 1em;
-  position: relative;
-  width: 60%;
-  max-height: 85vh;
-  overflow: auto;
-  border-radius:5px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
-  cursor: pointer;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
-  background: transparent;
-  color: #bbb;
-  content: "\00D7";
-  font-size: 26px;
-  font-weight: 400;
-  height: 30px;
-  line-height: 26px;
-  position: absolute;
-  right: 3px;
-  text-align: center;
-  top: 3px;
-  width: 30px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
-  color: #777;
-}
-
-@media (max-width: 568px) {
-  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
-    -webkit-animation: none;
-    animation: none;
-  }
-}
 /* console */
 @font-face {
   font-family: "Source Sans Pro Light";
@@ -929,35 +877,70 @@ body {
   #billing .row {
     padding: 30px; }
 
-.confirm-del .modal-content {
+.modal-custom .modal-content {
   border-radius: 0;
   font-family: "Source Sans Pro Light";
   font-size: 1.2em; }
-  .confirm-del .modal-content .btn {
+  .modal-custom .modal-content .btn {
     color: white;
     text-transform: uppercase; }
-  .confirm-del .modal-content .btn-yes {
+  .modal-custom .modal-content .btn-yes {
     background: #d74747; }
-    .confirm-del .modal-content .btn-yes:hover {
+    .modal-custom .modal-content .btn-yes:hover {
       background: #dc5e5c; }
-    .confirm-del .modal-content .btn-yes:active {
+    .modal-custom .modal-content .btn-yes:active {
       background: #d33232; }
-  .confirm-del .modal-content .btn-no {
+  .modal-custom .modal-content .btn-no {
     background: #888; }
-    .confirm-del .modal-content .btn-no:hover {
+    .modal-custom .modal-content .btn-no:hover {
       background: #999; }
-    .confirm-del .modal-content .btn-no:active {
+    .modal-custom .modal-content .btn-no:active {
       background: #777; }
-  .confirm-del .modal-content .modal-footer {
+  .modal-custom .modal-content .modal-footer {
     border: 0; }
-.confirm-del .modal-header {
+.modal-custom .modal-header {
   background: #d74747;
   padding: 15px 15px; }
-  .confirm-del .modal-header .bootstrap-dialog-title {
+  .modal-custom .modal-header .bootstrap-dialog-title {
     font-family: "Source Sans Pro Bold";
     font-size: 1.2em;
     color: white;
     text-transform: uppercase; }
+.modal-custom.modal-examples a:focus {
+  outline: none;
+  text-decoration: none; }
+.modal-custom.modal-examples .content-block {
+  overflow: hidden;
+  text-align: center;
+  margin-bottom: 20px; }
+  .modal-custom.modal-examples .content-block .icon {
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    transition: background 0.3s ease-out;
+    margin: auto; }
+  .modal-custom.modal-examples .content-block .docs {
+    width: 80px;
+    height: 80px; }
+  .modal-custom.modal-examples .content-block .docs {
+    background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain; }
+  .modal-custom.modal-examples .content-block .graph {
+    background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain; }
+  .modal-custom.modal-examples .content-block .auth {
+    background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain; }
+  .modal-custom.modal-examples .content-block .auth_providers {
+    background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain; }
+  .modal-custom.modal-examples .content-block .angular {
+    background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain; }
+  .modal-custom.modal-examples .content-block .js {
+    background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain; }
+  .modal-custom.modal-examples .content-block .fa-search {
+    font-size: 2em;
+    padding-top: 10px; }
+.modal-custom.modal-examples .modal-header {
+  background: #138FCD; }
+.modal-custom.modal-examples ul {
+  list-style: square; }
 
 #payment_modal .modal-title {
   text-align: center; }
@@ -985,6 +968,58 @@ body {
 .nav > li > a:focus {
   background-color: transparent; }
 
+.ngdialog.ngdialog-theme-dialog-small {
+  padding-bottom: 5vh;
+  padding-top: 5vh;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
+  background: #fff;
+  color: #444;
+  line-height: 1.5em;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 1em;
+  position: relative;
+  width: 60%;
+  max-height: 85vh;
+  overflow: auto;
+  border-radius:5px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
+  background: transparent;
+  color: #bbb;
+  content: "\00D7";
+  font-size: 26px;
+  font-weight: 400;
+  height: 30px;
+  line-height: 26px;
+  position: absolute;
+  right: 3px;
+  text-align: center;
+  top: 3px;
+  width: 30px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
+  color: #777;
+}
+
+@media (max-width: 568px) {
+  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
+    -webkit-animation: none;
+    animation: none;
+  }
+}
 @-webkit-keyframes ngdialog-fadeout {
   0% {
     opacity: 1;
