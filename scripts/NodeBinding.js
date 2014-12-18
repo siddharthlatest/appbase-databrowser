@@ -39,6 +39,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       root.expanded = false;
       root.children = [];
     }
+    var initialPoll = true;
     function pollNamespaces(cb){
       data.getNamespaces(function(namespaceObjs){
         $timeout(function() {
@@ -63,13 +64,23 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
             });
           }
           //adds new ones
-          namespaceObjs.forEach(function(namespaceObj) {
-            if(nodeBinding.creating.indexOf(namespaceObj.name) !== -1) {
-              nodeBinding.creating.splice(nodeBinding.creating.indexOf(namespaceObj.name), 1);
+          namespaceObjs.forEach(function(nsObj) {
+            if(nodeBinding.creating.indexOf(nsObj.name) !== -1) {
+              nodeBinding.creating.splice(nodeBinding.creating.indexOf(nsObj.name), 1);
             }
-            if(!addNamespaces(root, namespaceObj.name))
-            root.children.push(nodeBinding.bindAsNamespace($scope,namespaceObj.name,namespaceObj.searchable));
+            if(!addNamespaces(root, nsObj.name)) {
+              var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name,nsObj.searchable));
+              if(!initialPoll) {
+                p--;
+                $timeout(function(){root.children[p]['added'] = true; console.log(root.children[p])});
+
+                $timeout(function(){
+                  root.children[p]['added'] = false;
+                }, 1100);
+              }
+            }
           });
+          initialPoll = false;
         });
         if(cb) cb();
       });
@@ -80,34 +91,38 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
   
   var vertexBindCallbacks = {
     onAdd :function(scope, vData, vRef, done) {
-      vData.added = true;
-      console.log(vData)
       nodeBinding.bindAsVertex(scope, vRef.path(), vData);
+      $timeout(function(){
+        vData.added = true;
+      });
       done();
 
       $timeout(function() {
         vData.added = false;
-      }, 2000);
+      }, 1100);
     },
     onUnbind : function(scope, vData, vRef) {
       vData.ref && vData.ref.unbind();
     },
     onRemove : function(scope, vData, vRef, done) {
       $timeout(function() {
+        vData.removed = true;
+        console.log(vData)
         $('[data-toggle="tooltip"]').tooltip('destroy');
       });
-
       $timeout(function() {
         done();
-      }, 500)
+      }, 1100)
     },
     onChange : function(scope, vData, vRef, done) {
-      vData.color = 'gold';
+      $timeout(function(){
+        vData.mod = true;
+      });
       done();
 
       $timeout(function() {
-        vData.color = 'white';
-      }, 500);
+        vData.mod = false;
+      }, 1100);
     }
   }
 

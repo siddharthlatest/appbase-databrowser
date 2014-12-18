@@ -13,7 +13,11 @@
            ng-click="node.meAsRoot()"
            ng-bind="node.name"
            class="node-name"
-           ng-class="{'expanded': node.expanded, 'added': node.added}"></a>
+           ng-class="{'expanded': node.expanded,
+                      'added': node.added,
+                      'removed': node.removed,
+                      'mod': node.mod}">
+        </a>
 
         <ul class="list-inline node-options-list" ng-show="node.mouse">
 

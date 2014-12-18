@@ -45,6 +45,25 @@ $rip-good-orange: #aaa;
 	from 	{ top: -$manage-height;}
 	to 		{ top: 0; }
 }
+
+@keyframes added {
+	0% 	{ color: $blue; }
+	50% { color: darken($footer-color, 20%); }
+	100% {color: $blue; }
+}
+
+@keyframes removed {
+	0% 	{ color: $blue; }
+	50% { color: red }
+	100% {color: $blue; }
+}
+
+@keyframes mod {
+	0% 	{ color: $blue; }
+	50% { color: $perfect-orange }
+	100% {color: $blue; }
+}
+
 @keyframes propModify {
 	0% 	{ background-color: $rip-good-orange }
 	50% { background-color: $perfect-orange }
@@ -465,6 +484,15 @@ body {
 			transition: color 0.5s;
 			//color: lighten(#428bca, 15%);
 			color: lighten($dark-blue, 10%);
+			&.added {
+				animation: added 1s ease;
+			}
+			&.removed {
+				animation: removed 1s ease;
+			}
+			&.mod {
+				animation: mod 1s ease;
+			}
 			&.expanded {
 				color: darken(#428bca, 15%);
 			}
@@ -551,9 +579,9 @@ body {
 		margin-top:7px;
 		width: 65%;
 		.panel.mod{
-			animation: propModifyB 1s infinite ease;
+			animation: propModifyB 1s ease;
 			.panel-heading {
-				animation: propModify 1s infinite ease;
+				animation: propModify 1s ease;
 			}
 		}
 
@@ -691,9 +719,6 @@ body {
  			left: -1px;
  			top: 1px;
  			font-size: 1em;
- 			&.added {
- 				color: green;
- 			}
  		}
  	}
 }
