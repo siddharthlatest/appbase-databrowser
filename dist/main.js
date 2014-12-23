@@ -1413,6 +1413,14 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
   }
 
   nodeBinding.bindAsVertex = function($scope, path, useThisVertex) {
+    $scope.stringify = function(v) {
+      if(angular.isObject(v)) {
+        try {
+          v = JSON.stringify(v);
+        } catch(e) {};
+      }
+      return v;
+    }
     var parsedPath = stringManipulation.parsePath(path);
     var vertex = useThisVertex || {
       ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)

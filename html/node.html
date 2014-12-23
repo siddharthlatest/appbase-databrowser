@@ -88,7 +88,9 @@
                   <i class="fa fa-pencil"
                      ng-click="node.editProp(prop, val)"></i>
 
-                  {&nbsp;&nbsp;&nbsp;"<span ng-bind="prop"></span>":&nbsp;&nbsp;&nbsp;"<span ng-bind="val"></span>"&nbsp;&nbsp;&nbsp;}
+                  {&nbsp;&nbsp;&nbsp;"<span ng-bind="prop"></span>":&nbsp;&nbsp;&nbsp;"
+                  <span ng-bind="stringify(val)" class="string">
+                  </span>"&nbsp;&nbsp;&nbsp;}
                   <i ng-show="!$last">,</i>
                 </div>
               </div>
