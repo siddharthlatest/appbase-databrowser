@@ -1300,7 +1300,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
             });
             toRemove.forEach(function(each){
               root.children.splice(each, 1);
-              $('[data-toggle="tooltip"]').tooltip('destroy');
+              $('.tooltip.fade.top').remove();
             });
           }
           //adds new ones
@@ -1347,8 +1347,7 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     onRemove : function(scope, vData, vRef, done) {
       $timeout(function() {
         vData.removed = true;
-        console.log(vData)
-        $('[data-toggle="tooltip"]').tooltip('destroy');
+        $('.tooltip.fade.top').remove();
       });
       $timeout(function() {
         done();

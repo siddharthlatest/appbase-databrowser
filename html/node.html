@@ -26,7 +26,7 @@
                   ng-class="node.loadingNs? 'fa-cog fa-spin' : 'fa-plus'"
                   title="Add vertex"
                   data-toggle="tooltip"
-                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body', class: 'tooltip-delete' })"
                   data-placement="top" >
             </span>
 
@@ -36,7 +36,7 @@
                   ng-class="node.deleting? 'fa-cog fa-spin' : 'fa-remove'"
                   title="Remove edge"
                   data-toggle="tooltip"
-                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body', class: 'tooltip-delete' })"
                   data-placement="top" >
             </span>
 
@@ -46,7 +46,7 @@
                   class="fa node-options"
                   title="Toggle search"
                   data-toggle="tooltip"
-                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body', class: 'tooltip-delete' })"
                   data-placement="top" >
             </span>
 
@@ -55,13 +55,13 @@
                   class="fa fa-pencil-square-o node-options"
                   title="Add property"
                   data-toggle="tooltip"
-                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body', class: 'tooltip-delete' })"
                   data-placement="top" >
             </span>
 
             <span ng-show="node.priority"
                   class="label label-warning node-options"
-                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body', class: 'tooltip-delete' })"
                   title="Priority: {{node.priority}}"
                   data-toggle="tooltip"
                   data-placement="top">P</span>
@@ -108,7 +108,7 @@
                     class="fa fa-plus node-options"
                     title="Add vertex"
                     data-toggle="tooltip"
-                    onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
+                    onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body', class: 'tooltip-delete' })"
                     data-placement="top" >
               </span>
           </ul>
