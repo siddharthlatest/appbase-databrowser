@@ -111,7 +111,7 @@ angular.module("AppbaseDashboard")
 function Analytics($rootScope, $location) {
     $rootScope.$on('$routeChangeSuccess', function(){
     	if(typeof(ga) === 'function'){
-        	ga('send', 'pageview', $location.path());
+        	ga('send', 'pageview', ['/developer',$location.path()].join(''));
     	}
     });
 };
