@@ -10,4 +10,4 @@ function Analytics($rootScope, $location) {
     });
 };
 
-});
+})();
