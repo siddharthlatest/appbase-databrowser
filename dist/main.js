@@ -116,7 +116,7 @@ function Analytics($rootScope, $location) {
     });
 };
 
-});
+})();
 (function(){
 angular
 .module("AppbaseDashboard")
