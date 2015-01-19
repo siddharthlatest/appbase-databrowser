@@ -18,12 +18,12 @@
 			<ng-include src="'/developer/html/manage.html'"></ng-include>
 			<div ng-view ng-hide="!$parent.logged || $parent.db_loading"></div>
 		</div>
-		<div ng-hide="!$parent.db_loading" id="loading">
-			<span>Loading...</span> 
-		</div>
 	</div>
 </div>
-<footer class="footer ng-hide" ng-show="true" ng-include="'/include/footer.html'"></footer>
+<div ng-hide="!$parent.db_loading" id="loading">
+	<span>Loading...</span> 
+</div>
+<footer class="footer ng-hide" ng-show="!$parent.db_loading" ng-include="'/include/footer.html'"></footer>
 
 <script src="/developer/dist/vendor.min.js"></script>
 <script src="https://cdn.appbase.io/latest/appbase.js"></script>

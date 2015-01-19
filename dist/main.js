@@ -55,7 +55,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     if($location.path() === '/billing') return 'billing';
     return $location.path().split('/')[2];
   }
-  document.addEventListener('login', function() {
+  document.addEventListener('postLogin', function() {
     $rootScope.logged = true;
     $route.reload();
   });
