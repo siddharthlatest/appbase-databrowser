@@ -323,7 +323,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   data.getDevsAppsWithEmail = function(done) {
     atomic.get(atob(server)+'user/'+ session.getProfile().email)
       .success(function(apps) {
-        console.log('h', apps)
         var appsAndSecrets = {};
         var appsArrived = 0;
         var secretArrived = function(app, secret, metrics) {

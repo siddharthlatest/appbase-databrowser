@@ -31,10 +31,8 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
       $.post('http://162.243.5.104:8080', {code: $scope.codeInput, user: userID}).done(function(data){
         if(data == "true") {
           profile["code"] = true;
-          console.log('here')
           session.setProfile(profile);
           $.post('http://162.243.5.104:8080/u', {user: userID}).done(function(data) {
-            console.log(data)
             $rootScope.hide = false;
             if(data == "true") {
               $rootScope.code = true;
@@ -46,7 +44,6 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
             }
           })
         } else {
-          console.log(data);
           alert('Sorry, unable to verify your code.');
           $route.reload();
         }
@@ -59,7 +56,7 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
       throw error;
     }
     proceed(result);
-  })   
+  });
 }
 
 function NavbarCtrl($rootScope, $scope, session){

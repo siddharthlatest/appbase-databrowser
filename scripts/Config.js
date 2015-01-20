@@ -22,6 +22,15 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.currentApp = sessionStorage.getItem('URL')?stringManipulation.urlToAppname(sessionStorage.getItem('URL')):'';
   $rootScope.$watch('currentApp', function(app){
     sessionStorage.setItem('URL', stringManipulation.appToURL(app));
+    if(app){
+      var local = localStorage.getItem('appStack');
+      if(local) {
+        local = JSON.parse(local);
+        local.splice(local.indexOf(app), 1);
+        local.unshift(app);
+        localStorage.setItem('appStack', JSON.stringify(local));
+      }
+    }
   });
   $rootScope.goToInvite = function() {
     $location.path('/invite');

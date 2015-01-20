@@ -35,6 +35,13 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
           $scope.fetching = false;
 
           $scope.apps = apps;
+          if(!localStorage.getItem('appStack')){
+            var apps = [];
+            for(app in apps){
+              apps.push(app);
+            }
+            localStorage.setItem('appStack', JSON.stringify(apps));
+          }
           session.setApps(apps);
         })
       });
