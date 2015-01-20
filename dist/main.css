@@ -1,119 +1,42 @@
 .morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
 .morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
 
+/* console */
 @font-face {
-  font-family: 'Source Sans Pro Extra Light Italic';
-  src: url('/styles/fonts/source/sourcesanspro-extralightit.eot');
-  src: url('/styles/fonts/source/sourcesanspro-extralightit.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-extralightit.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-extralightit.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-extralightit.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal; }
+  font-family: 'Source Sans Pro Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/ODelI1aHBYDBqgeIAH2zlJbPFduIYtoLzwST68uhz_Y.woff2) format('woff2');
+  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
 
 @font-face {
   font-family: 'Source Sans Pro Light';
-  src: url('/styles/fonts/source/sourcesanspro-light.eot');
-  src: url('/styles/fonts/source/sourcesanspro-light.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-light.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-light.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-light.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal; }
-
-@font-face {
-  font-family: 'Source Sans Pro Regular';
-  src: url('/styles/fonts/source/sourcesanspro-regular.eot');
-  src: url('/styles/fonts/source/sourcesanspro-regular.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-regular.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-regular.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal; }
+  font-style: normal;
+  font-weight: 400;
+  src: local('Source Sans Pro Light'), local('SourceSansPro-Light'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGCP2LEk6lMzYsRqr3dHFImA.woff2) format('woff2');
+  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
 
 @font-face {
   font-family: 'Source Sans Pro Bold';
-  src: url('/styles/fonts/source/sourcesanspro-bold.eot');
-  src: url('/styles/fonts/source/sourcesanspro-bold.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-bold.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-bold.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-bold.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal; }
+  font-style: normal;
+  font-weight: 700;
+  src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGJkF8H8ye47wsfpWywda8og.woff2) format('woff2');
+  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
 
 @font-face {
   font-family: 'Source Sans Pro Extra Light';
-  src: url('/styles/fonts/source/sourcesanspro-extralight.eot');
-  src: url('/styles/fonts/source/sourcesanspro-extralight.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-extralight.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-extralight.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-extralight.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal; }
-
-/*
-@font-face {
-    font-family: 'source_sans_proitalic';
-    src: url('/styles/fonts/source/sourcesanspro-it.eot');
-    src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-style: normal;
+  font-weight: 200;
+  src: local('Source Sans Pro ExtraLight'), local('SourceSansPro-ExtraLight'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGIAPdqzPmKFFIYQ-46z3JxY.woff2) format('woff2');
+  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
 
 @font-face {
-    font-family: 'source_sans_prosemibold';
-    src: url('/styles/fonts/source/sourcesanspro-semibold.eot');
-    src: url('/styles/fonts/source/sourcesanspro-semibold.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-semibold.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-semibold.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-semibold.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-family: 'Source Sans Pro Extra Light Italic';
+  font-style: normal;
+  font-weight: 200;
+  src: local('Source Sans Pro ExtraLight Italic'), local('SourceSansPro-ExtraLightIt'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/fpTVHK8qsXbIeTHTrnQH6KwWwkY55OPAcpsgnrG5el_3rGVtsTkPsbDajuO5ueQw.woff2) format('woff2');
+  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
 
-@font-face {
-    font-family: 'source_sans_proSBdIt';
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_problack_italic';
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_problack';
-    src: url('/styles/fonts/source/sourcesanspro-black.eot');
-    src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_probold_italic';
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_prolight_italic';
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}*/
-/* console */
 /************************
 * Colors for the browser icons
 ************************/
@@ -124,84 +47,6 @@
   to {
     opacity: 0; } }
 
-/*
-@font-face {
-    font-family: 'source_sans_proitalic';
-    src: url('/styles/fonts/source/sourcesanspro-it.eot');
-    src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_prosemibold';
-    src: url('/styles/fonts/source/sourcesanspro-semibold.eot');
-    src: url('/styles/fonts/source/sourcesanspro-semibold.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-semibold.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-semibold.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-semibold.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_proSBdIt';
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_problack_italic';
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_problack';
-    src: url('/styles/fonts/source/sourcesanspro-black.eot');
-    src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_probold_italic';
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_prolight_italic';
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}*/
-/* console */
 /************************
 * Colors for the browser icons
 ************************/

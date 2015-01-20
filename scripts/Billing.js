@@ -3,18 +3,19 @@ angular
 .module('AppbaseDashboard')
 .controller('billing', BillingCtrl);
 
-function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
+function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout, $document){
   //var stripeKey = 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv';//test key
   var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
     $.getScript("https://js.stripe.com/v2/",loaded);
-    //$.getScript("https://checkout.stripe.com/checkout.js",loaded);
+    
+
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
     var plan;
     var $button;
-    
+  
     function loaded(){ 
       Stripe.setPublishableKey(stripeKey);  
 
@@ -111,6 +112,9 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
           } else {
             $('.button-subscribe').on('click',function(e){
               $('#payment_modal').modal();
+              if(sessionStorage.getItem('discount')){
+                $('#payment_modal #coupon').val('prodhuntdisc30');
+              }
               $button = $(this);
               plan = $(this).data('plan');
               $('#modal-plan').html($(this).data('text'));
