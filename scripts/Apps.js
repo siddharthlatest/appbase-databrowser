@@ -111,6 +111,14 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       });
     }
 
+    $scope.share = function() {
+      BootstrapDialog.show({
+        message: 'Coming soon.',
+        cssClass: 'modal-custom modal-examples',
+        title: "Sharing"
+      });
+    }
+
     document.addEventListener('logout', function() {
       $timeout(function(){
         $rootScope.logged = false;

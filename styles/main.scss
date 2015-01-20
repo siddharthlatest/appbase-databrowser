@@ -76,17 +76,18 @@ $rip-good-orange: #aaa;
 	100% { border-color: $rip-good-orange }
 }
 
-// @keyframes rotate {
-// 	to {
-// 		transform: rotate(90deg);
-// 	} 
-// }
-
-// @keyframes back {
-// 	to {
-// 		transform: rotate(0deg);
-// 	}
-// }
+@media screen and (min-width: 1800px){
+	.col-hg-4 {
+		width: 33.3333333%;
+		padding:0;
+	}
+	.col-hg-4.one {
+		width: 50%;
+	}
+	#applications .well .bar a{
+		padding:0;
+	}
+}
 
 .ng-enter {
 	animation: slideInRight 0.3s both ease-in-out 0.31s;
@@ -189,7 +190,7 @@ body {
 	padding-left: 0;
 	padding-right: 0;
 	div[ng-view] {
-		margin-top: $manage-height+2px;
+		margin-top: $manage-height;
 		//min-height: calc(100vh - #{$navbar-height + $footer-height + $manage-height + 30px});
 	}
 }
@@ -254,6 +255,7 @@ body {
 		padding: 25px 30px 15px;
 		border-radius: 15px;
 		color: #888;
+		height: 170px;
 		.tip {
 			text-align: center;
 			line-height: 30px;
@@ -291,18 +293,65 @@ body {
 				cursor: default;
 			}
 		}
-		.manage-url {
-			margin-bottom: 0;
+
+		.delete {
+			position: absolute;
+			right:20px;
+			top: 6px;
+			overflow: hidden;
+			z-index: 2;
+			cursor: pointer;
+			.can, .lid{
+				fill: transparent;
+				stroke: #ccc;
+				transition: fill 0.1s ease-out;
+			}
+			svg:hover{
+				.can, .lid{
+					stroke: transparent;
+					fill: $db-remove;
+				}
+				.lid {
+					stroke: transparent;
+				}
+			}
 		}
 
-		.url {
-			line-height: 2;
-			cursor: pointer;
-			div {
-				width: 100%;
-				overflow: hidden;
-				text-overflow:ellipsis;
+		.bar {
+			margin-top: -4px;
+			$bar_blue: #50BAEF;
+			$bar_light: lighten($bar_blue, 9%);
+			&>a {
+				transition: color 0.2s ease-out;
+				display: block;
+				height: 51px;
+				&>div {
+					margin: -30px auto 0;
+				}
+				&:hover {
+					cursor: pointer;
+					color: $bar_blue;
+					svg .icon {
+						fill: $bar_light;
+					}
+				}
 			}
+
+			// temporary fix
+			svg {
+				position: relative;
+				.icon {
+					fill: $bar_blue;
+					transition: fill 0.2s ease-out;
+				}
+			}
+			.dbrowser { top:  0px; left: -1px }
+			.share    { top: -4px; left: 1px  }
+			.auth     { top: -5px; left: -1px }
+			.analytic { top: -3px; left: -4px }
+
+
+
 		}
 
 		button, a {
@@ -416,7 +465,7 @@ body {
 	border-radius: 0;
 	border:0;
 	margin-bottom: 0;
-	margin-top: 2px;
+	margin-top: 0;
 	.container-fluid {
 		height: $manage-height;
 		padding: -1px 5vw 0;
