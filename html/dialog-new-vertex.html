@@ -12,6 +12,12 @@
             <label ng-show="node.isV"
                  class="control-label">Vertex Type:
             </label>
+            <select ng-show="node.isV"
+                ng-required="true"
+                class="form-control small"
+                ng-model="vType"
+                ng-options="vT for vT in vTypeOptions">
+            </select>
             <label ng-show= "vType === vTypeOptions[0]"
                  class="control-label">Vertex Namespace:
             </label>
