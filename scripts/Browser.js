@@ -9,7 +9,8 @@ angular
 function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
   $rootScope.db_loading = true;
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  if(!appName || !session.getApps() || !session.getApps()[appName]) {
+  var app = session.appFromName(appName);
+  if(!app) {
     $rootScope.goToApps();
   } else {
     $rootScope.currentApp = appName;
@@ -22,7 +23,7 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
     session.setBrowserURL(URL);
   }
 
-  if(!data.init(appName)) {
+  if(!session.init(appName)) {
     $rootScope.goToApps();
   }
 

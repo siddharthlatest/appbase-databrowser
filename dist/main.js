@@ -12,6 +12,22 @@ angular.module("AppbaseDashboard", ['ngAppbase',
   .config(Routes);
 
 function FirstRun($rootScope, $location, stringManipulation, session, $route){
+  // changed the way sessions are stored, so to prevent errors:
+  var oldSession = sessionStorage.getItem('apps');
+  if(oldSession){
+    try {
+      oldSession = JSON.parse(oldSession);
+      if(!angular.isArray(oldSession)) clearSession();
+    } catch(e){
+      clearSession();
+    }
+  } else clearSession();
+  function clearSession(){
+    sessionStorage.setItem('apps', '[]');
+  }
+  // end session fixing 
+  
+  if(!angular.isArray())
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     session.setApps(null);
     session.setProfile(null);
@@ -22,6 +38,20 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.currentApp = sessionStorage.getItem('URL')?stringManipulation.urlToAppname(sessionStorage.getItem('URL')):'';
   $rootScope.$watch('currentApp', function(app){
     sessionStorage.setItem('URL', stringManipulation.appToURL(app));
+    var apps = session.getApps();
+    if(app && apps.length){
+      var appRef = apps.filter(function(b){
+        return b.name === app;
+      })[0];
+      apps.splice(apps.indexOf(appRef), 1);
+      apps.unshift(appRef); //moved app to top of array
+      session.setApps(apps);
+      var order = [];
+      apps.forEach(function(app){
+        order.push(app.name);
+      });
+      localStorage.setItem(session.getProfile().uid + 'order', JSON.stringify(order));
+    }
   });
   $rootScope.goToInvite = function() {
     $location.path('/invite');
@@ -140,26 +170,14 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   if($scope.devProfile) {
     var fetchApps = function(done) {
       $scope.fetching = true;
-      data.getDevsApps(function(apps) {
-        $timeout(function(){
-          for(var app in apps){
-            oauthFactory.getApp(app, apps[app].secret)
-            .then(function(data){
-              apps[app].oauth = data;
-            }, function(data){
-              throw data;
-            });
-          }
-          if(done) done();
-          $scope.fetching = false;
-
-          $scope.apps = apps;
-          session.setApps(apps);
-        })
+      session.fetchApps(function(){
+        $scope.fetching = false;
+        oauthFactory.updateApps();
+        $scope.apps = session.getApps();
+        $scope.$apply();
       });
       $rootScope.db_loading = false;
     }
-
     $scope.createApp = function (app) {
       $scope.creating = true;
       data.createApp(app, function(error) {
@@ -177,7 +195,10 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     $scope.deleteApp = function(app) {
       var a = new BootstrapDialog({
           title: 'Delete app',
-          message: 'Are you sure you want to delete ' + app + '?',
+          message: 'Are you sure you want to delete <span class="bold">' + app +
+          '</span>?<br>Enter the app name to confirm.<br><br>'
+          + '<div class="form-group"><input type="text" class="form-control" /></div>'
+          ,
           closable: false,
           cssClass: 'modal-custom',
           buttons: [{
@@ -190,17 +211,24 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
               label: 'Yes',
               cssClass: 'btn-yes',
               action: function(dialog) {
-                $scope.deleting = app;
-                data.deleteApp(app, function(error) {
-                  if(error){
-                    $scope.deleting = '';
-                    throw error;
-                  }
-                  else fetchApps(function(){
-                    $scope.deleting = '';
+                var input = dialog.getModalBody().find('.form-group');
+                var value = input.find('input').val();
+                console.log(value, app)
+                if(value === app){
+                  $scope.deleting = app;
+                  data.deleteApp(app, function(error) {
+                    if(error){
+                      $scope.deleting = '';
+                      throw error;
+                    }
+                    else fetchApps(function(){
+                      $scope.deleting = '';
+                    });
                   });
-                });
-                dialog.close();
+                  dialog.close();
+                } else {
+                  input.addClass('has-error');
+                }
               }
           }]
       }).open();
@@ -238,18 +266,19 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       });
     }
 
-    document.addEventListener('logout', function() {
+    document.addEventListener('logout', function(evnt) {
       $timeout(function(){
         $rootScope.logged = false;
         $appbase.unauth();
-        session.setApps(null);
+        session.setApps([]);
         session.setProfile(null);
         $route.reload();
       });
     });
 
     $scope.appToURL = stringManipulation.appToURL;
-    fetchApps()
+    $scope.apps = session.getApps() || [];
+    fetchApps();
   } else {
     $rootScope.db_loading = false;
   }
@@ -499,7 +528,8 @@ angular
 function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
   $rootScope.db_loading = true;
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  if(!appName || !session.getApps() || !session.getApps()[appName]) {
+  var app = session.appFromName(appName);
+  if(!app) {
     $rootScope.goToApps();
   } else {
     $rootScope.currentApp = appName;
@@ -512,7 +542,7 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
     session.setBrowserURL(URL);
   }
 
-  if(!data.init(appName)) {
+  if(!session.init(appName)) {
     $rootScope.goToApps();
   }
 
@@ -750,25 +780,89 @@ function ShowParent() {
 angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
-.factory('session', ['stringManipulation', '$rootScope', SessionFactory])
-.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', 'session', '$rootScope', DataFactory]);
+.factory('session', ['stringManipulation', '$rootScope', 'data', '$q', SessionFactory])
+.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', DataFactory]);
 
-function SessionFactory(stringManipulation, $rootScope){
+function SessionFactory(stringManipulation, $rootScope, data, $q){
   var session = {};
 
   session.setApps = function(apps) {
+    var toDelete = [];
+    if(angular.isArray(apps)){
+      apps.forEach(function(app, index){
+        if(!app) toDelete.push(index);
+      });
+      toDelete.forEach(function(index){
+        apps.splice(index, 1);
+      });
+    } else {
+      apps = []; 
+    }
     sessionStorage.setItem('apps', JSON.stringify(apps));
   };
 
   session.getApps = function() {
     if(session.getProfile()){
-      return JSON.parse(sessionStorage.getItem('apps'));
-    } else return null;
+      var apps = sessionStorage.getItem('apps');
+      return apps? JSON.parse(apps) : [];
+    } else return [];
   };
+
+  session.appFromName = function(appName) {
+    var apps = session.getApps();
+    return apps? apps.filter(function(app){
+      return app.name === appName;
+    })[0] : undefined;
+  };
+
+  session.fetchApps = function(done) {
+    data.getDevsApps(function(apps){
+      var existing = session.getApps();
+      var first = !existing.length;
+      if(first){
+        var order = localStorage.getItem(session.getProfile().uid + 'order');
+        if(order) order = JSON.parse(order);
+        else first = false;
+      }
+      existing.forEach(function(app, index){
+        var newRef = apps.filter(function(newApp){
+          return newApp.name === app.name;
+        })[0];
+        if(newRef){
+          app = newRef;
+        } else {
+          existing.splice(index, 1);
+        } 
+      }); // old removed
+
+      apps.forEach(function(app){
+        if(existing.filter(function(old){
+          return app.name === old.name;
+        }).length === 0){
+          existing.unshift(app);
+        }
+      }); // new added
+      //persists order after logout
+      if(first){
+        existing.sort(function(a,b){
+          //if a is greater, a should go after
+          //if a is new, a should go first
+          if(!a || !b) return 0;
+          var a_index = order.indexOf(a.name);
+          if(a_index === -1) return -1000000;
+          var b_index = order.indexOf(b.name);
+          if(b_index === -1) return 1000000;
+          return a_index - b_index;
+        });
+      }
+      session.setApps(existing);
+      if(done) done();
+    });
+  }
 
   session.getAppSecret = function(appName) {
     var apps = session.getApps();
-    return (apps !== undefined && apps !== null ? apps[appName].secret : undefined);
+    return (apps.length? session.appFromName(appName).secret : undefined);
   };
 
   session.setProfile = function(profile) {
@@ -787,7 +881,7 @@ function SessionFactory(stringManipulation, $rootScope){
     URL = sessionStorage.getItem('URL');
     if(URL === null){
       apps = session.getApps();
-      URL = apps ? stringManipulation.appToURL(Object.keys(apps)[0]) : undefined;
+      URL = apps ? apps[0].name : undefined;
     }
     return URL;
   };
@@ -795,6 +889,16 @@ function SessionFactory(stringManipulation, $rootScope){
   session.getProfile = function() {
     return JSON.parse(localStorage.getItem('devProfile'));
   };
+
+  session.init = function(appName) {
+    secret = session.getAppSecret(appName)
+    if(secret !== undefined) {
+      data.setAppCredentials(appName, secret)
+      return true
+    } else {
+      return false
+    }
+  }
 
   return session;
 }
@@ -886,20 +990,20 @@ function StringManipulationFactory(){
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbase, stringManipulation, session, $rootScope) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope) {
   var data = {};
   var appName;
   var secret;
   var server = "Ly9hY2NvdW50cy5hcHBiYXNlLmlvLw==";
 
-  data.init = function(appName) {
-    secret = session.getAppSecret(appName)
-    if(secret !== undefined) {
-      data.setAppCredentials(appName, secret)
-      return true
-    } else {
-      return false
-    }
+  function getEmail(){
+    var profile = JSON.parse(localStorage.getItem('devProfile'));
+    return profile? profile.email : undefined;
+  }
+
+  function getUID(){
+    var profile = JSON.parse(localStorage.getItem('devProfile'));
+    return profile? profile.uid : undefined;
   }
 
   data.setAppCredentials = function(app, s) {
@@ -923,7 +1027,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         done(vertices)
       })
       .error(function(error) {
-        throw error
+        throw error;
       })
   }
 
@@ -981,7 +1085,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         if(typeof response === "string") {
           done(response)
         } else if(typeof response === "object") {
-          atomic.put(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+          atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
             .success(function(result) {
               done(null)
             })
@@ -1001,7 +1105,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
         console.log('success')
-        atomic.delete(atob(server)+'user/' + session.getProfile().email, {'appname' : app})
+        atomic.delete(atob(server)+'user/' + getEmail(), {'appname' : app})
           .success(function(response){
             console.log(response)
             done();
@@ -1038,7 +1142,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
     //fetch from uid
-    atomic.get(atob(server)+'user/'+ session.getProfile().uid)
+    atomic.get(atob(server)+'user/'+ getUID())
       .success(function(apps) {
         if(!apps.length) return done();
         var appsRemaining = apps.length;
@@ -1050,10 +1154,10 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         }
         apps.forEach(function(app) {
           //add into email
-          atomic.put(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+          atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
             .success(function(result) {
               //delete from uid
-              atomic.delete(atob(server)+'user/'+ session.getProfile().uid, {"appname":app})
+              atomic.delete(atob(server)+'user/'+ getUID(), {"appname":app})
                 .success(function(result) {
                   checkForDone();
                 })
@@ -1069,30 +1173,30 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   }
   
   data.getDevsAppsWithEmail = function(done) {
-    atomic.get(atob(server)+'user/'+ session.getProfile().email)
+    atomic.get(atob(server)+'user/'+ getEmail())
       .success(function(apps) {
-        console.log('h', apps)
-        var appsAndSecrets = {};
+        console.log('apps arrived', apps)
+        var appsAndSecrets = [];
         var appsArrived = 0;
         var secretArrived = function(app, secret, metrics) {
           appsArrived += 1;
-          appsAndSecrets[app] = {};
-          appsAndSecrets[app].secret = secret;
-          appsAndSecrets[app].metrics = metrics;
+          appsAndSecrets.push({
+            name: app,
+            secret: secret,
+            metrics: metrics
+          });
           if(appsArrived === apps.length) {
             done(appsAndSecrets);
           }
         }
         apps.forEach(function(app) {
           data.getAppsSecret(app, function(secret) {
-            atomic.get(atob(server)+'app/'+app+'/metrics')
-              .success(function(metrics){
-                secretArrived(app, secret, metrics);
-              });
+            console.log('secret arrived', app);
+            getMetrics(app, secret, secretArrived);
           });
         });
         if(apps.length === 0){
-          done({});
+          done([]);
           $rootScope.noApps = true;
           $rootScope.noCalls = $rootScope.noCalls || true;
         } else {
@@ -1106,18 +1210,37 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   }
 
+  function getMetrics(app, secret, secretArrived){
+    atomic.get(atob(server)+'app/'+app+'/metrics')
+      .success(function(metrics){
+        console.log('metrics arrived', app);
+        secretArrived(app, secret, metrics);
+      })
+      .error(function(data, error) {
+        if(error.response === ""){
+          console.log('Empty response for ' + app + '\'s metrics, retrying');
+          getMetrics(app, secret, secretArrived);
+        } else throw error;
+      });
+  }
+
   data.getDevsApps = function(done) {
     data.uidToEmail(data.getDevsAppsWithEmail.bind(null, done));
   }
   
-  data.getAppsSecret = function(app, done) {
+  data.getAppsSecret = getSecret;
+
+  function getSecret(app, done) {
     atomic.get(atob(server)+'app/'+ app)
       .success(function(result) {
         done(result.secret);
       })
-      .error(function(error) {
-        throw error
-      })
+      .error(function(data, error) {
+        if(error.response === ""){
+          console.log('Empty response for ' + app + ', retrying');
+          getSecret(app, done);
+        } else throw error;
+      }); 
   }
 
   return data;
@@ -1654,42 +1777,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.clientID = '';
     $scope.clientSecret = '';
   }
-  $scope.tab = function(app) {
-    $scope.cancel();
-    $scope.status = $scope.provStatus = "Loading...";
-    $scope.domains = [];
-    $scope.userProviders = {};
-    oauthFactory.getApp(app, $scope.apps[app].secret)
-    .then(function(oauth){
-      oauth = oauth.data;
-      $timeout(function() {
-        $scope.status = false;
-        $scope.domains = oauth.domains;
-        if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
-        if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
-        console.log(oauth)
-        $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
-      });
-      if(oauth.keysets.length){
-        oauthFactory.getKeySets(app, oauth.keysets)
-        .then(function(data){
-          data.forEach(function(each) {
-            $scope.userProviders[each.provider] = each;
-          });
-          $timeout(function(){
-            $scope.keys = data;
-            $scope.provStatus = false;
-          });
-        }, function(data){throw data});
-      } else {
-        $timeout(function(){
-          $scope.provStatus = false;
-        });
-      }
-      
-    }, function(data){throw data});
-    $scope.app = app;
-  };
 
   $scope.validate = function(time){
     var minTime = 1000*60*60, maxTime = 1000*60*60*24*60;
@@ -1742,11 +1829,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
          + (seconds ? seconds + (' second' + (seconds>1?'s ':' ')) : '');
   }
 
-  $scope.switch = function(tab){
-    $location.path('oauth/'+tab);
-    $rootScope.currentApp = tab;
-  }
-
   oauthFactory.getProviders()
   .then(function(data){
     $scope.providers = data;
@@ -1755,7 +1837,8 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   });
 
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  if(!appName || !session.getApps() || !session.getApps()[appName]) {
+  var app = session.appFromName(appName);
+  if(!app) {
     $rootScope.goToApps();
   } else {
     $rootScope.logged = true;
@@ -1763,22 +1846,44 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.app = appName;
   }
   var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
+  $scope.apps = sessionApps;
+  $rootScope.db_loading = false;
   
-  if(typeof sessionApps === "object" && sessionApps){
-    if(!Object.getOwnPropertyNames(sessionApps).length){
-      $rootScope.goToApps();
+  $scope.cancel();
+  $scope.status = $scope.provStatus = "Loading...";
+  $scope.domains = [];
+  $scope.userProviders = {};
+  oauthFactory.getApp(app.name, app.secret)
+  .then(function(oauth){
+    oauth = oauth.data;
+    $timeout(function() {
+      $scope.status = false;
+      $scope.domains = oauth.domains;
+      if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
+      if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
+      console.log(oauth)
+      $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
+    });
+    if(oauth.keysets.length){
+      oauthFactory.getKeySets(app.name, oauth.keysets)
+      .then(function(data){
+        data.forEach(function(each) {
+          $scope.userProviders[each.provider] = each;
+        });
+        $timeout(function(){
+          $scope.keys = data;
+          $scope.provStatus = false;
+        });
+      }, function(data){throw data});
     } else {
-      $scope.apps = sessionApps;
-      $scope.tab($scope.app);
-      $rootScope.db_loading = false;
+      $timeout(function(){
+        $scope.provStatus = false;
+      });
     }
-  } else {
-      $rootScope.goToApps();
-  }
-
+  }, function(data){throw data});
 }
 
-function OauthFactory($timeout, $q){
+function OauthFactory($timeout, $q, session){
   var oauth = {};
   var config = { 
     oauthd: "https://auth.appbase.io",
@@ -1796,6 +1901,18 @@ function OauthFactory($timeout, $q){
     return config;
   }
   
+  oauth.createApp = function(appName, secret, domains){
+    var deferred = $q.defer();
+    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, tokenExpiry: 1000*60*60*24*30})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
   oauth.getApp = function(appName, secret){
     var deferred = $q.defer();
     atomic.get(url + 'apps/' + appName)
@@ -1818,6 +1935,27 @@ function OauthFactory($timeout, $q){
     return deferred.promise;
   };
 
+  oauth.updateApps = function(done){
+    var apps = session.getApps();
+    var received = 0;
+    apps.forEach(function(app){
+      oauth.getApp(app.name, session.getAppSecret(app.name))
+      .then(function(data){
+        var apps_ = session.getApps();
+        apps_.forEach(function(b){
+          if(b.name === app.name){
+            b.oauth = data.data;
+          }
+        });
+        session.setApps(apps_);
+        received += 1;
+        if(received === apps.length && done) done();
+      }, function(e){
+        throw e;
+      });
+    });
+  }
+
   oauth.removeDomain = function(appName, domains){
     var deferred = $q.defer();
     atomic.post(url + 'apps/' + appName, {domains: domains})
@@ -1838,18 +1976,6 @@ function OauthFactory($timeout, $q){
     })
     .error(function(data){
       deferred.reject(data);
-    });
-    return deferred.promise;
-  };
-
-  oauth.createApp = function(appName, secret, domains){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, tokenExpiry: 1000*60*60*24*30})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
     });
     return deferred.promise;
   };
@@ -1969,10 +2095,8 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
       $.post('http://162.243.5.104:8080', {code: $scope.codeInput, user: userID}).done(function(data){
         if(data == "true") {
           profile["code"] = true;
-          console.log('here')
           session.setProfile(profile);
           $.post('http://162.243.5.104:8080/u', {user: userID}).done(function(data) {
-            console.log(data)
             $rootScope.hide = false;
             if(data == "true") {
               $rootScope.code = true;
@@ -1984,7 +2108,6 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
             }
           })
         } else {
-          console.log(data);
           alert('Sorry, unable to verify your code.');
           $route.reload();
         }
@@ -1997,7 +2120,7 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
       throw error;
     }
     proceed(result);
-  })   
+  });
 }
 
 function NavbarCtrl($rootScope, $scope, session){
@@ -2032,7 +2155,12 @@ angular
 function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
   $rootScope.db_loading = true;
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  if(!appName || !session.getApps() || !session.getApps()[appName]) {
+  
+  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
+  $scope.apps = session.getApps();
+  $scope.app = session.appFromName(appName);
+
+  if(!appName || !$scope.app) {
     $rootScope.goToApps();
   } else {
     $rootScope.currentApp = appName;
@@ -2059,129 +2187,83 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
     labels: ['Rest API Calls', 'Socket API Calls', 'Search API Calls'],
     colors: ['#1f9e5a', '#138FCD', '#777']
   };
-
-  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
-  $scope.apps = sessionApps;
-  setApp();
-
-  function setApp(){
-    getMetrics();
-    if(appName){
-      $scope.app = appName;
-    } else {
-      var arr = [];
-      for (var prop in $scope.apps) arr.push(prop);
-      $scope.app = arr.sort()[0];
-      $location.path('stats/' + $scope.app)
-    }
-    setGraph($scope.app);
-  }
-
-  function getMetrics(){
-    for(var prop in $scope.apps){
-      // Iterate through properties of objects inside $scope.apps
-      $scope.apps[prop].vertices = $scope.apps[prop].metrics.edgesAndVertices.Vertices;
-      $scope.apps[prop].edges = $scope.apps[prop].metrics.edgesAndVertices.Edges;
-      var calls = $scope.apps[prop].metrics.calls;
-      var a = JSON.stringify(calls)
-      console.log(JSON.parse(a))
-      if(!calls){
-        $scope.apps[prop].metrics = [];
-      } else {
-        var metrics = [];
-        for(var name in calls){
-          if(name !== '_id' && name !== 'appname' && name !== 'last_access_at'){
-            var split = name.split(':');
-            var data = split[1];
-            var date = parseInt(split[0]);
-            var existing = false;
-            metrics.forEach(function(each){
-              if(each.date === date){
-                each[data] = calls[name];
-                existing = true;
-              }
-            });
-            if(!existing){
-              var toPush = {};
-              toPush.date = date;
-              date = new Date(date);
-              toPush.formatedDate = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-              toPush[data] = calls[name];
-              metrics.push(toPush);
-            }
+  var app = $scope.app;
+  app.vertices = app.metrics.edgesAndVertices.Vertices;
+  app.edges = app.metrics.edgesAndVertices.Edges;
+  var calls = app.metrics.calls;
+  if(!calls){
+    app.metrics = [];
+  } else {
+    var metrics = [];
+    for(var name in calls){
+      if(name !== '_id' && name !== 'appname' && name !== 'last_access_at'){
+        var split = name.split(':');
+        var data = split[1];
+        var date = parseInt(split[0]);
+        var existing = false;
+        metrics.forEach(function(each){
+          if(each.date === date){
+            each[data] = calls[name];
+            existing = true;
           }
+        });
+        if(!existing){
+          var toPush = {};
+          toPush.date = date;
+          date = new Date(date);
+          toPush.formatedDate = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
+          toPush[data] = calls[name];
+          metrics.push(toPush);
         }
-        $scope.apps[prop].metrics = metrics;
-        var grandTotal = 0;
-        $scope.apps[prop].metrics.forEach(function(each){
-          var total = 0;
-          total += (each.restAPICalls = each.restAPICalls || 0);
-          total += (each.socketAPICalls = each.socketAPICalls || 0);
-          total += (each.searchAPICalls = each.searchAPICalls || 0);
-          each.total = total;
-          grandTotal += total;
-        });
-        $scope.apps[prop].totalAPI = grandTotal;
-
-        var monthData=0, weekData=0, dayData;
-        var miliDay   = 1000 * 60 * 60 * 24;
-        var miliWeek  = miliDay * 7;
-        var miliMonth = miliDay * 30;
-        var now = Date.now();
-        
-        $scope.apps[prop].metrics.forEach(function(each){
-          if(now - each.date <= miliMonth) {
-            monthData += each.total;
-            if(now - each.date <= miliWeek){
-              weekData += each.total;
-              dayData = each.total;
-            }
-          }
-        });
-
-        $scope.apps[prop].day = dayData;
-        $scope.apps[prop].week = weekData;
-        $scope.apps[prop].month = monthData;
       }
     }
-  }
-
-  function setGraph(tab){
-    var app = $scope.apps[tab];
-    $scope.vert = app.vertices;
-    $scope.edges = app.edges;
-    $scope.total = app.totalAPI;
-    var metrics = app.metrics;
-    if(metrics.length){
-      $scope.morris.data = metrics;
-      $scope.chart.month = app.month;
-      $scope.chart.week = app.week;
-      $scope.chart.day = app.day;
-      $scope.noData = false;
-    } else {
-      $scope.noData = true;
-    }
-    $rootScope.db_loading = false;
-  }
-
-  $scope.tab = function(tab){
-    $scope.app = tab;
-    setGraph(tab);
-  }
-
-  $scope.switch = function(tab){
-    $location.path('stats/' + tab);
-    $rootScope.currentApp = tab;
-  }
-
-  function fetchApps(){
-    data.getDevsApps(function(apps) {
-      $timeout(function(){
-        $scope.apps = apps;
-        setApp();
-      });
+    app.metrics = metrics;
+    var grandTotal = 0;
+    app.metrics.forEach(function(each){
+      var total = 0;
+      total += (each.restAPICalls = each.restAPICalls || 0);
+      total += (each.socketAPICalls = each.socketAPICalls || 0);
+      total += (each.searchAPICalls = each.searchAPICalls || 0);
+      each.total = total;
+      grandTotal += total;
     });
+    app.totalAPI = grandTotal;
+
+    var monthData=0, weekData=0, dayData;
+    var miliDay   = 1000 * 60 * 60 * 24;
+    var miliWeek  = miliDay * 7;
+    var miliMonth = miliDay * 30;
+    var now = Date.now();
+    
+    app.metrics.forEach(function(each){
+      if(now - each.date <= miliMonth) {
+        monthData += each.total;
+        if(now - each.date <= miliWeek){
+          weekData += each.total;
+          dayData = each.total;
+        }
+      }
+    });
+
+    app.day = dayData;
+    app.week = weekData;
+    app.month = monthData;
   }
+
+  $scope.vert = app.vertices;
+  $scope.edges = app.edges;
+  $scope.total = app.totalAPI;
+  var metrics = app.metrics;
+  if(metrics.length){
+    $scope.morris.data = metrics;
+    $scope.chart.month = app.month;
+    $scope.chart.week = app.week;
+    $scope.chart.day = app.day;
+    $scope.noData = false;
+  } else {
+    $scope.noData = true;
+  }
+  $rootScope.db_loading = false;
 
 }
 

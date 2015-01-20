@@ -2,25 +2,89 @@
 angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
-.factory('session', ['stringManipulation', '$rootScope', SessionFactory])
-.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', 'session', '$rootScope', DataFactory]);
+.factory('session', ['stringManipulation', '$rootScope', 'data', '$q', SessionFactory])
+.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', DataFactory]);
 
-function SessionFactory(stringManipulation, $rootScope){
+function SessionFactory(stringManipulation, $rootScope, data, $q){
   var session = {};
 
   session.setApps = function(apps) {
+    var toDelete = [];
+    if(angular.isArray(apps)){
+      apps.forEach(function(app, index){
+        if(!app) toDelete.push(index);
+      });
+      toDelete.forEach(function(index){
+        apps.splice(index, 1);
+      });
+    } else {
+      apps = []; 
+    }
     sessionStorage.setItem('apps', JSON.stringify(apps));
   };
 
   session.getApps = function() {
     if(session.getProfile()){
-      return JSON.parse(sessionStorage.getItem('apps'));
-    } else return null;
+      var apps = sessionStorage.getItem('apps');
+      return apps? JSON.parse(apps) : [];
+    } else return [];
   };
+
+  session.appFromName = function(appName) {
+    var apps = session.getApps();
+    return apps? apps.filter(function(app){
+      return app.name === appName;
+    })[0] : undefined;
+  };
+
+  session.fetchApps = function(done) {
+    data.getDevsApps(function(apps){
+      var existing = session.getApps();
+      var first = !existing.length;
+      if(first){
+        var order = localStorage.getItem(session.getProfile().uid + 'order');
+        if(order) order = JSON.parse(order);
+        else first = false;
+      }
+      existing.forEach(function(app, index){
+        var newRef = apps.filter(function(newApp){
+          return newApp.name === app.name;
+        })[0];
+        if(newRef){
+          app = newRef;
+        } else {
+          existing.splice(index, 1);
+        } 
+      }); // old removed
+
+      apps.forEach(function(app){
+        if(existing.filter(function(old){
+          return app.name === old.name;
+        }).length === 0){
+          existing.unshift(app);
+        }
+      }); // new added
+      //persists order after logout
+      if(first){
+        existing.sort(function(a,b){
+          //if a is greater, a should go after
+          //if a is new, a should go first
+          if(!a || !b) return 0;
+          var a_index = order.indexOf(a.name);
+          if(a_index === -1) return -1000000;
+          var b_index = order.indexOf(b.name);
+          if(b_index === -1) return 1000000;
+          return a_index - b_index;
+        });
+      }
+      session.setApps(existing);
+      if(done) done();
+    });
+  }
 
   session.getAppSecret = function(appName) {
     var apps = session.getApps();
-    return (apps !== undefined && apps !== null ? apps[appName].secret : undefined);
+    return (apps.length? session.appFromName(appName).secret : undefined);
   };
 
   session.setProfile = function(profile) {
@@ -39,7 +103,7 @@ function SessionFactory(stringManipulation, $rootScope){
     URL = sessionStorage.getItem('URL');
     if(URL === null){
       apps = session.getApps();
-      URL = apps ? stringManipulation.appToURL(Object.keys(apps)[0]) : undefined;
+      URL = apps ? apps[0].name : undefined;
     }
     return URL;
   };
@@ -47,6 +111,16 @@ function SessionFactory(stringManipulation, $rootScope){
   session.getProfile = function() {
     return JSON.parse(localStorage.getItem('devProfile'));
   };
+
+  session.init = function(appName) {
+    secret = session.getAppSecret(appName)
+    if(secret !== undefined) {
+      data.setAppCredentials(appName, secret)
+      return true
+    } else {
+      return false
+    }
+  }
 
   return session;
 }
@@ -138,20 +212,20 @@ function StringManipulationFactory(){
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbase, stringManipulation, session, $rootScope) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope) {
   var data = {};
   var appName;
   var secret;
   var server = "Ly9hY2NvdW50cy5hcHBiYXNlLmlvLw==";
 
-  data.init = function(appName) {
-    secret = session.getAppSecret(appName)
-    if(secret !== undefined) {
-      data.setAppCredentials(appName, secret)
-      return true
-    } else {
-      return false
-    }
+  function getEmail(){
+    var profile = JSON.parse(localStorage.getItem('devProfile'));
+    return profile? profile.email : undefined;
+  }
+
+  function getUID(){
+    var profile = JSON.parse(localStorage.getItem('devProfile'));
+    return profile? profile.uid : undefined;
   }
 
   data.setAppCredentials = function(app, s) {
@@ -175,7 +249,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         done(vertices)
       })
       .error(function(error) {
-        throw error
+        throw error;
       })
   }
 
@@ -233,7 +307,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         if(typeof response === "string") {
           done(response)
         } else if(typeof response === "object") {
-          atomic.put(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+          atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
             .success(function(result) {
               done(null)
             })
@@ -253,7 +327,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
         console.log('success')
-        atomic.delete(atob(server)+'user/' + session.getProfile().email, {'appname' : app})
+        atomic.delete(atob(server)+'user/' + getEmail(), {'appname' : app})
           .success(function(response){
             console.log(response)
             done();
@@ -290,7 +364,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
     //fetch from uid
-    atomic.get(atob(server)+'user/'+ session.getProfile().uid)
+    atomic.get(atob(server)+'user/'+ getUID())
       .success(function(apps) {
         if(!apps.length) return done();
         var appsRemaining = apps.length;
@@ -302,10 +376,10 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
         }
         apps.forEach(function(app) {
           //add into email
-          atomic.put(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
+          atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
             .success(function(result) {
               //delete from uid
-              atomic.delete(atob(server)+'user/'+ session.getProfile().uid, {"appname":app})
+              atomic.delete(atob(server)+'user/'+ getUID(), {"appname":app})
                 .success(function(result) {
                   checkForDone();
                 })
@@ -321,29 +395,30 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
   }
   
   data.getDevsAppsWithEmail = function(done) {
-    atomic.get(atob(server)+'user/'+ session.getProfile().email)
+    atomic.get(atob(server)+'user/'+ getEmail())
       .success(function(apps) {
-        var appsAndSecrets = {};
+        console.log('apps arrived', apps)
+        var appsAndSecrets = [];
         var appsArrived = 0;
         var secretArrived = function(app, secret, metrics) {
           appsArrived += 1;
-          appsAndSecrets[app] = {};
-          appsAndSecrets[app].secret = secret;
-          appsAndSecrets[app].metrics = metrics;
+          appsAndSecrets.push({
+            name: app,
+            secret: secret,
+            metrics: metrics
+          });
           if(appsArrived === apps.length) {
             done(appsAndSecrets);
           }
         }
         apps.forEach(function(app) {
           data.getAppsSecret(app, function(secret) {
-            atomic.get(atob(server)+'app/'+app+'/metrics')
-              .success(function(metrics){
-                secretArrived(app, secret, metrics);
-              });
+            console.log('secret arrived', app);
+            getMetrics(app, secret, secretArrived);
           });
         });
         if(apps.length === 0){
-          done({});
+          done([]);
           $rootScope.noApps = true;
           $rootScope.noCalls = $rootScope.noCalls || true;
         } else {
@@ -357,18 +432,37 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, session,
       })
   }
 
+  function getMetrics(app, secret, secretArrived){
+    atomic.get(atob(server)+'app/'+app+'/metrics')
+      .success(function(metrics){
+        console.log('metrics arrived', app);
+        secretArrived(app, secret, metrics);
+      })
+      .error(function(data, error) {
+        if(error.response === ""){
+          console.log('Empty response for ' + app + '\'s metrics, retrying');
+          getMetrics(app, secret, secretArrived);
+        } else throw error;
+      });
+  }
+
   data.getDevsApps = function(done) {
     data.uidToEmail(data.getDevsAppsWithEmail.bind(null, done));
   }
   
-  data.getAppsSecret = function(app, done) {
+  data.getAppsSecret = getSecret;
+
+  function getSecret(app, done) {
     atomic.get(atob(server)+'app/'+ app)
       .success(function(result) {
         done(result.secret);
       })
-      .error(function(error) {
-        throw error
-      })
+      .error(function(data, error) {
+        if(error.response === ""){
+          console.log('Empty response for ' + app + ', retrying');
+          getSecret(app, done);
+        } else throw error;
+      }); 
   }
 
   return data;

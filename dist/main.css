@@ -1,42 +1,266 @@
 .morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
 .morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
 
-/* console */
-@font-face {
-  font-family: 'Source Sans Pro Regular';
-  font-style: normal;
+.ngdialog.ngdialog-theme-dialog-small {
+  padding-bottom: 5vh;
+  padding-top: 5vh;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
+  background: #fff;
+  color: #444;
+  line-height: 1.5em;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 1em;
+  position: relative;
+  width: 60%;
+  max-height: 85vh;
+  overflow: auto;
+  border-radius:5px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
+  background: transparent;
+  color: #bbb;
+  content: "\00D7";
+  font-size: 26px;
   font-weight: 400;
-  src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/ODelI1aHBYDBqgeIAH2zlJbPFduIYtoLzwST68uhz_Y.woff2) format('woff2');
-  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
+  height: 30px;
+  line-height: 26px;
+  position: absolute;
+  right: 3px;
+  text-align: center;
+  top: 3px;
+  width: 30px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
+  color: #777;
+}
+
+@media (max-width: 568px) {
+  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
+    -webkit-animation: none;
+    animation: none;
+  }
+}
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}
+@font-face {
+  font-family: 'Source Sans Pro Extra Light Italic';
+  src: url('/styles/fonts/source/sourcesanspro-extralightit.eot');
+  src: url('/styles/fonts/source/sourcesanspro-extralightit.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-extralightit.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-extralightit.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-extralightit.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
   font-family: 'Source Sans Pro Light';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Source Sans Pro Light'), local('SourceSansPro-Light'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGCP2LEk6lMzYsRqr3dHFImA.woff2) format('woff2');
-  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
+  src: url('/styles/fonts/source/sourcesanspro-light.eot');
+  src: url('/styles/fonts/source/sourcesanspro-light.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-light.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-light.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-light.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
+
+@font-face {
+  font-family: 'Source Sans Pro Regular';
+  src: url('/styles/fonts/source/sourcesanspro-regular.eot');
+  src: url('/styles/fonts/source/sourcesanspro-regular.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-regular.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-regular.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
   font-family: 'Source Sans Pro Bold';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGJkF8H8ye47wsfpWywda8og.woff2) format('woff2');
-  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
+  src: url('/styles/fonts/source/sourcesanspro-bold.eot');
+  src: url('/styles/fonts/source/sourcesanspro-bold.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-bold.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-bold.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-bold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
   font-family: 'Source Sans Pro Extra Light';
-  font-style: normal;
-  font-weight: 200;
-  src: local('Source Sans Pro ExtraLight'), local('SourceSansPro-ExtraLight'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGIAPdqzPmKFFIYQ-46z3JxY.woff2) format('woff2');
-  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
+  src: url('/styles/fonts/source/sourcesanspro-extralight.eot');
+  src: url('/styles/fonts/source/sourcesanspro-extralight.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-extralight.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-extralight.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-extralight.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
-  font-family: 'Source Sans Pro Extra Light Italic';
-  font-style: normal;
-  font-weight: 200;
-  src: local('Source Sans Pro ExtraLight Italic'), local('SourceSansPro-ExtraLightIt'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/fpTVHK8qsXbIeTHTrnQH6KwWwkY55OPAcpsgnrG5el_3rGVtsTkPsbDajuO5ueQw.woff2) format('woff2');
-  unicode-range: U0 -0FF, U131, U152 -153, U2C6, U2DA, U2DC, U2000 -206F, U2074, U20AC, U2212, U2215, UE0FF, UEFFD, UF000; }
+  font-family: 'Source Sans Pro Semi Bold';
+  src: url('/styles/fonts/source/sourcesanspro-semibold.eot');
+  src: url('/styles/fonts/source/sourcesanspro-semibold.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-semibold.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-semibold.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-semibold.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
+/*
+@font-face {
+    font-family: 'source_sans_proitalic';
+    src: url('/styles/fonts/source/sourcesanspro-it.eot');
+    src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_proSBdIt';
+    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_problack_italic';
+    src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_problack';
+    src: url('/styles/fonts/source/sourcesanspro-black.eot');
+    src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_probold_italic';
+    src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_prolight_italic';
+    src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}*/
+/* console */
 /************************
 * Colors for the browser icons
 ************************/
@@ -47,6 +271,73 @@
   to {
     opacity: 0; } }
 
+/*
+@font-face {
+    font-family: 'source_sans_proitalic';
+    src: url('/styles/fonts/source/sourcesanspro-it.eot');
+    src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_proSBdIt';
+    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_problack_italic';
+    src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_problack';
+    src: url('/styles/fonts/source/sourcesanspro-black.eot');
+    src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_probold_italic';
+    src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'source_sans_prolight_italic';
+    src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
+    src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'),
+         url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'),
+         url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'),
+         url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}*/
+/* console */
 /************************
 * Colors for the browser icons
 ************************/
@@ -59,14 +350,14 @@
 
 @-webkit-keyframes slideInRight {
   from {
-    opacity: 0; }
+    opacity: 0.5; }
 
   to {
     opacity: 1; } }
 
 @keyframes slideInRight {
   from {
-    opacity: 0; }
+    opacity: 0.5; }
 
   to {
     opacity: 1; } }
@@ -231,14 +522,14 @@
     padding: 0; } }
 
 .ng-enter {
-  -webkit-animation: slideInRight 0.3s both ease-in-out 0.31s;
-  animation: slideInRight 0.3s both ease-in-out 0.31s; }
+  -webkit-animation: slideInRight 0.3s both ease-out;
+  animation: slideInRight 0.3s both ease-out; }
 
 .ng-leave {
-  -webkit-animation: slideOutLeft 0.3s both ease-in-out;
-  animation: slideOutLeft 0.3s both ease-in-out; }
+  -webkit-animation: none;
+  animation: none; }
 
-#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #browser.ng-enter, #browser.ng-leave {
+#nav.ng-enter, #nav.ng-leave, .footer.ng-enter, .footer.ng-leave, #oauth.ng-leave, #stats.ng-leave, #sidebar.ng-enter, #sidebar.ng-leave, #browser.ng-enter, #browser.ng-leave {
   -webkit-animation: none;
   animation: none; }
 
@@ -363,6 +654,10 @@ body {
       height: 30px; }
       #applications .well .tip .text-info {
         color: #888; }
+    #applications .well label.empty {
+      background-color: #ccc;
+      height: 15px;
+      margin: 10px 0; }
     @media screen and (min-width: 992px) and (max-width: 1190px) {
       #applications .well {
         margin: 10px 3px;
@@ -409,6 +704,13 @@ body {
           color: #50BAEF; }
           #applications .well .bar > a:hover svg .icon {
             fill: #7acbf3; }
+      #applications .well .bar .empty {
+        background-color: #50BAEF;
+        width: 50px;
+        height: 10px;
+        margin-top: -25px; }
+        #applications .well .bar .empty.auth, #applications .well .bar .empty.dbrowser {
+          width: 70px; }
       #applications .well .bar svg {
         position: relative; }
         #applications .well .bar svg .icon {
@@ -933,7 +1235,7 @@ body {
   position: fixed;
   font-family: "Source Sans Pro Light";
   font-size: 2em;
-  color: #444;
+  color: #aaa;
   text-align: center;
   margin: 0 auto;
   height: 100%;
@@ -1006,6 +1308,8 @@ body {
   #billing .row {
     padding: 30px; }
 
+.modal-custom .bold {
+  font-family: "Source Sans Pro Semi Bold"; }
 .modal-custom .modal-content {
   border-radius: 0;
   font-family: "Source Sans Pro Light";
@@ -1096,155 +1400,3 @@ body {
 
 .nav > li > a:focus {
   background-color: transparent; }
-
-.ngdialog.ngdialog-theme-dialog-small {
-  padding-bottom: 5vh;
-  padding-top: 5vh;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
-  background: #fff;
-  color: #444;
-  line-height: 1.5em;
-  margin: 0 auto;
-  max-width: 100%;
-  padding: 1em;
-  position: relative;
-  width: 60%;
-  max-height: 85vh;
-  overflow: auto;
-  border-radius:5px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
-  cursor: pointer;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
-  background: transparent;
-  color: #bbb;
-  content: "\00D7";
-  font-size: 26px;
-  font-weight: 400;
-  height: 30px;
-  line-height: 26px;
-  position: absolute;
-  right: 3px;
-  text-align: center;
-  top: 3px;
-  width: 30px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
-  color: #777;
-}
-
-@media (max-width: 568px) {
-  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
-    -webkit-animation: none;
-    animation: none;
-  }
-}
-@-webkit-keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ngdialog {
-  position: fixed;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 10000;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.ngdialog-overlay {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.4);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-content {
-  background: white;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-content {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-close:before {
-  content: '\00D7';
-  cursor: pointer;
-}
-
-body.ngdialog-open {
-  overflow: hidden;
-}

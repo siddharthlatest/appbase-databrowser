@@ -21,33 +21,14 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   if($scope.devProfile) {
     var fetchApps = function(done) {
       $scope.fetching = true;
-      data.getDevsApps(function(apps) {
-        $timeout(function(){
-          for(var app in apps){
-            oauthFactory.getApp(app, apps[app].secret)
-            .then(function(data){
-              apps[app].oauth = data;
-            }, function(data){
-              throw data;
-            });
-          }
-          if(done) done();
-          $scope.fetching = false;
-
-          $scope.apps = apps;
-          if(!localStorage.getItem('appStack')){
-            var apps = [];
-            for(app in apps){
-              apps.push(app);
-            }
-            localStorage.setItem('appStack', JSON.stringify(apps));
-          }
-          session.setApps(apps);
-        })
+      session.fetchApps(function(){
+        $scope.fetching = false;
+        oauthFactory.updateApps();
+        $scope.apps = session.getApps();
+        $scope.$apply();
       });
       $rootScope.db_loading = false;
     }
-
     $scope.createApp = function (app) {
       $scope.creating = true;
       data.createApp(app, function(error) {
@@ -65,7 +46,10 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     $scope.deleteApp = function(app) {
       var a = new BootstrapDialog({
           title: 'Delete app',
-          message: 'Are you sure you want to delete ' + app + '?',
+          message: 'Are you sure you want to delete <span class="bold">' + app +
+          '</span>?<br>Enter the app name to confirm.<br><br>'
+          + '<div class="form-group"><input type="text" class="form-control" /></div>'
+          ,
           closable: false,
           cssClass: 'modal-custom',
           buttons: [{
@@ -78,17 +62,24 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
               label: 'Yes',
               cssClass: 'btn-yes',
               action: function(dialog) {
-                $scope.deleting = app;
-                data.deleteApp(app, function(error) {
-                  if(error){
-                    $scope.deleting = '';
-                    throw error;
-                  }
-                  else fetchApps(function(){
-                    $scope.deleting = '';
+                var input = dialog.getModalBody().find('.form-group');
+                var value = input.find('input').val();
+                console.log(value, app)
+                if(value === app){
+                  $scope.deleting = app;
+                  data.deleteApp(app, function(error) {
+                    if(error){
+                      $scope.deleting = '';
+                      throw error;
+                    }
+                    else fetchApps(function(){
+                      $scope.deleting = '';
+                    });
                   });
-                });
-                dialog.close();
+                  dialog.close();
+                } else {
+                  input.addClass('has-error');
+                }
               }
           }]
       }).open();
@@ -126,18 +117,19 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
       });
     }
 
-    document.addEventListener('logout', function() {
+    document.addEventListener('logout', function(evnt) {
       $timeout(function(){
         $rootScope.logged = false;
         $appbase.unauth();
-        session.setApps(null);
+        session.setApps([]);
         session.setProfile(null);
         $route.reload();
       });
     });
 
     $scope.appToURL = stringManipulation.appToURL;
-    fetchApps()
+    $scope.apps = session.getApps() || [];
+    fetchApps();
   } else {
     $rootScope.db_loading = false;
   }

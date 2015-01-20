@@ -12,6 +12,22 @@ angular.module("AppbaseDashboard", ['ngAppbase',
   .config(Routes);
 
 function FirstRun($rootScope, $location, stringManipulation, session, $route){
+  // changed the way sessions are stored, so to prevent errors:
+  var oldSession = sessionStorage.getItem('apps');
+  if(oldSession){
+    try {
+      oldSession = JSON.parse(oldSession);
+      if(!angular.isArray(oldSession)) clearSession();
+    } catch(e){
+      clearSession();
+    }
+  } else clearSession();
+  function clearSession(){
+    sessionStorage.setItem('apps', '[]');
+  }
+  // end session fixing 
+  
+  if(!angular.isArray())
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     session.setApps(null);
     session.setProfile(null);
@@ -22,14 +38,19 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.currentApp = sessionStorage.getItem('URL')?stringManipulation.urlToAppname(sessionStorage.getItem('URL')):'';
   $rootScope.$watch('currentApp', function(app){
     sessionStorage.setItem('URL', stringManipulation.appToURL(app));
-    if(app){
-      var local = localStorage.getItem('appStack');
-      if(local) {
-        local = JSON.parse(local);
-        local.splice(local.indexOf(app), 1);
-        local.unshift(app);
-        localStorage.setItem('appStack', JSON.stringify(local));
-      }
+    var apps = session.getApps();
+    if(app && apps.length){
+      var appRef = apps.filter(function(b){
+        return b.name === app;
+      })[0];
+      apps.splice(apps.indexOf(appRef), 1);
+      apps.unshift(appRef); //moved app to top of array
+      session.setApps(apps);
+      var order = [];
+      apps.forEach(function(app){
+        order.push(app.name);
+      });
+      localStorage.setItem(session.getProfile().uid + 'order', JSON.stringify(order));
     }
   });
   $rootScope.goToInvite = function() {

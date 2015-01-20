@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/styles/font-awesome.min.css" />
 </head>
 <body>
-<div id="nav" ng-include="'/include/navbar.html'"></div>
-<div class="container-fluid view-wrapper">
+<div id="nav" ng-include="'/developer/html/navbar.html'"></div>
+<div class="container-fluid view-wrapper ng-hide" ng-show="!$parent.db_loading">
 	<div class="row view-wrapper">
 		<div ng-include="'/developer/html/login.html'" class="col-xs-12 ng-hide" id="db-login" ng-show="!$parent.logged &&!$parent.db_loading"></div>
 		<div ng-include="'/developer/html/sidebar.html'" class="col-xs-2 ng-hide" id="sidebar" ng-hide="!$parent.logged || $parent.db_loading"></div>
@@ -21,7 +21,7 @@
 	</div>
 </div>
 <div ng-hide="!$parent.db_loading" id="loading">
-	<span>Loading...</span> 
+	<span class="fa fa-refresh ab-spin fa-2x"></span> 
 </div>
 <footer class="footer ng-hide" ng-show="!$parent.db_loading" ng-include="'/include/footer.html'"></footer>
 

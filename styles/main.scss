@@ -30,7 +30,7 @@ $rip-good-orange: #aaa;
 	}
 }
 @keyframes slideInRight {
-	from 	{ opacity: 0; }
+	from 	{ opacity: 0.5; }
 	to 		{ opacity: 1; }
 }
 @keyframes slideIn {
@@ -90,14 +90,16 @@ $rip-good-orange: #aaa;
 }
 
 .ng-enter {
-	animation: slideInRight 0.3s both ease-in-out 0.31s;
+	animation: slideInRight 0.3s both ease-out;
 }
+
 .ng-leave {
-	animation: slideOutLeft 0.3s both ease-in-out;
+	animation: none;
 } 
 
 #nav.ng-enter, #nav.ng-leave,
 .footer.ng-enter, .footer.ng-leave,
+#oauth.ng-leave,  #stats.ng-leave,
 #sidebar.ng-enter,  #sidebar.ng-leave,
 #browser.ng-enter,  #browser.ng-leave{
 	animation: none;
@@ -264,6 +266,12 @@ body {
 				color: #888;
 			}
 		}
+		label.empty {
+			background-color: #ccc;
+			height: 15px;
+
+			margin: 10px 0;
+		}
 
 		@media screen and (min-width: 992px) and (max-width: 1190px) {
 		    margin: 10px 3px;
@@ -336,7 +344,15 @@ body {
 					}
 				}
 			}
-
+			.empty {
+				background-color: $blue;
+				width: 50px;
+				height: 10px;
+				margin-top: -25px;
+				&.auth, &.dbrowser{
+					width: 70px;
+				}
+			}
 			// temporary fix
 			svg {
 				position: relative;
@@ -1079,7 +1095,7 @@ body {
 	position: fixed;
 	font-family: $font-light;
 	font-size: 2em;
-	color: #444;
+	color: #aaa;
 	text-align: center;
 	margin: 0 auto;
 	height: 100%;
@@ -1184,6 +1200,9 @@ body {
 }
 
 .modal-custom {
+	.bold {
+		font-family: $font-semi-bold; 
+	}
 	.modal-content {
 		border-radius: 0;
 		font-family: $font-light;

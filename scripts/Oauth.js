@@ -84,42 +84,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.clientID = '';
     $scope.clientSecret = '';
   }
-  $scope.tab = function(app) {
-    $scope.cancel();
-    $scope.status = $scope.provStatus = "Loading...";
-    $scope.domains = [];
-    $scope.userProviders = {};
-    oauthFactory.getApp(app, $scope.apps[app].secret)
-    .then(function(oauth){
-      oauth = oauth.data;
-      $timeout(function() {
-        $scope.status = false;
-        $scope.domains = oauth.domains;
-        if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
-        if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
-        console.log(oauth)
-        $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
-      });
-      if(oauth.keysets.length){
-        oauthFactory.getKeySets(app, oauth.keysets)
-        .then(function(data){
-          data.forEach(function(each) {
-            $scope.userProviders[each.provider] = each;
-          });
-          $timeout(function(){
-            $scope.keys = data;
-            $scope.provStatus = false;
-          });
-        }, function(data){throw data});
-      } else {
-        $timeout(function(){
-          $scope.provStatus = false;
-        });
-      }
-      
-    }, function(data){throw data});
-    $scope.app = app;
-  };
 
   $scope.validate = function(time){
     var minTime = 1000*60*60, maxTime = 1000*60*60*24*60;
@@ -172,11 +136,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
          + (seconds ? seconds + (' second' + (seconds>1?'s ':' ')) : '');
   }
 
-  $scope.switch = function(tab){
-    $location.path('oauth/'+tab);
-    $rootScope.currentApp = tab;
-  }
-
   oauthFactory.getProviders()
   .then(function(data){
     $scope.providers = data;
@@ -185,7 +144,8 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   });
 
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  if(!appName || !session.getApps() || !session.getApps()[appName]) {
+  var app = session.appFromName(appName);
+  if(!app) {
     $rootScope.goToApps();
   } else {
     $rootScope.logged = true;
@@ -193,22 +153,44 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.app = appName;
   }
   var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
+  $scope.apps = sessionApps;
+  $rootScope.db_loading = false;
   
-  if(typeof sessionApps === "object" && sessionApps){
-    if(!Object.getOwnPropertyNames(sessionApps).length){
-      $rootScope.goToApps();
+  $scope.cancel();
+  $scope.status = $scope.provStatus = "Loading...";
+  $scope.domains = [];
+  $scope.userProviders = {};
+  oauthFactory.getApp(app.name, app.secret)
+  .then(function(oauth){
+    oauth = oauth.data;
+    $timeout(function() {
+      $scope.status = false;
+      $scope.domains = oauth.domains;
+      if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
+      if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
+      console.log(oauth)
+      $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
+    });
+    if(oauth.keysets.length){
+      oauthFactory.getKeySets(app.name, oauth.keysets)
+      .then(function(data){
+        data.forEach(function(each) {
+          $scope.userProviders[each.provider] = each;
+        });
+        $timeout(function(){
+          $scope.keys = data;
+          $scope.provStatus = false;
+        });
+      }, function(data){throw data});
     } else {
-      $scope.apps = sessionApps;
-      $scope.tab($scope.app);
-      $rootScope.db_loading = false;
+      $timeout(function(){
+        $scope.provStatus = false;
+      });
     }
-  } else {
-      $rootScope.goToApps();
-  }
-
+  }, function(data){throw data});
 }
 
-function OauthFactory($timeout, $q){
+function OauthFactory($timeout, $q, session){
   var oauth = {};
   var config = { 
     oauthd: "https://auth.appbase.io",
@@ -226,6 +208,18 @@ function OauthFactory($timeout, $q){
     return config;
   }
   
+  oauth.createApp = function(appName, secret, domains){
+    var deferred = $q.defer();
+    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, tokenExpiry: 1000*60*60*24*30})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
   oauth.getApp = function(appName, secret){
     var deferred = $q.defer();
     atomic.get(url + 'apps/' + appName)
@@ -248,6 +242,27 @@ function OauthFactory($timeout, $q){
     return deferred.promise;
   };
 
+  oauth.updateApps = function(done){
+    var apps = session.getApps();
+    var received = 0;
+    apps.forEach(function(app){
+      oauth.getApp(app.name, session.getAppSecret(app.name))
+      .then(function(data){
+        var apps_ = session.getApps();
+        apps_.forEach(function(b){
+          if(b.name === app.name){
+            b.oauth = data.data;
+          }
+        });
+        session.setApps(apps_);
+        received += 1;
+        if(received === apps.length && done) done();
+      }, function(e){
+        throw e;
+      });
+    });
+  }
+
   oauth.removeDomain = function(appName, domains){
     var deferred = $q.defer();
     atomic.post(url + 'apps/' + appName, {domains: domains})
@@ -268,18 +283,6 @@ function OauthFactory($timeout, $q){
     })
     .error(function(data){
       deferred.reject(data);
-    });
-    return deferred.promise;
-  };
-
-  oauth.createApp = function(appName, secret, domains){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, tokenExpiry: 1000*60*60*24*30})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
     });
     return deferred.promise;
   };
