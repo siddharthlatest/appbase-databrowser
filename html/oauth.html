@@ -1,11 +1,13 @@
 <div class="col-xs-12 oa-tab" id="oauth">
-	<div class="list">
+	<div class="inner-loading" ng-hide="!status">
+		<span class="fa fa-refresh fa-spin fa-4x"></span>
+	</div>
+	<div class="list ng-hide" ng-show="!status">
 		<div class="col-md-4">
 			<div>
 			<h4>Expiry time</h4>
 			<p>Token expiration, from 60 minutes to 90 days. <span data-toggle="tooltip" data-placement="right" title="60m (60 minutes), 1d (1 day), 1w (1 week)" class="example">Example</span></p>
 			</div>
-			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
 			<div ng-hide="status" ng-class="{overlay: loading}">
 				<form ng-submit="updateExpiry(timeInput)">
 					<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">

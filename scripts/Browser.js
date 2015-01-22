@@ -7,7 +7,7 @@ angular
               'session', '$rootScope', BrowserCtrl]);
 
 function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
-  $rootScope.db_loading = true;
+  $scope.status = "Loading";
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
   var app = session.appFromName(appName);
   if(!app) {
@@ -46,12 +46,15 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
   $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
   $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
   $rootScope.db_loading = false;
+  $scope.status = false;
   
   $scope.addEdgeInto = function(node) {
     var namespaces = [];
     node.loadingNs = true;
     data.getNamespaces(function(array) {
-      node.loadingNs = false;
+      $timeout(function(){
+        node.loadingNs = false;
+      });
       array.forEach(function(each){
         namespaces.push(each.name);
       });

@@ -1,9 +1,10 @@
 <div class="col-xs-12" id="stats">
-	<div ng-show="noData" class="no-data">
+	<div ng-hide="!status" class="inner-loading"></div>
+	<div ng-show="noData && !status" class="no-data ng-hide">
 		<div class="sad">:(</div>
 		<span>No data to display.</span>
 	</div>
-	<div ng-show="!noData" >
+	<div ng-show="!noData && !status" >
 		<div class="col-md-3">
 			<div class="st-sum">
 				<div>Edges: <span ng-bind="edges"></span></div>

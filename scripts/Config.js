@@ -12,6 +12,7 @@ angular.module("AppbaseDashboard", ['ngAppbase',
   .config(Routes);
 
 function FirstRun($rootScope, $location, stringManipulation, session, $route){
+  $rootScope.db_loading = true;
   // changed the way sessions are stored, so to prevent errors:
   var oldSession = sessionStorage.getItem('apps');
   if(oldSession){

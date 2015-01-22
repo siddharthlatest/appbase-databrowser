@@ -4,9 +4,8 @@ angular
 .controller('stats', StatsCtrl);
 
 function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
-  $rootScope.db_loading = true;
+  $scope.status = "Loading";
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  
   var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
   $scope.apps = session.getApps();
   $scope.app = session.appFromName(appName);
@@ -115,7 +114,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
     $scope.noData = true;
   }
   $rootScope.db_loading = false;
-
+  $scope.status = false;
 }
 
 })();

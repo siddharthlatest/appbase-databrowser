@@ -100,7 +100,9 @@
 
     </div>
     <ul ng-show="node.expanded" class="children">
-        <li class="status" ng-show="node.loading">Loading...</li>
+        <li class="status" ng-show="node.loading">
+            <span class="fa fa-refresh fa-spin bro-loading"></span> Loading 
+        </li>
         <li class="status empty" ng-show="!node.children.length && !node.loading">
           Empty
           <ul class="list-inline node-options-list">

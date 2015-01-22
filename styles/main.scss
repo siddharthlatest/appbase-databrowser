@@ -833,9 +833,24 @@ body {
 	}
 }
 
+.inner-loading {
+	position: absolute;
+	width: 90%;
+	height:90%;
+	text-align: center;
+	line-height: 65vh;
+	color: #bbb;
+}
+
+.bro-loading {
+	margin: 0 12px;
+	position: relative;
+}
+
 #oauth {
 	font-family: $font-light;
 	font-size: 1.1em;
+	
 	h4 {
 		font-family: $font-extra-light;
 		font-size: 2em;

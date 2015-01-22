@@ -12,6 +12,7 @@ angular.module("AppbaseDashboard", ['ngAppbase',
   .config(Routes);
 
 function FirstRun($rootScope, $location, stringManipulation, session, $route){
+  $rootScope.db_loading = true;
   // changed the way sessions are stored, so to prevent errors:
   var oldSession = sessionStorage.getItem('apps');
   if(oldSession){
@@ -163,7 +164,6 @@ angular
 );
 
 function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, $appbase) {
-  $rootScope.db_loading = true;
   $scope.api = false;
   Prism.highlightAll();
   $scope.devProfile = session.getProfile();
@@ -526,7 +526,7 @@ angular
               'session', '$rootScope', BrowserCtrl]);
 
 function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
-  $rootScope.db_loading = true;
+  $scope.status = "Loading";
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
   var app = session.appFromName(appName);
   if(!app) {
@@ -565,12 +565,15 @@ function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,
   $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
   $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
   $rootScope.db_loading = false;
+  $scope.status = false;
   
   $scope.addEdgeInto = function(node) {
     var namespaces = [];
     node.loadingNs = true;
     data.getNamespaces(function(array) {
-      node.loadingNs = false;
+      $timeout(function(){
+        node.loadingNs = false;
+      });
       array.forEach(function(each){
         namespaces.push(each.name);
       });
@@ -983,8 +986,8 @@ function StringManipulationFactory(){
     return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
   }
 
-  stringManipulation.appToURL = function(app, api) {
-    return "https://api.appbase.io/"+ app +"/v" + (api? "1": "2") + "/";
+  stringManipulation.appToURL = function(app) {
+    return "https://api.appbase.io/"+ app +"/v2/";
   }
 
   return stringManipulation;
@@ -1018,7 +1021,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   }
 
   data.getVerticesOfNamespace = function(namespace, done) {
-    atomic.post(stringManipulation.appToURL(appName) + namespace + '/~list', {"data": [""], "secret": secret})
+    atomic.post(stringManipulation.appToURL(appName) + namespace + '/~list',{"data":[""],"secret":secret})
       .success(function(result) {
         var vertices = []
         result.forEach(function(obj) {
@@ -1034,7 +1037,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   data.getNamespaces = function(done) {
     atomic.get(atob(server)+'app/'+ appName +'/namespaces')
       .success(function(result) {
-        if(result !== undefined && result.namesapces !== undefined && result.search_enabled !== undefined) {
+        if(result !== undefined && result.namesapces !== undefined && result.search_enabled !== undefined){
           return console.error("Unexpected response from server for namespaces:", result);
         }
         var namespaces = []
@@ -1087,11 +1090,17 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         } else if(typeof response === "object") {
           atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
             .success(function(result) {
-              done(null)
+              atomic.put(atob(server)+'app/'+app+'/owners', {"owner":getEmail()})
+              .success(function(){
+                done(null)
+              })
+              .error(function(error){
+                throw error;
+              });
             })
             .error(function(error) {
               throw error
-            })
+            });
         } else {
           throw 'Server Error, try again.'
         }
@@ -1175,7 +1184,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   data.getDevsAppsWithEmail = function(done) {
     atomic.get(atob(server)+'user/'+ getEmail())
       .success(function(apps) {
-        console.log('apps arrived', apps)
         var appsAndSecrets = [];
         var appsArrived = 0;
         var secretArrived = function(app, secret, metrics) {
@@ -1191,7 +1199,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         }
         apps.forEach(function(app) {
           data.getAppsSecret(app, function(secret) {
-            console.log('secret arrived', app);
             getMetrics(app, secret, secretArrived);
           });
         });
@@ -1213,7 +1220,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   function getMetrics(app, secret, secretArrived){
     atomic.get(atob(server)+'app/'+app+'/metrics')
       .success(function(metrics){
-        console.log('metrics arrived', app);
         secretArrived(app, secret, metrics);
       })
       .error(function(data, error) {
@@ -1699,7 +1705,6 @@ angular
 
 function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope, $location){
   $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
-  $rootScope.db_loading = true;
 
   $scope.status = "Loading...";
   $scope.loading = $scope.loadingProv = $scope.editing = false;
@@ -2153,9 +2158,8 @@ angular
 .controller('stats', StatsCtrl);
 
 function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
-  $rootScope.db_loading = true;
+  $scope.status = "Loading";
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  
   var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
   $scope.apps = session.getApps();
   $scope.app = session.appFromName(appName);
@@ -2264,7 +2268,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
     $scope.noData = true;
   }
   $rootScope.db_loading = false;
-
+  $scope.status = false;
 }
 
 })();

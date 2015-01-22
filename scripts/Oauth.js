@@ -6,7 +6,6 @@ angular
 
 function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope, $location){
   $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
-  $rootScope.db_loading = true;
 
   $scope.status = "Loading...";
   $scope.loading = $scope.loadingProv = $scope.editing = false;

@@ -14,7 +14,6 @@ angular
 );
 
 function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, $appbase) {
-  $rootScope.db_loading = true;
   $scope.api = false;
   Prism.highlightAll();
   $scope.devProfile = session.getProfile();
