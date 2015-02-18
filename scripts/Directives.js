@@ -54,9 +54,6 @@ function BarChart(){
           $scope.$watch('data', function(newData){
             graph.setData(newData);
           });
-
-          window.asdf = graph.setData
-          window.dataa = $scope.data
       }
 
   };
