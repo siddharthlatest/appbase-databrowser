@@ -399,7 +399,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
             $('.button-subscribe').on('click',function(e){
               $('#payment_modal').modal();
               if(sessionStorage.getItem('discount')){
-                $('#payment_modal #coupon').val('prodhuntdisc30');
+                $('#payment_modal #coupon').val('PHUNT30');
               }
               $button = $(this);
               plan = $(this).data('plan');
@@ -701,9 +701,6 @@ function BarChart(){
           $scope.$watch('data', function(newData){
             graph.setData(newData);
           });
-
-          window.asdf = graph.setData
-          window.dataa = $scope.data
       }
 
   };

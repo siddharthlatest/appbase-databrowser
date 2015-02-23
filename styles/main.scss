@@ -21,6 +21,251 @@ $red: lighten(#d9534f, 3%);
 $perfect-orange: #f47c3c;
 $rip-good-orange: #aaa;
 
+$navbar-height: 50px;
+
+#nav {
+    position: relative;
+    z-index:2;
+    &.affix {
+        position: fixed;
+        background-color: $blue!important;
+        .navbar {
+            background-color: $blue;
+        }
+    }
+    background-color: $blue;
+    .navbar {
+        min-height: $navbar-height;
+        background-color: $blue;
+        border:0;
+        margin:-2px 0 0;
+        border-radius:0;
+        .container-fluid {
+            min-height: $navbar-height;
+            padding: 0;
+            @media screen and (min-width: 768px){
+                opacity: 0.94;
+                padding: 0 1vw;
+                .nav {
+                    text-align: left;
+                    li .link {
+                        padding: 0 .9vw;
+                        a {
+                            padding: 6px 5px;
+                        }
+                    }
+                }
+                .navbar-header {
+                    margin: 0 -15px;
+                }
+            }
+
+            @media screen and (min-width: 900px){
+                padding: 0 2.5vw;
+                .nav li .link {
+                    padding: 0 .3vw;
+                    a {
+                        padding: 6px 20px;
+                    }
+                }
+            }
+
+            @media screen and (min-width: 1200px){
+                padding: 0 5.5vw;
+                .nav li .link {
+                    padding: 0 .2vw;
+                }
+            }
+
+            @media screen and (min-width: 1600px){
+                padding: 0 10vw;
+                .nav li .link {
+                    padding: 0 .5vw;
+                }
+            }
+
+            @media screen and (min-width: 2000px){
+                padding: 0 12vw;
+                .nav li .link {
+                    padding: 0 1vw;
+                }
+            }
+        }
+
+        .navbar-header {
+            margin:0;
+            height: $navbar-height;
+            line-height: $navbar-height;
+            vertical-align: middle;
+            z-index: 15;
+            .navbar-toggle {
+                position: relative;
+                z-index: 21;
+                margin: ($navbar-height - 34px)/2 20px;
+                .icon-bar {
+                    background-color: white;
+                }
+            }
+
+            .navbar-brand {
+                position: relative;
+                z-index: 10;
+                padding: ($navbar-height - $logo-height)/2 20px;
+                img {
+                    height: $logo-height;
+                }
+                cursor: pointer;
+            }
+        }
+
+        .nav {
+            position: relative;
+            z-index: 30;
+            margin:0 inherit;
+            color: white;
+            font-family: $font-light;
+
+            #login_userInfo {
+                font-size: 1.25em;
+                margin-top: 15px;
+                margin-left:15px;
+                line-height: $navbar-height;
+                &>span {
+                    cursor: default;
+                }
+                .tooltip{                
+                    line-height: 35px;
+                    opacity: 0;
+                    &:hover {
+                        opacity: 0.6;
+                    }
+                    .tooltip-inner {
+                        font-family: $font-light;
+                        font-size: 2.5em;
+                        background-color: brown;
+                        height: 40px;
+                        width: 40px;
+                        border-radius: 20px;
+                        cursor: pointer; 
+                    }
+
+                }
+                .circle {
+                    float:right;
+                    position: relative;
+                    top: ($navbar-height - 40px)/2;
+                    height: 40px;
+                    width: 40px;
+                    margin-left: 15px;
+                    .overlay {
+                        display: inline;
+                        color: transparent;
+                        &:hover {
+                            color: black;
+                        }
+                    }
+                    img {
+                        float: left;
+                        vertical-align: top;
+                        border-radius: 25px;
+                        height: 40px;
+                        width: 40px;
+                    } 
+                }
+
+            }
+        }
+
+        li {
+            .link {
+                padding:0;
+                line-height:$navbar-height;
+                a {
+                    cursor: pointer;
+                    font-family: "Source Sans Pro Light";
+                    font-size: 1.35em;
+                    text-transform: uppercase;
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    &:hover {
+                        background-color: white;
+                        text-decoration: none!important;
+                        color: $landing-color;
+                        opacity: 1;
+                        border-radius: 20px;
+                    }
+                    &:focus {
+                        text-decoration: none!important;
+                    }
+                    &.current-path {
+                        font-family: $font-bold;
+                        &:hover{
+                            opacity: 0.9;
+                            cursor: default;
+                        }
+                    }
+                }
+                
+            }
+
+            li:last-child {
+                padding-right: 20px;
+                .link {
+                    padding-left: 3vw;
+                    padding-right: 0;
+                }
+            }
+        }
+
+        .navbar-collapse {
+            &.in {
+                opacity: 1!important;
+            }
+            border-top:none;
+            width: 100%;
+            position: relative;
+            @media screen and (max-width: 768px){
+                opacity: 0;
+                position: relative;
+                top: -($navbar-height +20px);
+                padding: 0!important;
+                margin-left:0;
+                margin-bottom:-($navbar-height + 70px);
+                background: $blue;
+                .nav {
+                    text-align: center;
+                    width: 100%;
+                    margin:0;
+                    padding-top: $navbar-height;
+                    //opacity: 0.95;
+                    .profile {
+                        display: none;
+                    }
+                    li {
+                        display:inline;
+                        .link {
+                            line-height: ($navbar-height/3)*2!important;
+                        }
+                        div {
+                            display: inline;
+                        }
+                        a {
+                            color: white;
+                            &:hover {
+                                color: $landing-color;
+                                background-color: white;
+                                opacity: 0.9;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}
+
 @keyframes slideOutLeft {
 	100% {
 		display: none;
@@ -139,7 +384,7 @@ $rip-good-orange: #aaa;
 }
 
 body {
-	padding-top: $navbar-height;
+	padding-top: ($navbar-height) - 2px;
 }
 
 #sidebar {
@@ -536,12 +781,6 @@ body {
 
 #browser {
 
-	.child.ng-enter {
-		animation: slideIn 0.2s both ease-in-out;
-	}
-	.child.ng-leave {
-		animation: slideOut 0.2 both ease-in-out;
-	}
 	.node {
 		.status {
 			color: #666;

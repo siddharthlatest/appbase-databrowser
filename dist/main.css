@@ -53,6 +53,105 @@
     animation: none;
   }
 }
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}
 @font-face {
   font-family: 'Source Sans Pro Extra Light Italic';
   src: url('/styles/fonts/source/sourcesanspro-extralightit.eot');
@@ -95,76 +194,231 @@
   font-weight: normal;
   font-style: normal; }
 
-/*
 @font-face {
-    font-family: 'source_sans_proitalic';
-    src: url('/styles/fonts/source/sourcesanspro-it.eot');
-    src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-family: 'Source Sans Pro Light Italic';
+  src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
+  src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
-    font-family: 'source_sans_proSBdIt';
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-family: 'Source Sans Pro Italic';
+  src: url('/styles/fonts/source/sourcesanspro-it.eot');
+  src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
-    font-family: 'source_sans_problack_italic';
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-family: 'Source Sans Pro Semibold Italic';
+  src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
+  src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
-    font-family: 'source_sans_problack';
-    src: url('/styles/fonts/source/sourcesanspro-black.eot');
-    src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-family: 'Source Sans Pro Black Italic';
+  src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
+  src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
-    font-family: 'source_sans_probold_italic';
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+  font-family: 'Source Sans Pro Black';
+  src: url('/styles/fonts/source/sourcesanspro-black.eot');
+  src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
 
 @font-face {
-    font-family: 'source_sans_prolight_italic';
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}*/
+  font-family: 'Source Sans Pro Bold Italic';
+  src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
+  src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'), url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'), url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'), url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal; }
+
 /* console */
 /************************
 * Colors for the browser icons
 ************************/
+#nav {
+  position: relative;
+  z-index: 2;
+  background-color: #50BAEF; }
+  #nav.affix {
+    position: fixed;
+    background-color: #50BAEF !important; }
+    #nav.affix .navbar {
+      background-color: #50BAEF; }
+  #nav .navbar {
+    min-height: 50px;
+    background-color: #50BAEF;
+    border: 0;
+    margin: -2px 0 0;
+    border-radius: 0; }
+    #nav .navbar .container-fluid {
+      min-height: 50px;
+      padding: 0; }
+      @media screen and (min-width: 768px) {
+        #nav .navbar .container-fluid {
+          opacity: 0.94;
+          padding: 0 1vw; }
+          #nav .navbar .container-fluid .nav {
+            text-align: left; }
+            #nav .navbar .container-fluid .nav li .link {
+              padding: 0 0.9vw; }
+              #nav .navbar .container-fluid .nav li .link a {
+                padding: 6px 5px; }
+          #nav .navbar .container-fluid .navbar-header {
+            margin: 0 -15px; } }
+      @media screen and (min-width: 900px) {
+        #nav .navbar .container-fluid {
+          padding: 0 2.5vw; }
+          #nav .navbar .container-fluid .nav li .link {
+            padding: 0 0.3vw; }
+            #nav .navbar .container-fluid .nav li .link a {
+              padding: 6px 20px; } }
+      @media screen and (min-width: 1200px) {
+        #nav .navbar .container-fluid {
+          padding: 0 5.5vw; }
+          #nav .navbar .container-fluid .nav li .link {
+            padding: 0 0.2vw; } }
+      @media screen and (min-width: 1600px) {
+        #nav .navbar .container-fluid {
+          padding: 0 10vw; }
+          #nav .navbar .container-fluid .nav li .link {
+            padding: 0 0.5vw; } }
+      @media screen and (min-width: 2000px) {
+        #nav .navbar .container-fluid {
+          padding: 0 12vw; }
+          #nav .navbar .container-fluid .nav li .link {
+            padding: 0 1vw; } }
+    #nav .navbar .navbar-header {
+      margin: 0;
+      height: 50px;
+      line-height: 50px;
+      vertical-align: middle;
+      z-index: 15; }
+      #nav .navbar .navbar-header .navbar-toggle {
+        position: relative;
+        z-index: 21;
+        margin: 8px 20px; }
+        #nav .navbar .navbar-header .navbar-toggle .icon-bar {
+          background-color: white; }
+      #nav .navbar .navbar-header .navbar-brand {
+        position: relative;
+        z-index: 10;
+        padding: 5px 20px;
+        cursor: pointer; }
+        #nav .navbar .navbar-header .navbar-brand img {
+          height: 40px; }
+    #nav .navbar .nav {
+      position: relative;
+      z-index: 30;
+      margin: 0 inherit;
+      color: white;
+      font-family: "Source Sans Pro Light"; }
+      #nav .navbar .nav #login_userInfo {
+        font-size: 1.25em;
+        margin-top: 15px;
+        margin-left: 15px;
+        line-height: 50px; }
+        #nav .navbar .nav #login_userInfo > span {
+          cursor: default; }
+        #nav .navbar .nav #login_userInfo .tooltip {
+          line-height: 35px;
+          opacity: 0; }
+          #nav .navbar .nav #login_userInfo .tooltip:hover {
+            opacity: 0.6; }
+          #nav .navbar .nav #login_userInfo .tooltip .tooltip-inner {
+            font-family: "Source Sans Pro Light";
+            font-size: 2.5em;
+            background-color: brown;
+            height: 40px;
+            width: 40px;
+            border-radius: 20px;
+            cursor: pointer; }
+        #nav .navbar .nav #login_userInfo .circle {
+          float: right;
+          position: relative;
+          top: 5px;
+          height: 40px;
+          width: 40px;
+          margin-left: 15px; }
+          #nav .navbar .nav #login_userInfo .circle .overlay {
+            display: inline;
+            color: transparent; }
+            #nav .navbar .nav #login_userInfo .circle .overlay:hover {
+              color: black; }
+          #nav .navbar .nav #login_userInfo .circle img {
+            float: left;
+            vertical-align: top;
+            border-radius: 25px;
+            height: 40px;
+            width: 40px; }
+    #nav .navbar li .link {
+      padding: 0;
+      line-height: 50px; }
+      #nav .navbar li .link a {
+        cursor: pointer;
+        font-family: "Source Sans Pro Light";
+        font-size: 1.35em;
+        text-transform: uppercase;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px; }
+        #nav .navbar li .link a:hover {
+          background-color: white;
+          text-decoration: none !important;
+          color: #50BAEF;
+          opacity: 1;
+          border-radius: 20px; }
+        #nav .navbar li .link a:focus {
+          text-decoration: none !important; }
+        #nav .navbar li .link a.current-path {
+          font-family: "Source Sans Pro Bold"; }
+          #nav .navbar li .link a.current-path:hover {
+            opacity: 0.9;
+            cursor: default; }
+    #nav .navbar li li:last-child {
+      padding-right: 20px; }
+      #nav .navbar li li:last-child .link {
+        padding-left: 3vw;
+        padding-right: 0; }
+    #nav .navbar .navbar-collapse {
+      border-top: none;
+      width: 100%;
+      position: relative; }
+      #nav .navbar .navbar-collapse.in {
+        opacity: 1 !important; }
+      @media screen and (max-width: 768px) {
+        #nav .navbar .navbar-collapse {
+          opacity: 0;
+          position: relative;
+          top: -70px;
+          padding: 0 !important;
+          margin-left: 0;
+          margin-bottom: -120px;
+          background: #50BAEF; }
+          #nav .navbar .navbar-collapse .nav {
+            text-align: center;
+            width: 100%;
+            margin: 0;
+            padding-top: 50px; }
+            #nav .navbar .navbar-collapse .nav .profile {
+              display: none; }
+            #nav .navbar .navbar-collapse .nav li {
+              display: inline; }
+              #nav .navbar .navbar-collapse .nav li .link {
+                line-height: 33.33333px !important; }
+              #nav .navbar .navbar-collapse .nav li div {
+                display: inline; }
+              #nav .navbar .navbar-collapse .nav li a {
+                color: white; }
+                #nav .navbar .navbar-collapse .nav li a:hover {
+                  color: #50BAEF;
+                  background-color: white;
+                  opacity: 0.9; } }
+
 @-webkit-keyframes slideOutLeft {
   100% {
     display: none; }
@@ -172,76 +426,6 @@
   to {
     opacity: 0; } }
 
-/*
-@font-face {
-    font-family: 'source_sans_proitalic';
-    src: url('/styles/fonts/source/sourcesanspro-it.eot');
-    src: url('/styles/fonts/source/sourcesanspro-it.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-it.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-it.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-it.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_proSBdIt';
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-semiboldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-semiboldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_problack_italic';
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-blackit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-blackit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-blackit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_problack';
-    src: url('/styles/fonts/source/sourcesanspro-black.eot');
-    src: url('/styles/fonts/source/sourcesanspro-black.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-black.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-black.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-black.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_probold_italic';
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-boldit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-boldit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-boldit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'source_sans_prolight_italic';
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot');
-    src: url('/styles/fonts/source/sourcesanspro-lightit.eot?#iefix') format('embedded-opentype'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff2') format('woff2'),
-         url('/styles/fonts/source/sourcesanspro-lightit.woff') format('woff'),
-         url('/styles/fonts/source/sourcesanspro-lightit.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}*/
-/* console */
-/************************
-* Colors for the browser icons
-************************/
 @keyframes slideOutLeft {
   100% {
     display: none; }
@@ -462,7 +646,7 @@
   z-index: 2; }
 
 body {
-  padding-top: 70px; }
+  padding-top: 48px; }
 
 #sidebar {
   font-family: "Source Sans Pro Regular";
@@ -738,12 +922,6 @@ body {
 #browser {
   font-family: "Source Sans Pro Light";
   font-size: 1.22em; }
-  #browser .child.ng-enter {
-    -webkit-animation: slideIn 0.2s both ease-in-out;
-    animation: slideIn 0.2s both ease-in-out; }
-  #browser .child.ng-leave {
-    -webkit-animation: slideOut 0.2 both ease-in-out;
-    animation: slideOut 0.2 both ease-in-out; }
   #browser .node .status {
     color: #666; }
   #browser .node a.node-name {
@@ -1313,103 +1491,3 @@ body {
 
 .nav > li > a:focus {
   background-color: transparent; }
-
-@-webkit-keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ngdialog {
-  position: fixed;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 10000;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.ngdialog-overlay {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.4);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-content {
-  background: white;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-content {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-close:before {
-  content: '\00D7';
-  cursor: pointer;
-}
-
-body.ngdialog-open {
-  overflow: hidden;
-}
