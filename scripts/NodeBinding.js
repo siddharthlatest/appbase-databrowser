@@ -199,7 +199,6 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
     vertex.prevPage = function(){
       if(vertex.page > 0) {
         vertex.page--;
-        // vertex.children = [];
         vertex.expand();
       }
     }
