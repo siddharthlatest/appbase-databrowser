@@ -399,7 +399,7 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
             $('.button-subscribe').on('click',function(e){
               $('#payment_modal').modal();
               if(sessionStorage.getItem('discount')){
-                $('#payment_modal #coupon').val('prodhuntdisc30');
+                $('#payment_modal #coupon').val('PHUNT30');
               }
               $button = $(this);
               plan = $(this).data('plan');
@@ -701,9 +701,6 @@ function BarChart(){
           $scope.$watch('data', function(newData){
             graph.setData(newData);
           });
-
-          window.asdf = graph.setData
-          window.dataa = $scope.data
       }
 
   };
@@ -1453,7 +1450,9 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
               var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name,nsObj.searchable));
               if(!initialPoll) {
                 p--;
-                $timeout(function(){root.children[p]['added'] = true; console.log(root.children[p])});
+                $timeout(function(){
+                  root.children[p]['added'] = true;
+                });
 
                 $timeout(function(){
                   root.children[p]['added'] = false;
@@ -1566,15 +1565,31 @@ function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, s
       ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
     }    
     vertex.isV = true
+    vertex.page = 0;
+
+    vertex.nextPage = function(){
+      if(vertex.children.length === 25) {
+        vertex.page++;
+        vertex.expand();
+      }
+    }
+
+    vertex.prevPage = function(){
+      if(vertex.page > 0) {
+        vertex.page--;
+        vertex.children = [];
+        vertex.expand();
+      }
+    }
 
     vertex.expand = function() {
       vertex.expanded = true;
       vertex.loading = true;
-      vertex.children = vertex.ref.bindEdges($scope,$.extend({}, vertexBindCallbacks,{onComplete: function(){
+      vertex.children=vertex.ref.bindEdges($scope,$.extend({},vertexBindCallbacks,{onComplete: function(a){
         $timeout(function(){
           vertex.loading = false;
         });
-      }}));
+      }}), function(){}, {limit: 25, skip: vertex.page * 25 });
     }
 
     vertex.meAsRoot = function() {
