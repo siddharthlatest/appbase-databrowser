@@ -1,14 +1,14 @@
 (function(){
 angular
 .module("AppbaseDashboard")
-.factory('nodeBinding',['data',
+.factory('nodeBinding',['data', '$location',
   'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog',NodeBinding]);
 
 function debug(a) {
   return JSON.parse(JSON.stringify(a))
 }
 
-function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
+function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
   nodeBinding.creating = [];
   function addNamespaces(node, childName) {

@@ -240,6 +240,10 @@ body.ngdialog-open {
 /************************
 * Colors for the browser icons
 ************************/
+body {
+  background-color: #f3f3f3;
+  color: #555; }
+
 #nav {
   position: relative;
   z-index: 2;
@@ -250,13 +254,13 @@ body.ngdialog-open {
     #nav.affix .navbar {
       background-color: #50BAEF; }
   #nav .navbar {
-    min-height: 50px;
+    min-height: 60px;
     background-color: #50BAEF;
     border: 0;
     margin: -2px 0 0;
     border-radius: 0; }
     #nav .navbar .container-fluid {
-      min-height: 50px;
+      min-height: 60px;
       padding: 0; }
       @media screen and (min-width: 768px) {
         #nav .navbar .container-fluid {
@@ -264,68 +268,67 @@ body.ngdialog-open {
           padding: 0 1vw; }
           #nav .navbar .container-fluid .nav {
             text-align: left; }
-            #nav .navbar .container-fluid .nav li .link {
-              padding: 0 0.9vw; }
-              #nav .navbar .container-fluid .nav li .link a {
-                padding: 6px 5px; }
+            #nav .navbar .container-fluid .nav li {
+              padding: 0; }
+              #nav .navbar .container-fluid .nav li a {
+                padding: 0; }
           #nav .navbar .container-fluid .navbar-header {
             margin: 0 -15px; } }
       @media screen and (min-width: 900px) {
         #nav .navbar .container-fluid {
           padding: 0 2.5vw; }
-          #nav .navbar .container-fluid .nav li .link {
-            padding: 0 0.3vw; }
-            #nav .navbar .container-fluid .nav li .link a {
-              padding: 6px 20px; } }
+          #nav .navbar .container-fluid .nav li {
+            padding: 0; }
+            #nav .navbar .container-fluid .nav li a {
+              padding: 9px 12px; } }
       @media screen and (min-width: 1200px) {
         #nav .navbar .container-fluid {
           padding: 0 5.5vw; }
-          #nav .navbar .container-fluid .nav li .link {
-            padding: 0 0.2vw; } }
+          #nav .navbar .container-fluid .nav li {
+            padding: 0; } }
       @media screen and (min-width: 1600px) {
         #nav .navbar .container-fluid {
           padding: 0 10vw; }
-          #nav .navbar .container-fluid .nav li .link {
-            padding: 0 0.5vw; } }
+          #nav .navbar .container-fluid .nav li {
+            padding: 0; } }
       @media screen and (min-width: 2000px) {
         #nav .navbar .container-fluid {
           padding: 0 12vw; }
-          #nav .navbar .container-fluid .nav li .link {
-            padding: 0 1vw; } }
+          #nav .navbar .container-fluid .nav li {
+            padding: 0; } }
     #nav .navbar .navbar-header {
       margin: 0;
-      height: 50px;
-      line-height: 50px;
+      height: 60px;
+      line-height: 60px;
       vertical-align: middle;
       z-index: 15; }
       #nav .navbar .navbar-header .navbar-toggle {
         position: relative;
         z-index: 21;
-        margin: 8px 20px; }
+        margin: 13px 20px; }
         #nav .navbar .navbar-header .navbar-toggle .icon-bar {
           background-color: white; }
       #nav .navbar .navbar-header .navbar-brand {
         position: relative;
         z-index: 10;
-        padding: 5px 20px;
+        padding: 12.5px 20px;
         cursor: pointer; }
         #nav .navbar .navbar-header .navbar-brand img {
-          height: 40px; }
+          height: 35px; }
     #nav .navbar .nav {
       position: relative;
       z-index: 30;
       margin: 0 inherit;
       color: white;
-      font-family: "Source Sans Pro Light"; }
+      font-family: "Source Sans Pro Regular"; }
       #nav .navbar .nav #login_userInfo {
-        font-size: 1.25em;
+        font-size: 1.15em;
         margin-top: 15px;
         margin-left: 15px;
-        line-height: 50px; }
+        line-height: 60px; }
         #nav .navbar .nav #login_userInfo > span {
           cursor: default; }
         #nav .navbar .nav #login_userInfo .tooltip {
-          line-height: 35px;
           opacity: 0; }
           #nav .navbar .nav #login_userInfo .tooltip:hover {
             opacity: 0.6; }
@@ -340,7 +343,7 @@ body.ngdialog-open {
         #nav .navbar .nav #login_userInfo .circle {
           float: right;
           position: relative;
-          top: 5px;
+          top: 10px;
           height: 40px;
           width: 40px;
           margin-left: 15px; }
@@ -355,33 +358,33 @@ body.ngdialog-open {
             border-radius: 25px;
             height: 40px;
             width: 40px; }
-    #nav .navbar li .link {
-      padding: 0;
-      line-height: 50px; }
-      #nav .navbar li .link a {
+    #nav .navbar li {
+      display: inline;
+      padding: 0; }
+      #nav .navbar li a {
         cursor: pointer;
         font-family: "Source Sans Pro Light";
-        font-size: 1.35em;
-        text-transform: uppercase;
+        font-size: 1.1em;
+        text-transform: none;
         color: white;
-        padding: 5px 10px;
+        margin: 11px 6px;
         border-radius: 5px; }
-        #nav .navbar li .link a:hover {
-          background-color: white;
+        #nav .navbar li a:hover, #nav .navbar li a.active {
+          background-color: #2F9ED5;
           text-decoration: none !important;
-          color: #50BAEF;
+          color: white;
           opacity: 1;
-          border-radius: 20px; }
-        #nav .navbar li .link a:focus {
+          border-radius: 3px; }
+        #nav .navbar li a:focus {
           text-decoration: none !important; }
-        #nav .navbar li .link a.current-path {
+        #nav .navbar li a.current-path {
           font-family: "Source Sans Pro Bold"; }
-          #nav .navbar li .link a.current-path:hover {
+          #nav .navbar li a.current-path:hover {
             opacity: 0.9;
             cursor: default; }
-    #nav .navbar li li:last-child {
+    #nav .navbar li:last-child {
       padding-right: 20px; }
-      #nav .navbar li li:last-child .link {
+      #nav .navbar li:last-child .link {
         padding-left: 3vw;
         padding-right: 0; }
     #nav .navbar .navbar-collapse {
@@ -394,30 +397,24 @@ body.ngdialog-open {
         #nav .navbar .navbar-collapse {
           opacity: 0;
           position: relative;
-          top: -70px;
+          top: -80px;
           padding: 0 !important;
           margin-left: 0;
-          margin-bottom: -120px;
+          margin-bottom: -130px;
           background: #50BAEF; }
           #nav .navbar .navbar-collapse .nav {
             text-align: center;
             width: 100%;
             margin: 0;
-            padding-top: 50px; }
+            padding-top: 60px; }
             #nav .navbar .navbar-collapse .nav .profile {
               display: none; }
-            #nav .navbar .navbar-collapse .nav li {
+            #nav .navbar .navbar-collapse .nav li, #nav .navbar .navbar-collapse .nav li div {
               display: inline; }
-              #nav .navbar .navbar-collapse .nav li .link {
-                line-height: 33.33333px !important; }
-              #nav .navbar .navbar-collapse .nav li div {
-                display: inline; }
-              #nav .navbar .navbar-collapse .nav li a {
-                color: white; }
-                #nav .navbar .navbar-collapse .nav li a:hover {
-                  color: #50BAEF;
-                  background-color: white;
-                  opacity: 0.9; } }
+            #nav .navbar .navbar-collapse .nav li a {
+              color: white; }
+              #nav .navbar .navbar-collapse .nav li a:hover {
+                background-color: #2F9ED5; } }
 
 @-webkit-keyframes slideOutLeft {
   100% {
@@ -482,20 +479,6 @@ body.ngdialog-open {
   to {
     -webkit-transform: translateX(50%);
     transform: translateX(50%); } }
-
-@-webkit-keyframes slideDown {
-  from {
-    top: -60px; }
-
-  to {
-    top: 0; } }
-
-@keyframes slideDown {
-  from {
-    top: -60px; }
-
-  to {
-    top: 0; } }
 
 @-webkit-keyframes added {
   0% {
@@ -626,8 +609,7 @@ body.ngdialog-open {
   top: -200vh; }
 
 .man-show {
-  -webkit-animation: slideDown 0.5s both ease-in-out;
-  animation: slideDown 0.5s both ease-in-out; }
+  top: 0; }
 
 .view-wrapper, body {
   height: 100%; }
@@ -646,13 +628,13 @@ body.ngdialog-open {
   z-index: 2; }
 
 body {
-  padding-top: 48px; }
+  padding-top: 58px; }
 
 #sidebar {
   font-family: "Source Sans Pro Regular";
   font-size: 1.2em;
   padding: 0;
-  background-color: #7DD3F4;
+  background-color: #eee;
   height: 100%;
   position: fixed;
   left: 0;
@@ -666,7 +648,9 @@ body {
         background-color: transparent;
         text-shadow: 0px 0px 1px rgba(255, 255, 255, 0.6); }
       #sidebar ul li a.active {
-        background-color: #50BAEF; }
+        background-color: #666; }
+      #sidebar ul li a:not(.active) {
+        color: #666; }
     #sidebar ul li.balance {
       text-align: center;
       width: 100%;
@@ -682,14 +666,13 @@ body {
         font-size: 2.5em; }
 
 #view {
-  margin-bottom: 5vh;
   padding-left: 0;
   padding-right: 0; }
   #view div[ng-view] {
-    margin-top: 60px; }
+    margin-top: 108px; }
 
 #applications {
-  margin-top: -60px;
+  margin-top: -108px;
   font-family: "Source Sans Pro Extra Light Italic";
   margin-bottom: 50px; }
   #applications .main-title {
@@ -881,45 +864,67 @@ body {
           border-color: #e76800; }
 
 #manage {
-  min-height: 60px;
-  height: 60px;
-  background-color: #888;
-  border-radius: 0;
-  border: 0;
-  margin-bottom: 0;
-  margin-top: 0; }
-  #manage .container-fluid {
-    height: 60px;
-    padding: -1px 5vw 0; }
-    #manage .container-fluid .navbar-header {
-      line-height: 60px;
-      height: 60px; }
-      #manage .container-fluid .navbar-header .app-title {
-        font-family: "Source Sans Pro Extra Light";
-        color: white;
-        font-size: 2em; }
-    #manage .container-fluid .navbar-right {
+  font-family: "Source Sans Pro Regular";
+  font-size: 1.1em;
+  height: 108px;
+  background-color: #f3f3f3; }
+  #manage .title {
+    margin-left: 30px;
+    position: inline;
+    line-height: 50px; }
+  #manage .right-tools {
+    position: inline;
+    float: right; }
+  #manage .navbar {
+    position: absolute;
+    width: 100%;
+    margin: 0 -15px;
+    border-radius: 0;
+    border: 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    background: white; }
+  #manage .delete {
+    color: red;
+    text-decoration: underline;
+    font-size: 1em; }
+    #manage .delete:hover {
+      color: #ff8080; }
+  #manage .secret {
+    color: #50BAEF;
+    display: inline-block;
+    font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+    font-size: 15px;
+    min-width: 350px; }
+    #manage .secret span span {
+      font-size: 10px;
+      margin-left: 3px;
+      opacity: 0.6;
+      color: #1394d5; }
+    #manage .secret a {
       font-family: "Source Sans Pro Regular";
-      font-size: 1em;
-      height: 60px;
-      line-height: 60px;
+      text-decoration: underline; }
+    #manage .secret span {
+      cursor: pointer; }
+  #manage .navbar-left {
+    margin-left: 30px; }
+  #manage .navbar-left a {
+    padding: 9px 11px;
+    margin: 9px;
+    border-radius: 4px;
+    color: #555; }
+    #manage .navbar-left a.active, #manage .navbar-left a:hover {
       color: white;
-      text-transform: uppercase;
-      margin-right: 3vw; }
-      #manage .container-fluid .navbar-right:hover li a > * {
-        border: 0; }
-      #manage .container-fluid .navbar-right li a {
-        height: 60px;
-        line-height: 60px;
-        padding: 0 20px;
-        background-color: #888;
-        color: white; }
-        #manage .container-fluid .navbar-right li a:hover {
-          background-color: #666; }
-      #manage .container-fluid .navbar-right .underline {
-        border-bottom: 1px solid white; }
+      background: #555; }
+  #manage .navbar-right {
+    color: #999;
+    line-height: 56px;
+    font-family: "Source Sans Pro Light"; }
 
 #browser {
+  background-color: white;
+  padding: 0 15px;
+  min-height: calc(100vh - 200px);
   font-family: "Source Sans Pro Light";
   font-size: 1.22em; }
   #browser .node .status {
@@ -1056,14 +1061,18 @@ body {
           font-family: "Source Sans Pro Regular";
           color: black; }
   #browser .breadcrumb {
-    background-color: #aaa;
+    background-color: #ccc;
     border-radius: 0;
-    color: white;
-    margin-bottom: 0; }
+    color: #222;
+    margin-bottom: 0;
+    margin-left: -15px;
+    margin-right: -15px; }
     #browser .breadcrumb .active {
       color: white; }
-    #browser .breadcrumb li a {
+    #browser .breadcrumb > li + li:before {
       color: #eee; }
+    #browser .breadcrumb li a {
+      color: white; }
       #browser .breadcrumb li a:hover {
         color: white; }
   #browser .propertiesBox form {
@@ -1107,7 +1116,9 @@ body {
 
 #stats {
   font-family: "Source Sans Pro Extra Light";
-  margin-top: 15px; }
+  padding: 0 15px;
+  margin-top: 15px;
+  background-color: #f3f3f3; }
   #stats .st-sum {
     font-size: 1.2em;
     margin-top: 10px; }
@@ -1388,7 +1399,6 @@ body {
 #billing {
   min-height: 530px;
   font-family: "Source Sans Pro Extra Light";
-  background: white;
   z-index: 99999; }
   #billing .main-title h1 {
     text-align: center;

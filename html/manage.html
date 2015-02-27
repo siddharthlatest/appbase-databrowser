@@ -1,20 +1,50 @@
-<nav class="navbar" id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['stats', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
+<div id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['stats', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
   <div class="container-fluid">
-    <div class="navbar-header">
-    	<div class="app-title" ng-bind="$parent.currentApp"></div>
+    <div class="title">
+        <a href="/developer/#/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{$parent.currentApp}}
+        <div class="right-tools">
+            <a href="" class="delete">Delete</a>
+        </div>
     </div>
-    <div class="navbar-right">
-    	<ul class="nav navbar-nav navbar-right">
-            <li><a ng-href="/developer/#/{{$parent.currentApp}}/stats">
-                <span ng-class="{underline: $parent.where()==='stats'}">Analytics</span>
-            </a></li>
-    		<li><a ng-href="/developer/#/{{$parent.currentApp}}/browser">
-                <span ng-class="{underline: $parent.where()==='browser'}">Data Browser</span>
-            </a></li>
-    		<li><a ng-href="/developer/#/{{$parent.currentApp}}/oauth">
-                <span ng-class="{underline: $parent.where()==='oauth'}">Authentication</span>
-            </a></li>
+    <nav class="navbar">
+
+    	<ul class="nav navbar-nav navbar-left">
+            <li>
+                <a ng-href="/developer/#/{{$parent.currentApp}}/stats"
+                   ng-class="{active: $parent.where()==='stats'}">
+                   Dashboard
+                </a>
+            </li>
+
+    		<li>
+                <a ng-href="/developer/#/{{$parent.currentApp}}/browser"
+                   ng-class="{active: $parent.where()==='browser'}">
+                    Data Browser
+                </a>
+            </li>
+
+    		<li>
+                <a ng-href="/developer/#/{{$parent.currentApp}}/oauth"
+                   ng-class="{active: $parent.where()==='oauth'}">
+                    Authentication
+                </a>
+            </li>
     	</ul>
+        <ul class="nav navbar-right">
+            <li>
+                <span class="fa fa-lock"></span> Secret:
+                <span class="secret" ng-show="!secretShown" ng-click="secretShown = true">
+                    <span ng-click="secretShown = true">
+                    {{$parent.currentSecret[0]}}{{$parent.currentSecret[1]}}<span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span>
+                    </span>
+                </span>
+                <span class="secret" ng-show="secretShown">
+                    <span ng-bind="$parent.currentSecret" ng-click="secretShown = false"></span>
+                    <a href="">Copy</a>
+                    </span>
+                </span>
+            </li>
+        </ul>
     </div>
   </div>
-</nav>
+</div>

@@ -1,9 +1,7 @@
 <ul class="nav nav-stacked">
-  <li><a ng-click="$parent.goToApps()" href="" ng-class="{active: $parent.where()==='apps'}">MY APPS</a></li>
-  <li><a ng-click="$parent.goToInvite()" ng-class="{active: $parent.where()==='invite'}" href="">INVITE A FRIEND</a></li>
+	<li><a ng-href="/developer/#/{{$parent.currentApp}}/stats" ng-class="{active: $parent.where()==='stats'}">DASH</a></li>
+  	<li><a ng-href="/developer/#/{{$parent.currentApp}}/browser" ng-class="{active: $parent.where()==='browser'}">BROWSER</a></li>
+  	<li><a ng-href="/developer/#/{{$parent.currentApp}}/oauth" ng-class="{active: $parent.where()==='oauth'}">AUTH</a></li>
+  <li><a ng-click="$parent.goToInvite()" ng-class="{active: $parent.where()==='invite'}" href="">INVITE</a></li>
   <li><a ng-click="$parent.goToBilling()" ng-class="{active: $parent.where()==='billing'}" href="">BILLING</a></li>
-  <li class="balance">
-  	<div class="title">API Credits</div>
-  	<div class="value" id="user-balance">...</div>
-  </li>
 </ul>

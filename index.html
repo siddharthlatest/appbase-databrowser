@@ -13,8 +13,7 @@
 <div class="container-fluid view-wrapper ng-hide" ng-show="!$parent.db_loading">
 	<div class="row view-wrapper">
 		<div ng-include="'/developer/html/login.html'" class="col-xs-12 ng-hide" id="db-login" ng-show="!$parent.logged &&!$parent.db_loading"></div>
-		<div ng-include="'/developer/html/sidebar.html'" class="col-xs-2 ng-hide" id="sidebar" ng-hide="!$parent.logged || $parent.db_loading"></div>
-		<div class="col-xs-10 col-xs-offset-2" id="view">
+		<div class="col-xs-12" id="view">
 			<ng-include src="'/developer/html/manage.html'"></ng-include>
 			<div ng-view ng-hide="!$parent.logged || $parent.db_loading"></div>
 		</div>
@@ -23,11 +22,11 @@
 <div ng-hide="!$parent.db_loading" id="loading">
 	<span class="fa fa-refresh ab-spin fa-2x"></span> 
 </div>
-<footer class="footer ng-hide" ng-show="!$parent.db_loading" ng-include="'/include/footer.html'"></footer>
 
+<script src="https://js.stripe.com/v2/"></script>
 <script src="/developer/dist/vendor.min.js"></script>
 <script src="/vendor/appbase/appbase.min.js"></script>
-<script src="https://cdn.appbase.io/latest/ng-appbase.js"></script> 
+<script src="https://cdn.appbase.io/latest/ng-appbase.js"></script>
 <script src="/developer/dist/main.js"></script>
 <script src="/vendor/analytics.js"></script>
 </body>

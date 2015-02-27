@@ -18,6 +18,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   Prism.highlightAll();
   $scope.devProfile = session.getProfile();
   if($scope.devProfile) {
+    $rootScope.devProfile = $scope.devProfile;
     var fetchApps = function(done) {
       $scope.fetching = true;
       session.fetchApps(function(){

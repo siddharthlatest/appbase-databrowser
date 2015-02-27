@@ -36,24 +36,45 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   } else {
     $rootScope.logged = true;
   }
-  $rootScope.currentApp = sessionStorage.getItem('URL')?stringManipulation.urlToAppname(sessionStorage.getItem('URL')):'';
+
+  var url = sessionStorage.getItem('URL');
+  $rootScope.currentApp = url ? stringManipulation.urlToAppname(url) : '';
+
+  var apps = session.getApps();
+
+  if(apps && $rootScope.currentApp) {
+    $rootScope.currentSecret = getSecret(apps, $rootScope.currentApp);
+  }
+  
   $rootScope.$watch('currentApp', function(app){
     sessionStorage.setItem('URL', stringManipulation.appToURL(app));
     var apps = session.getApps();
+
     if(app && apps.length){
+      $rootScope.currentSecret = getSecret(apps, app);
+
       var appRef = apps.filter(function(b){
         return b.name === app;
       })[0];
+
       apps.splice(apps.indexOf(appRef), 1);
       apps.unshift(appRef); //moved app to top of array
       session.setApps(apps);
+      
       var order = [];
       apps.forEach(function(app){
         order.push(app.name);
       });
+      
       localStorage.setItem(session.getProfile().uid + 'order', JSON.stringify(order));
     }
   });
+
+  function getSecret(apps, app){
+    return apps.filter(function(each){
+      return each.name === app;
+    })[0].secret;
+  }
   $rootScope.goToInvite = function() {
     $location.path('/invite');
   }
@@ -168,6 +189,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   Prism.highlightAll();
   $scope.devProfile = session.getProfile();
   if($scope.devProfile) {
+    $rootScope.devProfile = $scope.devProfile;
     var fetchApps = function(done) {
       $scope.fetching = true;
       session.fetchApps(function(){
@@ -295,13 +317,13 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
-    $.getScript("https://js.stripe.com/v2/",loaded);
-    
 
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
     var plan;
     var $button;
-  
+    
+    loaded();
+
     function loaded(){ 
       Stripe.setPublishableKey(stripeKey);  
 
@@ -1379,14 +1401,14 @@ function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScop
 (function(){
 angular
 .module("AppbaseDashboard")
-.factory('nodeBinding',['data',
+.factory('nodeBinding',['data', '$location',
   'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog',NodeBinding]);
 
 function debug(a) {
   return JSON.parse(JSON.stringify(a))
 }
 
-function NodeBinding(data, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
+function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
   var nodeBinding = {};
   nodeBinding.creating = [];
   function addNamespaces(node, childName) {

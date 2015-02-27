@@ -9,13 +9,13 @@ function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootSco
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
-    $.getScript("https://js.stripe.com/v2/",loaded);
-    
 
     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
     var plan;
     var $button;
-  
+    
+    loaded();
+
     function loaded(){ 
       Stripe.setPublishableKey(stripeKey);  
 

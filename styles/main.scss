@@ -21,7 +21,16 @@ $red: lighten(#d9534f, 3%);
 $perfect-orange: #f47c3c;
 $rip-good-orange: #aaa;
 
-$navbar-height: 50px;
+$navbar-height: 60px;
+$logo-height: 35px;
+
+$apps-bg: #f3f3f3;
+$manage-height: 108px;
+
+body {
+	background-color: $apps-bg;
+	color: #555;
+}
 
 #nav {
     position: relative;
@@ -48,10 +57,10 @@ $navbar-height: 50px;
                 padding: 0 1vw;
                 .nav {
                     text-align: left;
-                    li .link {
-                        padding: 0 .9vw;
+                    li {
+                        padding: 0;
                         a {
-                            padding: 6px 5px;
+                            padding: 0;
                         }
                     }
                 }
@@ -62,32 +71,32 @@ $navbar-height: 50px;
 
             @media screen and (min-width: 900px){
                 padding: 0 2.5vw;
-                .nav li .link {
-                    padding: 0 .3vw;
+                .nav li {
+                    padding: 0;
                     a {
-                        padding: 6px 20px;
+                        padding: 9px 12px;
                     }
                 }
             }
 
             @media screen and (min-width: 1200px){
                 padding: 0 5.5vw;
-                .nav li .link {
-                    padding: 0 .2vw;
+                .nav li {
+                    padding: 0;
                 }
             }
 
             @media screen and (min-width: 1600px){
                 padding: 0 10vw;
-                .nav li .link {
-                    padding: 0 .5vw;
+                .nav li {
+                    padding: 0;
                 }
             }
 
             @media screen and (min-width: 2000px){
                 padding: 0 12vw;
-                .nav li .link {
-                    padding: 0 1vw;
+                .nav li {
+                    padding: 0;
                 }
             }
         }
@@ -123,10 +132,10 @@ $navbar-height: 50px;
             z-index: 30;
             margin:0 inherit;
             color: white;
-            font-family: $font-light;
+            font-family: $font-regular;
 
             #login_userInfo {
-                font-size: 1.25em;
+                font-size: 1.15em;
                 margin-top: 15px;
                 margin-left:15px;
                 line-height: $navbar-height;
@@ -134,7 +143,6 @@ $navbar-height: 50px;
                     cursor: default;
                 }
                 .tooltip{                
-                    line-height: 35px;
                     opacity: 0;
                     &:hover {
                         opacity: 0.6;
@@ -177,44 +185,46 @@ $navbar-height: 50px;
         }
 
         li {
-            .link {
-                padding:0;
-                line-height:$navbar-height;
-                a {
-                    cursor: pointer;
-                    font-family: "Source Sans Pro Light";
-                    font-size: 1.35em;
-                    text-transform: uppercase;
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 5px;
-                    &:hover {
-                        background-color: white;
-                        text-decoration: none!important;
-                        color: $landing-color;
-                        opacity: 1;
-                        border-radius: 20px;
-                    }
-                    &:focus {
-                        text-decoration: none!important;
-                    }
-                    &.current-path {
-                        font-family: $font-bold;
-                        &:hover{
-                            opacity: 0.9;
-                            cursor: default;
-                        }
-                    }
-                }
-                
-            }
+        	display: inline;
+            padding:0;
 
-            li:last-child {
-                padding-right: 20px;
-                .link {
-                    padding-left: 3vw;
-                    padding-right: 0;
+            a {
+                cursor: pointer;
+                font-family: "Source Sans Pro Light";
+                font-size: 1.1em;
+                text-transform: none;
+                color: white;
+                margin: 11px 6px;
+                border-radius: 5px;
+                &:last-child {
+                	//margin-right: 0px;
                 }
+                &:hover, &.active {
+                    background-color: #2F9ED5;
+                    text-decoration: none!important;
+                    color: white;
+                    opacity: 1;
+                    border-radius: 3px;
+                }
+                &:focus {
+                    text-decoration: none!important;
+                }
+                &.current-path {
+                    font-family: $font-bold;
+                    &:hover{
+                        opacity: 0.9;
+                        cursor: default;
+                    }
+                }
+            }
+                
+        }
+
+        li:last-child {
+            padding-right: 20px;
+            .link {
+                padding-left: 3vw;
+                padding-right: 0;
             }
         }
 
@@ -238,25 +248,18 @@ $navbar-height: 50px;
                     width: 100%;
                     margin:0;
                     padding-top: $navbar-height;
-                    //opacity: 0.95;
+
                     .profile {
                         display: none;
                     }
-                    li {
+                    li, li div {
                         display:inline;
-                        .link {
-                            line-height: ($navbar-height/3)*2!important;
-                        }
-                        div {
-                            display: inline;
-                        }
-                        a {
-                            color: white;
-                            &:hover {
-                                color: $landing-color;
-                                background-color: white;
-                                opacity: 0.9;
-                            }
+                    }
+                        
+                    li a {
+                        color: white;
+                        &:hover {
+                            background-color: #2F9ED5;
                         }
                     }
                 }
@@ -285,10 +288,6 @@ $navbar-height: 50px;
 @keyframes slideOut {
 	from 	{ transform:translateX(0); }
 	to 		{ transform: translateX(50%); }
-}
-@keyframes slideDown {
-	from 	{ top: -$manage-height;}
-	to 		{ top: 0; }
 }
 
 @keyframes added {
@@ -360,7 +359,7 @@ $navbar-height: 50px;
 }
 
 .man-show {
-	animation: slideDown 0.5s both ease-in-out;
+	top: 0;
 }
 
 .view-wrapper, body {
@@ -391,7 +390,7 @@ body {
 	font-family: $font-regular;
 	font-size: 1.2em;
 	padding: 0;
-	background-color: $light-blue;
+	background-color: #eee;
 	height: 100%;
 	position: fixed;
 	left:0;
@@ -407,7 +406,10 @@ body {
 					text-shadow: 0px 0px 1px rgba(255,255,255,0.6);
 				}
 				&.active {
-					background-color: $blue;
+					background-color: #666;
+				}
+				&:not(.active) {
+					color: #666;
 				}
 			}
 			&.balance {
@@ -433,7 +435,6 @@ body {
 }
 
 #view {
-	margin-bottom: 5vh;
 	padding-left: 0;
 	padding-right: 0;
 	div[ng-view] {
@@ -720,67 +721,74 @@ body {
 }
 
 #manage {
-	min-height: $manage-height;
+	font-family: $font-regular;
+	font-size: 1.1em;
 	height: $manage-height;
-	background-color: #888;
-	border-radius: 0;
-	border:0;
-	margin-bottom: 0;
-	margin-top: 0;
-	.container-fluid {
-		height: $manage-height;
-		padding: -1px 5vw 0;
-		.navbar-header {
-			line-height: $manage-height;
-			height: $manage-height;
-			.app-title {
-				font-family: $font-extra-light;
-				color: white;
-				font-size: 2em;
-			}
-		}
-		.navbar-right {
-			font-family: $font-regular;
-			font-size: 1em;
-			height: $manage-height;
-			line-height: $manage-height;
+	background-color: $apps-bg;
+
+	.title {
+		margin-left: 30px;
+		position: inline;
+		line-height: 50px;
+	}
+	.right-tools {
+		position: inline;
+		float: right;
+	}
+
+	.navbar {
+		position: absolute;
+		width: 100%;
+		margin:0 -15px;
+		border-radius: 0;
+		border: 0;
+		border-top: 1px solid #ddd;
+		border-bottom: 1px solid #ddd;
+		background: white;
+	}
+	.delete {
+		color: red;
+		text-decoration: underline;
+		font-size: 1em;
+		&:hover {color: lighten(red, 25%)}
+	}
+
+	.secret {
+		color: $blue;
+		display: inline-block;
+		font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+		font-size: 15px;
+		min-width: 350px;
+		span span {font-size: 10px; margin-left: 3px; opacity: 0.6; color: darken($blue, 17%)}
+		a { font-family: $font-regular; text-decoration: underline}
+		span { cursor: pointer; }
+	}
+
+	.navbar-left {
+		margin-left: 30px;
+	}
+	.navbar-left a{
+		padding: 9px 11px;
+		margin: 9px;
+		border-radius: 4px;
+		color: #555;
+
+		&.active, &:hover {
 			color: white;
-			text-transform: uppercase;
-			margin-right: 3vw;
-			&:hover {
-				li {
-					a {
-						&>*{
-							border:0;
-						}
-					}
-				}
-			}
-			li {
-				a {
-					height: $manage-height;
-					line-height: $manage-height;
-					padding: 0 20px;
-					background-color: #888;
-					color: white;
-					&:hover {
-						background-color: #666;
-					}
-					&:active{
-
-					}
-				}
-			}
-
-			.underline {
-				border-bottom: 1px solid white;
-			}
+			background: #555;
 		}
+	}
+	.navbar-right {
+		color: #999;
+		line-height: 56px;
+		font-family: $font-light;
 	}
 }
 
 #browser {
-
+	background-color: white;
+	padding: 0 15px;
+	min-height: calc(100vh - 200px);
 	.node {
 		.status {
 			color: #666;
@@ -950,16 +958,21 @@ body {
 		}
 	}
 	.breadcrumb {
-		background-color: #aaa;
+		background-color: #ccc;
 		border-radius: 0;
-		color: white;
+		color: #222;
 		margin-bottom: 0;
+		margin-left: -15px;
+		margin-right: -15px;
 		.active {
 			color: white;
 		}
+		&> li + li:before{
+			color: #eee;
+		}
 		li {
 			a {
-				color: #eee;
+				color: white;
 				&:hover {
 					color: white;
 				}
@@ -1030,7 +1043,9 @@ body {
 
 #stats {
 	font-family: $font-extra-light;
+	padding: 0 15px;
 	margin-top: 15px;
+	background-color: $apps-bg;
 	.st-sum {
 		font-size: 1.2em;
 		margin-top: 10px;
@@ -1446,7 +1461,6 @@ body {
 			padding: 50px 0 30px;
 		}
 	}
-	background: white;
 	z-index:99999; 
 	.row {
 		padding:30px;
