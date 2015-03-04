@@ -136,7 +136,10 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $location.path('/billing');
   }
   $rootScope.goToDash = function(app) {
-    $location.path('/' + app + '/dash');
+    if(app) {
+      $rootScope.currentApp = app;
+      $location.path('/' + app + '/dash');
+    }
   }
   $rootScope.goToApps = function() {
     $location.path('/apps');
