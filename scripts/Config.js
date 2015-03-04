@@ -42,8 +42,17 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
 
   var apps = session.getApps();
 
-  if(apps && $rootScope.currentApp) {
-    $rootScope.currentSecret = getSecret(apps, $rootScope.currentApp);
+  if(apps.length) {
+    var profile = session.getProfile();
+    if(profile){
+      var order = localStorage.getItem(profile.uid + 'order');
+      if(order) {
+        order = JSON.parse(order);
+        $rootScope.currentApp = order[0];
+      } else {
+        $rootScope.currentApp = apps[0];
+      }
+    }
   }
   
   $rootScope.$watch('currentApp', function(app){
@@ -70,11 +79,55 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     }
   });
 
+  $rootScope.confirm = function(title, message, callback, field){
+    var a = new BootstrapDialog({
+        title: title,
+        message: message
+        + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
+        closable: false,
+        cssClass: 'modal-custom',
+        buttons: [{
+            label: 'Cancel',
+            cssClass: 'btn-no',
+            action: function(dialog) {
+                dialog.close();
+            }
+        }, {
+            label: 'Yes',
+            cssClass: 'btn-yes',
+            action: function(dialog) {
+              var input = dialog.getModalBody().find('.form-group');
+              var value = input.find('input').val();
+              if(!field) {callback();dialog.close();}
+              else if(value) callback(value);  
+            }
+        }]
+    }).open();
+  }
+
   function getSecret(apps, app){
+    if(angular.isObject(app)) {
+      return app.secret;
+    }
+
     return apps.filter(function(each){
       return each.name === app;
     })[0].secret;
   }
+
+  $rootScope.getAppFromName = getAppFromName;
+
+  function getAppFromName(name){
+    var apps = session.getApps();
+    if (apps && apps.length) {
+      var filter = apps.filter(function(each){
+        return each.name === name;
+      });
+
+      return filter.length ? filter[0] : null;
+    } else return null;
+  }
+
   $rootScope.goToInvite = function() {
     $location.path('/invite');
   }
@@ -82,9 +135,11 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.goToBilling = function() {
     $location.path('/billing');
   }
-
+  $rootScope.goToDash = function(app) {
+    $location.path('/' + app + '/dash');
+  }
   $rootScope.goToApps = function() {
-    $location.path('/');
+    $location.path('/apps');
   }
   $rootScope.goToBrowser = function(path) {
     session.setBrowserURL(path);
@@ -94,7 +149,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.goToStats = function(path){
     if(path) $rootScope.currentApp = path;
     else path = $rootScope.currentApp;
-    $location.path('/' + path + '/stats/');
+    $location.path('/' + path + '/dash/');
   }
   $rootScope.goToOauth = function(path){
     if(path) $rootScope.currentApp = path;
@@ -102,7 +157,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $location.path('/' + path + '/oauth/');
   }
   $rootScope.where = function(here){
-    if($location.path() === '/') return 'apps';
+    if($location.path() === '/' || $location.path() === '/apps') return 'apps';
     if($location.path() === '/invite') return 'invite';
     if($location.path() === '/billing') return 'billing';
     return $location.path().split('/')[2];
@@ -140,16 +195,20 @@ function Routes($routeProvider){
   }, billing = {
     controller: 'billing',
     templateUrl: '/developer/html/billing.html'
+  }, start = {
+    controller: 'start',
+    templateUrl: '/developer/html/start.html'
   };
 
   $routeProvider
-    .when('/', apps)
+    .when('/', start)
     .when('/invite', invite)
     .when('/billing', billing)
     .when('/signup', signup)
     .when('/:path/browser', browser)
-    .when('/:path/stats', stats)
+    .when('/:path/dash', stats)
     .when('/:path/oauth', oauth)
+    .when('/apps', apps)
     .otherwise({ redirectTo: '/' });
 }
 })();

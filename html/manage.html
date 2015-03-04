@@ -1,17 +1,17 @@
-<div id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['stats', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
+<div id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['dash', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
   <div class="container-fluid">
     <div class="title">
         <a href="/developer/#/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{$parent.currentApp}}
         <div class="right-tools">
-            <a href="" class="delete">Delete</a>
+            <a href="" ng-click="deleteApp($parent.currentApp)" class="delete">Delete</a>
         </div>
     </div>
     <nav class="navbar">
 
     	<ul class="nav navbar-nav navbar-left">
             <li>
-                <a ng-href="/developer/#/{{$parent.currentApp}}/stats"
-                   ng-class="{active: $parent.where()==='stats'}">
+                <a ng-href="/developer/#/{{$parent.currentApp}}/dash"
+                   ng-class="{active: $parent.where()==='dash'}">
                    Dashboard
                 </a>
             </li>

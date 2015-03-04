@@ -244,178 +244,6 @@ body {
   background-color: #f3f3f3;
   color: #555; }
 
-#nav {
-  position: relative;
-  z-index: 2;
-  background-color: #50BAEF; }
-  #nav.affix {
-    position: fixed;
-    background-color: #50BAEF !important; }
-    #nav.affix .navbar {
-      background-color: #50BAEF; }
-  #nav .navbar {
-    min-height: 60px;
-    background-color: #50BAEF;
-    border: 0;
-    margin: -2px 0 0;
-    border-radius: 0; }
-    #nav .navbar .container-fluid {
-      min-height: 60px;
-      padding: 0; }
-      @media screen and (min-width: 768px) {
-        #nav .navbar .container-fluid {
-          opacity: 0.94;
-          padding: 0 1vw; }
-          #nav .navbar .container-fluid .nav {
-            text-align: left; }
-            #nav .navbar .container-fluid .nav li {
-              padding: 0; }
-              #nav .navbar .container-fluid .nav li a {
-                padding: 0; }
-          #nav .navbar .container-fluid .navbar-header {
-            margin: 0 -15px; } }
-      @media screen and (min-width: 900px) {
-        #nav .navbar .container-fluid {
-          padding: 0 2.5vw; }
-          #nav .navbar .container-fluid .nav li {
-            padding: 0; }
-            #nav .navbar .container-fluid .nav li a {
-              padding: 9px 12px; } }
-      @media screen and (min-width: 1200px) {
-        #nav .navbar .container-fluid {
-          padding: 0 5.5vw; }
-          #nav .navbar .container-fluid .nav li {
-            padding: 0; } }
-      @media screen and (min-width: 1600px) {
-        #nav .navbar .container-fluid {
-          padding: 0 10vw; }
-          #nav .navbar .container-fluid .nav li {
-            padding: 0; } }
-      @media screen and (min-width: 2000px) {
-        #nav .navbar .container-fluid {
-          padding: 0 12vw; }
-          #nav .navbar .container-fluid .nav li {
-            padding: 0; } }
-    #nav .navbar .navbar-header {
-      margin: 0;
-      height: 60px;
-      line-height: 60px;
-      vertical-align: middle;
-      z-index: 15; }
-      #nav .navbar .navbar-header .navbar-toggle {
-        position: relative;
-        z-index: 21;
-        margin: 13px 20px; }
-        #nav .navbar .navbar-header .navbar-toggle .icon-bar {
-          background-color: white; }
-      #nav .navbar .navbar-header .navbar-brand {
-        position: relative;
-        z-index: 10;
-        padding: 12.5px 20px;
-        cursor: pointer; }
-        #nav .navbar .navbar-header .navbar-brand img {
-          height: 35px; }
-    #nav .navbar .nav {
-      position: relative;
-      z-index: 30;
-      margin: 0 inherit;
-      color: white;
-      font-family: "Source Sans Pro Regular"; }
-      #nav .navbar .nav #login_userInfo {
-        font-size: 1.15em;
-        margin-top: 15px;
-        margin-left: 15px;
-        line-height: 60px; }
-        #nav .navbar .nav #login_userInfo > span {
-          cursor: default; }
-        #nav .navbar .nav #login_userInfo .tooltip {
-          opacity: 0; }
-          #nav .navbar .nav #login_userInfo .tooltip:hover {
-            opacity: 0.6; }
-          #nav .navbar .nav #login_userInfo .tooltip .tooltip-inner {
-            font-family: "Source Sans Pro Light";
-            font-size: 2.5em;
-            background-color: brown;
-            height: 40px;
-            width: 40px;
-            border-radius: 20px;
-            cursor: pointer; }
-        #nav .navbar .nav #login_userInfo .circle {
-          float: right;
-          position: relative;
-          top: 10px;
-          height: 40px;
-          width: 40px;
-          margin-left: 15px; }
-          #nav .navbar .nav #login_userInfo .circle .overlay {
-            display: inline;
-            color: transparent; }
-            #nav .navbar .nav #login_userInfo .circle .overlay:hover {
-              color: black; }
-          #nav .navbar .nav #login_userInfo .circle img {
-            float: left;
-            vertical-align: top;
-            border-radius: 25px;
-            height: 40px;
-            width: 40px; }
-    #nav .navbar li {
-      display: inline;
-      padding: 0; }
-      #nav .navbar li a {
-        cursor: pointer;
-        font-family: "Source Sans Pro Light";
-        font-size: 1.1em;
-        text-transform: none;
-        color: white;
-        margin: 11px 6px;
-        border-radius: 5px; }
-        #nav .navbar li a:hover, #nav .navbar li a.active {
-          background-color: #2F9ED5;
-          text-decoration: none !important;
-          color: white;
-          opacity: 1;
-          border-radius: 3px; }
-        #nav .navbar li a:focus {
-          text-decoration: none !important; }
-        #nav .navbar li a.current-path {
-          font-family: "Source Sans Pro Bold"; }
-          #nav .navbar li a.current-path:hover {
-            opacity: 0.9;
-            cursor: default; }
-    #nav .navbar li:last-child {
-      padding-right: 20px; }
-      #nav .navbar li:last-child .link {
-        padding-left: 3vw;
-        padding-right: 0; }
-    #nav .navbar .navbar-collapse {
-      border-top: none;
-      width: 100%;
-      position: relative; }
-      #nav .navbar .navbar-collapse.in {
-        opacity: 1 !important; }
-      @media screen and (max-width: 768px) {
-        #nav .navbar .navbar-collapse {
-          opacity: 0;
-          position: relative;
-          top: -80px;
-          padding: 0 !important;
-          margin-left: 0;
-          margin-bottom: -130px;
-          background: #50BAEF; }
-          #nav .navbar .navbar-collapse .nav {
-            text-align: center;
-            width: 100%;
-            margin: 0;
-            padding-top: 60px; }
-            #nav .navbar .navbar-collapse .nav .profile {
-              display: none; }
-            #nav .navbar .navbar-collapse .nav li, #nav .navbar .navbar-collapse .nav li div {
-              display: inline; }
-            #nav .navbar .navbar-collapse .nav li a {
-              color: white; }
-              #nav .navbar .navbar-collapse .nav li a:hover {
-                background-color: #2F9ED5; } }
-
 @-webkit-keyframes slideOutLeft {
   100% {
     display: none; }
@@ -678,16 +506,16 @@ body {
   #applications .main-title {
     text-align: center;
     font-family: "Source Sans Pro Extra Light";
-    font-size: 3.5em;
-    color: #888;
-    padding: 50px 0 30px; }
+    font-size: 2.8em;
+    color: #666;
+    padding: 30px 0 15px; }
   #applications .loading {
-    line-height: 128px;
+    line-height: 100px;
     text-align: center; }
   #applications .fetching {
     position: absolute;
     left: 50%;
-    top: 90px;
+    top: 50px;
     width: 100px;
     height: 100px;
     line-height: 100px;
@@ -698,24 +526,28 @@ body {
       animation: fa-spin 1s infinite ease-in-out; }
   #applications .create-app {
     transition: margin-left 0.3s ease; }
-  @media (min-width: 992px) {
-    #applications .one {
-      margin-left: 25%; }
-    #applications .many {
-      margin-left: 0%; } }
   #applications .grayed {
     opacity: 0.5; }
   #applications .desc {
     font-size: 1.2em; }
   #applications .well {
-    background-color: #F2F2F2;
-    box-shadow: none;
+    background-color: #fdfdfd;
+    box-shadow: 1px 1px 1px #dedede;
     border: none;
     margin: 30px;
     padding: 25px 30px 15px;
-    border-radius: 15px;
+    border-radius: 5px;
     color: #888;
-    height: 170px; }
+    min-height: 170px; }
+    #applications .well table th {
+      font-family: "Source Sans Pro Semi Bold"; }
+    #applications .well table tr td {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      cursor: pointer;
+      text-align: left; }
     #applications .well .tip {
       text-align: center;
       line-height: 30px;
@@ -743,22 +575,6 @@ body {
       #applications .well input[readonly] {
         background-color: #e5e5e5;
         cursor: default; }
-    #applications .well .delete {
-      position: absolute;
-      right: 20px;
-      top: 6px;
-      overflow: hidden;
-      z-index: 2;
-      cursor: pointer; }
-      #applications .well .delete .can, #applications .well .delete .lid {
-        fill: transparent;
-        stroke: #ccc;
-        transition: fill 0.1s ease-out; }
-      #applications .well .delete svg:hover .can, #applications .well .delete svg:hover .lid {
-        stroke: transparent;
-        fill: #ff4136; }
-      #applications .well .delete svg:hover .lid {
-        stroke: transparent; }
     #applications .well .bar {
       margin-top: -4px; }
       #applications .well .bar > a {
@@ -822,6 +638,8 @@ body {
         background-color: #d33232; }
     #applications .well .manage-button {
       text-align: right; }
+  #applications .create-app [ng-model="newAppname"] {
+    background-color: #f3f3f3; }
   #applications .get-started {
     font-family: "Source Sans Pro Extra Light"; }
     #applications .get-started .title {
@@ -1342,7 +1160,8 @@ body {
   margin: 0 auto;
   height: 100%;
   width: 100%;
-  top: 40vh; }
+  top: 40vh;
+  z-index: 1000; }
 
 #invite {
   font-family: "Source Sans Pro Extra Light"; }

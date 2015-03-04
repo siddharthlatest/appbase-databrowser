@@ -19,14 +19,14 @@
 		</div>
 	</div>
 </div>
-<div ng-hide="!$parent.db_loading" id="loading">
-	<span class="fa fa-refresh ab-spin fa-2x"></span> 
+<div ng-show="$parent.db_loading" id="loading">
+	<span class="fa fa-refresh fa-spin fa-2x"></span> 
 </div>
 
 <script src="https://js.stripe.com/v2/"></script>
 <script src="/developer/dist/vendor.min.js"></script>
 <script src="/vendor/appbase/appbase.min.js"></script>
-<script src="https://cdn.appbase.io/latest/ng-appbase.js"></script>
+<script src="/vendor/appbase/ng-appbase.js"></script> 
 <script src="/developer/dist/main.js"></script>
 <script src="/vendor/analytics.js"></script>
 </body>

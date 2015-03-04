@@ -5,16 +5,13 @@ angular
 
 function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
   $scope.status = "Loading";
-  var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
   $scope.apps = session.getApps();
-  $scope.app = session.appFromName(appName);
+  $scope.app = $rootScope.getAppFromName($rootScope.currentApp);
 
-  if(!appName || !$scope.app) {
+  if(!$scope.app) {
     $rootScope.goToApps();
-  } else {
-    $rootScope.currentApp = appName;
   }
+
   $scope.cap = 100000;
   $rootScope.$watch('balance', function(val){
     $scope.cap = val || 100000;

@@ -167,7 +167,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
       $scope.domains = oauth.domains;
       if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
       if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
-      console.log(oauth)
       $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
     });
     if(oauth.keysets.length){

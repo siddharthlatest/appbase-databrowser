@@ -8,203 +8,55 @@
                 <span class="fa fa-refresh ab-spin"></span>
             </div>
         </div>
-        <div class="form-horizontal col-md-6 col-xs-12 col-hg-4 create-app" ng-class="noApps?'one':'many' ">
-            <div class="row wrapper well test" ng-submit="createApp(newAppname); newAppname ='' ;">
-                <form>
-                    <div class="form-group new-app input-line">
-                        <div class="col-xs-12">
-                            <input type="text"
-                                   pattern="^[a-z0-9_]*$"
-                                   ng-required="true"
-                                   class="form-control"
-                                   placeholder="App name"
-                                   ng-model="newAppname" />
+        <div class="col-xs-12 text-center">
+            <div class="form-horizontal col-md-8 col-xs-12 create-app col-md-offset-2">
+                <div class="row wrapper well test" ng-submit="createApp(newAppname); newAppname ='' ;">
+                    <form>
+                        <div class="form-group new-app input-line">
+                            <div class="col-xs-12">
+                                <input type="text"
+                                       pattern="^[a-z0-9_]*$"
+                                       ng-required="true"
+                                       class="form-control"
+                                       placeholder="App name"
+                                       ng-model="newAppname" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-xs-12">
-                            <button class="form-control btn btn-success" type="submit" id="createuserapp">
-                                Create App
-                            </button>
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <button class="form-control btn btn-success" type="submit" id="createuserapp">
+                                    Create App
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="col-xs-12 tip">
-                        <span class="text-info">
-                            Use only lowercase letters (a-z), numbers, and underscores.
-                        </span>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="form-horizontal col-md-6 col-xs-12 col-hg-4 grayed"
-             ng-repeat="one in [1,2,3,4,5]"
-             ng-show="!apps.length && fetching && !creating">
-            <div class="row wrapper well test">
-                <div class="form-group input-line">
-                    <label class="col-lg-3 col-xs-4 control-label empty"></label>
-                    <div class="col-lg-9 col-xs-8">
-                        <input type="text" class="form-control" readonly/>
-                    </div>
-                </div>
-                <div class="form-group input-line">
-                    <label class="col-lg-3 col-xs-4 control-label empty"></label>
-                    <div class="col-lg-9 col-xs-8">
-                        <input type="text" class="form-control" readonly/>
-                    </div>
-                </div>
-                <div class="bar text-center">
+                        
+                        <div class="col-xs-12 tip">
+                            <span class="text-info">
+                                Use only lowercase letters (a-z), numbers, and underscores.
+                            </span>
+                        </div>
+                    </form>
+                    <table class="table table-hover" ng-show="apps.length">
+                        <tr>
+                            <th>Name</th>
+                            <th>Total records</th>
+                            <th>Total calls</th>
+                        </tr>
+                        <tr ng-repeat="app in apps"
+                            ng-click="goToDash(app.name)"
+                            ng-class="fetching ? 'grayed':''"
+                            ng-show="deleting !== app.name" >
 
-                    <a class="col-xs-3">
-                        <svg class="share" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="65.979px" height="50.515px" viewBox="0 0 65.979 50.515" enable-background="new 0 0 65.979 50.515" xml:space="preserve">
-                        <g>
-                            <path class="icon" d="M43.371,21.472H40.32v-3.143c0-0.027-0.104-0.053-0.129-0.053h-2.246c-0.025,0-0.021,0.026-0.021,0.053
-                                v3.143h-3.158c-0.025,0-0.037,0.01-0.037,0.036v2.246c0,0.026,0.012,0.115,0.037,0.115h3.158v3.064
-                                c0,0.027-0.004,0.131,0.021,0.131h2.246c0.027,0,0.129-0.104,0.129-0.131v-3.064h3.051c0.025,0,0.146-0.088,0.146-0.115v-2.246
-                                C43.517,21.481,43.396,21.472,43.371,21.472z"/>
-                            <path class="icon" d="M34.25,24.709c-0.314,0-0.557-0.342-0.557-0.656v-2.866c0-0.316,0.242-0.557,0.557-0.557h2.488v-2.484
-                                c-0.998-1.183-2.332-2.082-3.863-2.547c1.535-0.845,2.576-2.469,2.576-4.335c0-2.734-2.232-4.952-4.99-4.952
-                                c-2.754,0-4.988,2.217-4.988,4.952c0,1.867,1.041,3.491,2.578,4.335c-3.326,1.009-5.742,4.051-5.742,7.647
-                                c0,4.421,3.65,5.182,8.152,5.182c2.525,0,4.781-0.24,6.277-1.229v-2.49H34.25z"/>
-                        </g>
-                        </svg>
-                        <div class="empty"></div>
-                    </a>
+                           <td ng-bind="app.name"></td>
+                           <td>{{app.metrics ? app.metrics.totalRec : '0'}}</td>
+                           <td>{{app.metrics ? app.metrics.totalCalls : '0'}}</td>
 
-                    <a class="col-xs-3">
-                        <svg class="auth" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="73.5px" height="50.515px" viewBox="0 0 72.667 50.515" enable-background="new 0 0 72.667 50.515" xml:space="preserve">
-                        <g>
-                            <path class="icon" d="M45.914,11.649l-2.611-2.958c0,0-3.018,2.688-6.207-0.003c-3.191,2.69-6.209,0.003-6.209,0.003
-                                l-2.611,2.958c0,0,2.078,1.393,0.873,4.686c-1.365,3.728-1.744,9.117,7.947,13.021c9.691-3.904,9.311-9.293,7.945-13.021
-                                C43.835,13.042,45.914,11.649,45.914,11.649z M36.4,22.678c-0.225,0.225-0.518,0.337-0.811,0.337s-0.588-0.112-0.813-0.337
-                                l-3.014-3.012l1.623-1.625l2.201,2.202l5.215-5.214l1.623,1.624L36.4,22.678z"/>
-                        </g>
-                        </svg>
-                        <div class="empty dbrowser"></div>
-                    </a>
-
-                    <a class="col-xs-3">
-                        <svg class="dbrowser" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="72.667px" height="50.515px" viewBox="0 0 72.667 50.515" enable-background="new 0 0 72.667 50.515" xml:space="preserve">
-                        <path class="icon" d="M46.247,6.973c-0.801,0-1.508,0.409-1.924,1.028l-7.642-2.1c0.021-0.156,0.036-0.314,0.036-0.471
-                            c0-1.881-1.523-3.404-3.398-3.404c-1.879,0-3.402,1.523-3.402,3.404c0,1.49,0.966,2.757,2.306,3.213l-0.655,4.109
-                            c-0.332-0.071-0.675-0.112-1.033-0.112c-2.676,0-4.842,2.169-4.842,4.843c0,2.677,2.166,4.845,4.842,4.845
-                            c2.674,0,4.846-2.168,4.846-4.845c0-0.693-0.148-1.349-0.41-1.946l9.383-4.917c0.418,0.597,1.113,0.989,1.895,0.989
-                            c1.285,0,2.322-1.038,2.322-2.318C48.569,8.009,47.532,6.973,46.247,6.973z M34.571,14.813c-0.533-0.81-1.303-1.446-2.21-1.814
-                            l0.669-4.186c0.096,0.008,0.188,0.012,0.289,0.012c1.428,0,2.65-0.88,3.149-2.129l7.523,2.071c-0.035,0.166-0.061,0.342-0.061,0.523
-                            c0,0.2,0.028,0.394,0.076,0.581L34.571,14.813z"/>
-                        </svg>
-                        <div class="empty auth"></div>
-                    </a>
-
-                    <a class="col-xs-3">
-                        <svg class="analytic" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="72.667px" height="50.515px" viewBox="0 0 72.667 50.515" enable-background="new 0 0 72.667 50.515" xml:space="preserve">
-                        <path class="icon" d="M40.635,3.689c-6.211,0-11.244,5.034-11.244,11.244c0,6.21,5.033,11.244,11.244,11.244
-                            c6.21,0,11.245-5.033,11.245-11.244C51.88,8.723,46.845,3.689,40.635,3.689z M50.708,15.125l-3.465-0.038l-0.852,2.858l-1.023-0.06
-                            l-1.219-6.958l-1.799,5.4l-0.984,0.04l-1.23-2.901l-1.723,6.82l-1.027-0.021l-1.699-8.141l-1.231,4.29l-0.501,0.835h-2.632
-                            c-0.292,0-0.527-0.209-0.527-0.5c0-0.291,0.235-0.5,0.527-0.5h2.249l1.725-5.844l1.016-0.193l1.639,7.728l1.547-6.187l0.996-0.107
-                            l1.298,3.044l2.018-6.062l1.019,0.071l1.192,6.809l0.328-1.101l0.51-0.376l3.862,0.042c0.289,0.002,0.522,0.241,0.52,0.532
-                            C51.237,14.895,51,15.145,50.708,15.125z"/>
-                        </svg>
-                        <div class="empty"></div>
-                    </a>
-
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="form-horizontal col-md-6 col-xs-12 col-hg-4" ng-repeat="app in apps" ng-class="fetching ? 'grayed':''" ng-show="deleting !== app.name" ng-mouseover="appHover=app.name" ng-mouseleave="appHover=0">
-            <div class="row wrapper well">
-                <div class="form-group input-line">
-                    <label class="col-lg-3 col-xs-4 control-label">App name</label>
-                    <div class="col-lg-9 col-xs-8">
-                        <input type="text"
-                               class="form-control"
-                               placeholder="App name"
-                               readonly ng-value="app.name">
-                        <div class="delete" ng-show="appHover===app.name" ng-click="deleteApp(app.name)">
-                            <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg">
-                             <g>
-                               <path class="can" d="m16.504,18.084v-12.378h-11.425v12.378999c0,1.047001 0.855,1.905001 1.904,1.905001h7.617c1.047,-0.000999 1.903999,-0.858 1.903999,-1.906l0,0l0,0l0,0l0,0z"/>
-                               <polygon class="lid" points="13.64699935913086,2.8489999771118164 12.695999145507812,1.8959999084472656 8.887001037597656,1.8959999084472656 7.933998107910156,2.8489999771118164 4.125,2.8489999771118164 4.125,4.753000259399414 6.030000686645508,4.753000259399414 15.553001403808594,4.753000259399414 17.45800018310547,4.753000259399414 17.45800018310547,2.8489999771118164 "/>
-                             </g>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group input-line">
-                    <label for="inputAppsecret" class="col-lg-3 col-xs-4 control-label">App Secret</label>
-                    <div class="col-lg-9 col-xs-8">
-                        <input type="text"
-                               class="form-control"
-                               placeholder="App Secret"
-                               readonly ng-value="app.secret" />
-                    </div>
-                </div>
-                <div class="bar text-center">
-
-                    <a class="col-xs-3" ng-click="share()">
-                        <svg class="share" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="65.979px" height="50.515px" viewBox="0 0 65.979 50.515" enable-background="new 0 0 65.979 50.515" xml:space="preserve">
-                        <g>
-                            <path class="icon" d="M43.371,21.472H40.32v-3.143c0-0.027-0.104-0.053-0.129-0.053h-2.246c-0.025,0-0.021,0.026-0.021,0.053
-                                v3.143h-3.158c-0.025,0-0.037,0.01-0.037,0.036v2.246c0,0.026,0.012,0.115,0.037,0.115h3.158v3.064
-                                c0,0.027-0.004,0.131,0.021,0.131h2.246c0.027,0,0.129-0.104,0.129-0.131v-3.064h3.051c0.025,0,0.146-0.088,0.146-0.115v-2.246
-                                C43.517,21.481,43.396,21.472,43.371,21.472z"/>
-                            <path class="icon" d="M34.25,24.709c-0.314,0-0.557-0.342-0.557-0.656v-2.866c0-0.316,0.242-0.557,0.557-0.557h2.488v-2.484
-                                c-0.998-1.183-2.332-2.082-3.863-2.547c1.535-0.845,2.576-2.469,2.576-4.335c0-2.734-2.232-4.952-4.99-4.952
-                                c-2.754,0-4.988,2.217-4.988,4.952c0,1.867,1.041,3.491,2.578,4.335c-3.326,1.009-5.742,4.051-5.742,7.647
-                                c0,4.421,3.65,5.182,8.152,5.182c2.525,0,4.781-0.24,6.277-1.229v-2.49H34.25z"/>
-                        </g>
-                        </svg>
-                        <div>Share</div>
-                    </a>
-
-                    <a class="col-xs-3" ng-href="#{{app.name}}/oauth">
-                        <svg class="auth" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="73.5px" height="50.515px" viewBox="0 0 72.667 50.515" enable-background="new 0 0 72.667 50.515" xml:space="preserve">
-                        <g>
-                            <path class="icon" d="M45.914,11.649l-2.611-2.958c0,0-3.018,2.688-6.207-0.003c-3.191,2.69-6.209,0.003-6.209,0.003
-                                l-2.611,2.958c0,0,2.078,1.393,0.873,4.686c-1.365,3.728-1.744,9.117,7.947,13.021c9.691-3.904,9.311-9.293,7.945-13.021
-                                C43.835,13.042,45.914,11.649,45.914,11.649z M36.4,22.678c-0.225,0.225-0.518,0.337-0.811,0.337s-0.588-0.112-0.813-0.337
-                                l-3.014-3.012l1.623-1.625l2.201,2.202l5.215-5.214l1.623,1.624L36.4,22.678z"/>
-                        </g>
-                        </svg>
-                        <div>Authentication</div>
-                    </a>
-
-                    <a class="col-xs-3" ng-href="#{{app.name}}/browser">
-                        <svg class="dbrowser" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="72.667px" height="50.515px" viewBox="0 0 72.667 50.515" enable-background="new 0 0 72.667 50.515" xml:space="preserve">
-                        <path class="icon" d="M46.247,6.973c-0.801,0-1.508,0.409-1.924,1.028l-7.642-2.1c0.021-0.156,0.036-0.314,0.036-0.471
-                            c0-1.881-1.523-3.404-3.398-3.404c-1.879,0-3.402,1.523-3.402,3.404c0,1.49,0.966,2.757,2.306,3.213l-0.655,4.109
-                            c-0.332-0.071-0.675-0.112-1.033-0.112c-2.676,0-4.842,2.169-4.842,4.843c0,2.677,2.166,4.845,4.842,4.845
-                            c2.674,0,4.846-2.168,4.846-4.845c0-0.693-0.148-1.349-0.41-1.946l9.383-4.917c0.418,0.597,1.113,0.989,1.895,0.989
-                            c1.285,0,2.322-1.038,2.322-2.318C48.569,8.009,47.532,6.973,46.247,6.973z M34.571,14.813c-0.533-0.81-1.303-1.446-2.21-1.814
-                            l0.669-4.186c0.096,0.008,0.188,0.012,0.289,0.012c1.428,0,2.65-0.88,3.149-2.129l7.523,2.071c-0.035,0.166-0.061,0.342-0.061,0.523
-                            c0,0.2,0.028,0.394,0.076,0.581L34.571,14.813z"/>
-                        </svg>
-                        <div>Browser</div>
-                    </a>
-
-                    <a class="col-xs-3" ng-href="#{{app.name}}/stats">
-                        <svg class="analytic" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                             width="72.667px" height="50.515px" viewBox="0 0 72.667 50.515" enable-background="new 0 0 72.667 50.515" xml:space="preserve">
-                        <path class="icon" d="M40.635,3.689c-6.211,0-11.244,5.034-11.244,11.244c0,6.21,5.033,11.244,11.244,11.244
-                            c6.21,0,11.245-5.033,11.245-11.244C51.88,8.723,46.845,3.689,40.635,3.689z M50.708,15.125l-3.465-0.038l-0.852,2.858l-1.023-0.06
-                            l-1.219-6.958l-1.799,5.4l-0.984,0.04l-1.23-2.901l-1.723,6.82l-1.027-0.021l-1.699-8.141l-1.231,4.29l-0.501,0.835h-2.632
-                            c-0.292,0-0.527-0.209-0.527-0.5c0-0.291,0.235-0.5,0.527-0.5h2.249l1.725-5.844l1.016-0.193l1.639,7.728l1.547-6.187l0.996-0.107
-                            l1.298,3.044l2.018-6.062l1.019,0.071l1.192,6.809l0.328-1.101l0.51-0.376l3.862,0.042c0.289,0.002,0.522,0.241,0.52,0.532
-                            C51.237,14.895,51,15.145,50.708,15.125z"/>
-                        </svg>
-                        <div>Analytics</div>
-                    </a>
-
-                </div>
-            </div>
-        </div>
+        
     </div>
     <div class="get-started" ng-show="noCalls">
         <div class="title">

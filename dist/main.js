@@ -42,8 +42,17 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
 
   var apps = session.getApps();
 
-  if(apps && $rootScope.currentApp) {
-    $rootScope.currentSecret = getSecret(apps, $rootScope.currentApp);
+  if(apps.length) {
+    var profile = session.getProfile();
+    if(profile){
+      var order = localStorage.getItem(profile.uid + 'order');
+      if(order) {
+        order = JSON.parse(order);
+        $rootScope.currentApp = order[0];
+      } else {
+        $rootScope.currentApp = apps[0];
+      }
+    }
   }
   
   $rootScope.$watch('currentApp', function(app){
@@ -70,11 +79,55 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     }
   });
 
+  $rootScope.confirm = function(title, message, callback, field){
+    var a = new BootstrapDialog({
+        title: title,
+        message: message
+        + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
+        closable: false,
+        cssClass: 'modal-custom',
+        buttons: [{
+            label: 'Cancel',
+            cssClass: 'btn-no',
+            action: function(dialog) {
+                dialog.close();
+            }
+        }, {
+            label: 'Yes',
+            cssClass: 'btn-yes',
+            action: function(dialog) {
+              var input = dialog.getModalBody().find('.form-group');
+              var value = input.find('input').val();
+              if(!field) {callback();dialog.close();}
+              else if(value) callback(value);  
+            }
+        }]
+    }).open();
+  }
+
   function getSecret(apps, app){
+    if(angular.isObject(app)) {
+      return app.secret;
+    }
+
     return apps.filter(function(each){
       return each.name === app;
     })[0].secret;
   }
+
+  $rootScope.getAppFromName = getAppFromName;
+
+  function getAppFromName(name){
+    var apps = session.getApps();
+    if (apps && apps.length) {
+      var filter = apps.filter(function(each){
+        return each.name === name;
+      });
+
+      return filter.length ? filter[0] : null;
+    } else return null;
+  }
+
   $rootScope.goToInvite = function() {
     $location.path('/invite');
   }
@@ -82,9 +135,11 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.goToBilling = function() {
     $location.path('/billing');
   }
-
+  $rootScope.goToDash = function(app) {
+    $location.path('/' + app + '/dash');
+  }
   $rootScope.goToApps = function() {
-    $location.path('/');
+    $location.path('/apps');
   }
   $rootScope.goToBrowser = function(path) {
     session.setBrowserURL(path);
@@ -94,7 +149,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   $rootScope.goToStats = function(path){
     if(path) $rootScope.currentApp = path;
     else path = $rootScope.currentApp;
-    $location.path('/' + path + '/stats/');
+    $location.path('/' + path + '/dash/');
   }
   $rootScope.goToOauth = function(path){
     if(path) $rootScope.currentApp = path;
@@ -102,7 +157,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $location.path('/' + path + '/oauth/');
   }
   $rootScope.where = function(here){
-    if($location.path() === '/') return 'apps';
+    if($location.path() === '/' || $location.path() === '/apps') return 'apps';
     if($location.path() === '/invite') return 'invite';
     if($location.path() === '/billing') return 'billing';
     return $location.path().split('/')[2];
@@ -140,16 +195,20 @@ function Routes($routeProvider){
   }, billing = {
     controller: 'billing',
     templateUrl: '/developer/html/billing.html'
+  }, start = {
+    controller: 'start',
+    templateUrl: '/developer/html/start.html'
   };
 
   $routeProvider
-    .when('/', apps)
+    .when('/', start)
     .when('/invite', invite)
     .when('/billing', billing)
     .when('/signup', signup)
     .when('/:path/browser', browser)
-    .when('/:path/stats', stats)
+    .when('/:path/dash', stats)
     .when('/:path/oauth', oauth)
+    .when('/apps', apps)
     .otherwise({ redirectTo: '/' });
 }
 })();
@@ -186,124 +245,74 @@ angular
 
 function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, $appbase) {
   $scope.api = false;
-  Prism.highlightAll();
-  $scope.devProfile = session.getProfile();
-  if($scope.devProfile) {
-    $rootScope.devProfile = $scope.devProfile;
-    var fetchApps = function(done) {
-      $scope.fetching = true;
-      session.fetchApps(function(){
-        $scope.fetching = false;
-        oauthFactory.updateApps();
-        $scope.apps = session.getApps();
-        $scope.$apply();
-      });
+  $scope.devProfile = $rootScope.devProfile = session.getProfile();
+  $scope.apps = session.getApps() || [];
+
+  $rootScope.db_loading = !$scope.apps;
+  $scope.fetching = true;
+
+  $rootScope.loadApps(function(){
+    $timeout(function(){
+      $scope.apps = session.getApps();
+      $scope.fetching = false;
       $rootScope.db_loading = false;
-    }
-    $scope.createApp = function (app) {
-      $scope.creating = true;
-      data.createApp(app, function(error) {
-        if(error) {
-          $scope.creating = false;
-          alert('Name taken. Try another name.');
-        } else {
-          fetchApps(function(){
-            $scope.creating = false;
-          });
-        } 
-      })
-    }
-
-    $scope.deleteApp = function(app) {
-      var a = new BootstrapDialog({
-          title: 'Delete app',
-          message: 'Are you sure you want to delete <span class="bold">' + app +
-          '</span>?<br>Enter the app name to confirm.<br><br>'
-          + '<div class="form-group"><input type="text" class="form-control" /></div>'
-          ,
-          closable: false,
-          cssClass: 'modal-custom',
-          buttons: [{
-              label: 'Cancel',
-              cssClass: 'btn-no',
-              action: function(dialog) {
-                  dialog.close();
-              }
-          }, {
-              label: 'Yes',
-              cssClass: 'btn-yes',
-              action: function(dialog) {
-                var input = dialog.getModalBody().find('.form-group');
-                var value = input.find('input').val();
-                console.log(value, app)
-                if(value === app){
-                  $scope.deleting = app;
-                  data.deleteApp(app, function(error) {
-                    if(error){
-                      $scope.deleting = '';
-                      throw error;
-                    }
-                    else fetchApps(function(){
-                      $scope.deleting = '';
-                    });
-                  });
-                  dialog.close();
-                } else {
-                  input.addClass('has-error');
-                }
-              }
-          }]
-      }).open();
-    }
-
-    $scope.firstAPICall = function() {
-      BootstrapDialog.show({
-        message: $('<div></div>').load('/include/modal-api.html'),
-        cssClass: 'modal-custom modal-examples',
-        title: "Let's get kicking"
-      });
-    }
-
-    $scope.examplesModal = function() {
-      BootstrapDialog.show({
-        message: $('<div></div>').load('/include/modal-examples.html'),
-        cssClass: 'modal-custom modal-examples',
-        title: "Example Recipes"
-      });
-    }
-
-    $scope.docsModal = function() {
-      BootstrapDialog.show({
-        message: $('<div></div>').load('/include/modal-docs.html'),
-        cssClass: 'modal-custom modal-examples',
-        title: "Docs"
-      });
-    }
-
-    $scope.share = function() {
-      BootstrapDialog.show({
-        message: 'Coming soon.',
-        cssClass: 'modal-custom modal-examples',
-        title: "Sharing"
-      });
-    }
-
-    document.addEventListener('logout', function(evnt) {
-      $timeout(function(){
-        $rootScope.logged = false;
-        $appbase.unauth();
-        session.setApps([]);
-        session.setProfile(null);
-        $route.reload();
-      });
     });
+  });
 
-    $scope.appToURL = stringManipulation.appToURL;
-    $scope.apps = session.getApps() || [];
-    fetchApps();
-  } else {
-    $rootScope.db_loading = false;
+  $scope.createApp = function (app) {
+    $scope.creating = true;
+    $scope.fetching = true;
+    data.createApp(app, function(error) {
+      if(error) {
+        $scope.creating = false;
+        $scope.fetching = false;
+        alert('Name taken. Try another name.');
+      } else {
+        $rootScope.loadApps(function(){
+          $timeout(function(){
+            $scope.apps = session.getApps();
+            $scope.creating = false;
+            $scope.fetching = false;
+            $rootScope.goToDash(app);
+          });
+        });
+      } 
+    })
   }
+
+  $scope.firstAPICall = function() {
+    BootstrapDialog.show({
+      message: $('<div></div>').load('/include/modal-api.html'),
+      cssClass: 'modal-custom modal-examples',
+      title: "Let's get kicking"
+    });
+  }
+
+  $scope.examplesModal = function() {
+    BootstrapDialog.show({
+      message: $('<div></div>').load('/include/modal-examples.html'),
+      cssClass: 'modal-custom modal-examples',
+      title: "Example Recipes"
+    });
+  }
+
+  $scope.docsModal = function() {
+    BootstrapDialog.show({
+      message: $('<div></div>').load('/include/modal-docs.html'),
+      cssClass: 'modal-custom modal-examples',
+      title: "Docs"
+    });
+  }
+
+  $scope.share = function() {
+    BootstrapDialog.show({
+      message: 'Coming soon.',
+      cssClass: 'modal-custom modal-examples',
+      title: "Sharing"
+    });
+  }
+
+  $scope.appToURL = stringManipulation.appToURL;
 }
 })();
 (function(){
@@ -842,9 +851,12 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
       var existing = session.getApps();
       var first = !existing.length;
       if(first){
-        var order = localStorage.getItem(session.getProfile().uid + 'order');
-        if(order) order = JSON.parse(order);
-        else first = false;
+        var profile = session.getProfile();
+        if(profile) {
+          var order = localStorage.getItem(profile.uid + 'order');
+          if(order) order = JSON.parse(order);
+          else first = false;
+        }
       }
       existing.forEach(function(app, index){
         var newRef = apps.filter(function(newApp){
@@ -877,6 +889,25 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
           return a_index - b_index;
         });
       }
+      //console.time('total')
+      existing.forEach(function(app){
+        //console.time(app.name);
+        app.metrics.totalRec = 0;
+        app.metrics.totalRec += parseInt(app.metrics.edgesAndVertices.Vertices) || 0;
+        app.metrics.totalRec += parseInt(app.metrics.edgesAndVertices.Edges) || 0;
+
+        var total = 0;
+        var calls = app.metrics.calls && Object.keys(app.metrics.calls);
+        if(calls && calls.length) {
+          calls.forEach(function(call){
+            total += call.indexOf('APICalls') !== -1 ? app.metrics.calls[call] : 0;
+          });
+        }
+
+        app.metrics.totalCalls = total;
+        //console.timeEnd(app.name);
+      });
+      //console.timeEnd('total')
       session.setApps(existing);
       if(done) done();
     });
@@ -1092,12 +1123,10 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
     }
     atomic.post(atob(server)+'app/'+ appName +'/search', request)
       .success(function(result) {
-        console.log(result)
-        done()
+        done();
       })
       .error(function(error) {
-        console.log(error)
-        throw error
+        throw error;
       })
   }
 
@@ -1132,10 +1161,8 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
-        console.log('success')
         atomic.delete(atob(server)+'user/' + getEmail(), {'appname' : app})
           .success(function(response){
-            console.log(response)
             done();
           })
       })
@@ -1472,7 +1499,9 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
               var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name,nsObj.searchable));
               if(!initialPoll) {
                 p--;
-                $timeout(function(){root.children[p]['added'] = true; console.log(root.children[p])});
+                $timeout(function(){
+                  root.children[p]['added'] = true;
+                });
 
                 $timeout(function(){
                   root.children[p]['added'] = false;
@@ -1585,15 +1614,30 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
       ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
     }    
     vertex.isV = true
+    vertex.page = 0;
+
+    vertex.nextPage = function(){
+      if(vertex.children.length === 25) {
+        vertex.page++;
+        vertex.expand();
+      }
+    }
+
+    vertex.prevPage = function(){
+      if(vertex.page > 0) {
+        vertex.page--;
+        vertex.expand();
+      }
+    }
 
     vertex.expand = function() {
       vertex.expanded = true;
       vertex.loading = true;
-      vertex.children = vertex.ref.bindEdges($scope,$.extend({}, vertexBindCallbacks,{onComplete: function(){
+      vertex.children=vertex.ref.bindEdges($scope,$.extend({},vertexBindCallbacks,{onComplete: function(a){
         $timeout(function(){
           vertex.loading = false;
         });
-      }}));
+      }}), function(){}, {limit: 25, skip: vertex.page * 25 });
     }
 
     vertex.meAsRoot = function() {
@@ -1885,7 +1929,6 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
       $scope.domains = oauth.domains;
       if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
       if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
-      console.log(oauth)
       $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
     });
     if(oauth.keysets.length){
@@ -2178,16 +2221,13 @@ angular
 
 function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
   $scope.status = "Loading";
-  var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
   $scope.apps = session.getApps();
-  $scope.app = session.appFromName(appName);
+  $scope.app = $rootScope.getAppFromName($rootScope.currentApp);
 
-  if(!appName || !$scope.app) {
+  if(!$scope.app) {
     $rootScope.goToApps();
-  } else {
-    $rootScope.currentApp = appName;
   }
+
   $scope.cap = 100000;
   $rootScope.$watch('balance', function(val){
     $scope.cap = val || 100000;
@@ -2288,6 +2328,126 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
   }
   $rootScope.db_loading = false;
   $scope.status = false;
+}
+
+})();
+(function(){
+angular
+.module("AppbaseDashboard")
+.controller('start', Start)
+.run(Authenticate);
+
+function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $timeout, data, $location) {
+  $rootScope.devProfile = session.getProfile();
+  if(!$rootScope.devProfile) {
+    $rootScope.db_loading = false;
+  } else {
+    loadApps();
+  }
+
+  document.addEventListener('logout', function() {
+    $timeout(function(){
+      $rootScope.logged = false;
+      $appbase.unauth();
+      session.setApps([]);
+      session.setProfile(null);
+      $route.reload();
+    });
+  });
+
+  document.addEventListener('login', loadApps);
+
+  $rootScope.loadApps = loadApps;
+
+  function loadApps(callback){
+    console.time('load')
+    session.fetchApps(function(){
+      $timeout(function(){
+        console.timeEnd('load')
+        $rootScope.$broadcast('appsLoaded');
+        $rootScope.apps = session.getApps();
+        $rootScope.db_loading = false;
+        if(angular.isFunction(callback)) callback($rootScope.apps);
+      });
+      oauthFactory.updateApps();
+    });
+  }
+
+  $rootScope.deleteApp = function(app) {
+    var a = new BootstrapDialog({
+        title: 'Delete app',
+        message: 'Are you sure you want to delete <span class="bold">' + app +
+        '</span>?<br>Enter the app name to confirm.<br><br>'
+        + '<div class="form-group"><input type="text" class="form-control" /></div>'
+        ,
+        closable: false,
+        cssClass: 'modal-custom',
+        buttons: [{
+            label: 'Cancel',
+            cssClass: 'btn-no',
+            action: function(dialog) {
+                dialog.close();
+            }
+        }, {
+            label: 'Yes',
+            cssClass: 'btn-yes',
+            action: function(dialog) {
+              var input = dialog.getModalBody().find('.form-group');
+              var value = input.find('input').val();
+              if(value === app){
+                $rootScope.deleting = app;
+                data.deleteApp(app, function(error) {
+                  if(error){
+                    $rootScope.deleting = '';
+                    throw error;
+                  }
+                  else {
+                    $rootScope.$apply(function(){
+                      $location.path('/apps');
+                    });
+                  }
+                });
+                dialog.close();
+              } else {
+                input.addClass('has-error');
+              }
+            }
+        }]
+    }).open();
+  }
+}
+
+function Start($rootScope, session, $location, $scope, $timeout) {
+  var user = session.getProfile();
+  var apps = session.getApps();
+  var currentApp = $rootScope.currentApp;
+
+  if(currentApp) {
+  	$location.path(currentApp + '/dash');
+  } else {
+    $rootScope.loadApps(function(apps){
+      if(!apps.length) {
+        $timeout(function(){
+          tutorial();
+        });
+      } else {
+        $location.path('/apps');
+      }
+    });
+  }
+
+  function tutorial(){
+    // To do: tutorial
+    $location.path('/apps');
+    //$scope.tutorialMode = true;
+
+  }
+
+  // if(!user || !apps.length) {
+  // 	$rootScope.$on('appsLoaded', function(){
+  // 		console.log('loaded')
+  // 	})
+  // } else console.log(apps)
 }
 
 })();

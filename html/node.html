@@ -31,7 +31,8 @@
             </span>
 
             <span 
-                  ng-click="node.removeSelfEdge ? node.removeSelfEdge() : node.remove()" title="Delete"
+                  ng-click="confirm('Delete', 'Are you sure you want to delete this?', node.removeSelfEdge ? node.removeSelfEdge : node.remove)"
+                  title="Delete"
                   class="fa node-options"
                   ng-class="node.deleting? 'fa-cog fa-spin' : 'fa-remove'"
                   title="Remove edge"
@@ -117,6 +118,22 @@
         </li>
         <li class="child" ng-repeat="node in node.children">
             <ng-include src="'html/node.html'"> </ng-include>
+        </li>
+        <li ng-show="(node.children.length === 25 || node.page) && node.children[0].priority">
+          <nav>
+            <ul class="pagination">
+              <li ng-class="node.page ? '' : 'disabled'">
+                <a href="" aria-label="Previous" ng-click="node.prevPage()">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li ng-class="node.children.length < 25 ? 'disabled' : ''">
+                <a href="" aria-label="Next" ng-click="node.nextPage()">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
         </li>
         <li class="status show-parent" ng-hide="node.loading || !node.children.length">
           <span class="fa fa-plus expand" ng-class="node.loadingNs? 'fa-cog fa-spin' : 'fa-plus'" ng-click="addEdgeInto(node)"></span>

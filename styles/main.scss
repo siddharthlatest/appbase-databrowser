@@ -3,13 +3,13 @@
 /************************
 * Colors for the browser icons
 ************************/
-$db-add: darken($footer-color, 5%);
+$db-add: darken($green, 5%);
 $db-add-hover: lighten($db-add, 6%);
 
 $db-remove: #ff4136;
 $db-remove-hover: lighten($db-remove, 10%);
 
-$db-search-on: $db-add;
+$db-search-on: $db-add; 
 $db-search-on-hover: $db-add-hover;
 
 $db-search-off: $db-remove;
@@ -32,242 +32,6 @@ body {
 	color: #555;
 }
 
-#nav {
-    position: relative;
-    z-index:2;
-    &.affix {
-        position: fixed;
-        background-color: $blue!important;
-        .navbar {
-            background-color: $blue;
-        }
-    }
-    background-color: $blue;
-    .navbar {
-        min-height: $navbar-height;
-        background-color: $blue;
-        border:0;
-        margin:-2px 0 0;
-        border-radius:0;
-        .container-fluid {
-            min-height: $navbar-height;
-            padding: 0;
-            @media screen and (min-width: 768px){
-                opacity: 0.94;
-                padding: 0 1vw;
-                .nav {
-                    text-align: left;
-                    li {
-                        padding: 0;
-                        a {
-                            padding: 0;
-                        }
-                    }
-                }
-                .navbar-header {
-                    margin: 0 -15px;
-                }
-            }
-
-            @media screen and (min-width: 900px){
-                padding: 0 2.5vw;
-                .nav li {
-                    padding: 0;
-                    a {
-                        padding: 9px 12px;
-                    }
-                }
-            }
-
-            @media screen and (min-width: 1200px){
-                padding: 0 5.5vw;
-                .nav li {
-                    padding: 0;
-                }
-            }
-
-            @media screen and (min-width: 1600px){
-                padding: 0 10vw;
-                .nav li {
-                    padding: 0;
-                }
-            }
-
-            @media screen and (min-width: 2000px){
-                padding: 0 12vw;
-                .nav li {
-                    padding: 0;
-                }
-            }
-        }
-
-        .navbar-header {
-            margin:0;
-            height: $navbar-height;
-            line-height: $navbar-height;
-            vertical-align: middle;
-            z-index: 15;
-            .navbar-toggle {
-                position: relative;
-                z-index: 21;
-                margin: ($navbar-height - 34px)/2 20px;
-                .icon-bar {
-                    background-color: white;
-                }
-            }
-
-            .navbar-brand {
-                position: relative;
-                z-index: 10;
-                padding: ($navbar-height - $logo-height)/2 20px;
-                img {
-                    height: $logo-height;
-                }
-                cursor: pointer;
-            }
-        }
-
-        .nav {
-            position: relative;
-            z-index: 30;
-            margin:0 inherit;
-            color: white;
-            font-family: $font-regular;
-
-            #login_userInfo {
-                font-size: 1.15em;
-                margin-top: 15px;
-                margin-left:15px;
-                line-height: $navbar-height;
-                &>span {
-                    cursor: default;
-                }
-                .tooltip{                
-                    opacity: 0;
-                    &:hover {
-                        opacity: 0.6;
-                    }
-                    .tooltip-inner {
-                        font-family: $font-light;
-                        font-size: 2.5em;
-                        background-color: brown;
-                        height: 40px;
-                        width: 40px;
-                        border-radius: 20px;
-                        cursor: pointer; 
-                    }
-
-                }
-                .circle {
-                    float:right;
-                    position: relative;
-                    top: ($navbar-height - 40px)/2;
-                    height: 40px;
-                    width: 40px;
-                    margin-left: 15px;
-                    .overlay {
-                        display: inline;
-                        color: transparent;
-                        &:hover {
-                            color: black;
-                        }
-                    }
-                    img {
-                        float: left;
-                        vertical-align: top;
-                        border-radius: 25px;
-                        height: 40px;
-                        width: 40px;
-                    } 
-                }
-
-            }
-        }
-
-        li {
-        	display: inline;
-            padding:0;
-
-            a {
-                cursor: pointer;
-                font-family: "Source Sans Pro Light";
-                font-size: 1.1em;
-                text-transform: none;
-                color: white;
-                margin: 11px 6px;
-                border-radius: 5px;
-                &:last-child {
-                	//margin-right: 0px;
-                }
-                &:hover, &.active {
-                    background-color: #2F9ED5;
-                    text-decoration: none!important;
-                    color: white;
-                    opacity: 1;
-                    border-radius: 3px;
-                }
-                &:focus {
-                    text-decoration: none!important;
-                }
-                &.current-path {
-                    font-family: $font-bold;
-                    &:hover{
-                        opacity: 0.9;
-                        cursor: default;
-                    }
-                }
-            }
-                
-        }
-
-        li:last-child {
-            padding-right: 20px;
-            .link {
-                padding-left: 3vw;
-                padding-right: 0;
-            }
-        }
-
-        .navbar-collapse {
-            &.in {
-                opacity: 1!important;
-            }
-            border-top:none;
-            width: 100%;
-            position: relative;
-            @media screen and (max-width: 768px){
-                opacity: 0;
-                position: relative;
-                top: -($navbar-height +20px);
-                padding: 0!important;
-                margin-left:0;
-                margin-bottom:-($navbar-height + 70px);
-                background: $blue;
-                .nav {
-                    text-align: center;
-                    width: 100%;
-                    margin:0;
-                    padding-top: $navbar-height;
-
-                    .profile {
-                        display: none;
-                    }
-                    li, li div {
-                        display:inline;
-                    }
-                        
-                    li a {
-                        color: white;
-                        &:hover {
-                            background-color: #2F9ED5;
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-}
 
 @keyframes slideOutLeft {
 	100% {
@@ -292,7 +56,7 @@ body {
 
 @keyframes added {
 	0% 	{ color: $blue; }
-	50% { color: darken($footer-color, 20%); }
+	50% { color: darken($green, 20%); }
 	100% {color: $blue; }
 }
 
@@ -450,20 +214,20 @@ body {
 	.main-title {
 		text-align: center;
 		font-family: $font-extra-light;
-		font-size: 3.5em;
-		color: #888;
-		padding: 50px 0 30px;
+		font-size: 2.8em;
+		color: #666;
+		padding: 30px 0 15px;
 	}
 
 	.loading {
-		line-height: 128px;
+		line-height: 100px;
 		text-align: center;
 	}
 
 	.fetching {
 		position: absolute;
 		left: 50%;
-		top: 90px;
+		top: 50px;
 		width: 100px;
 		height: 100px;
 		line-height: 100px;
@@ -478,15 +242,6 @@ body {
 		transition: margin-left 0.3s ease;
 	}
 
-	@media (min-width: 992px) {
-		.one {
-			margin-left: 25%;
-		}
-		.many {
-			margin-left: 0%;
-		}
-	}
-
 	.grayed {
 		opacity: 0.5;
 	}
@@ -496,14 +251,24 @@ body {
 	}
 
 	.well {
-		background-color: #F2F2F2;
-		box-shadow: none;
+		table th {
+			font-family: $font-semi-bold;
+		}
+
+		table tr td{
+			user-select: none;
+			cursor: pointer;
+			text-align: left;
+		}
+
+		background-color: #fdfdfd;
+		box-shadow: 1px 1px 1px #dedede;
 		border:none;
 		margin: 30px;
 		padding: 25px 30px 15px;
-		border-radius: 15px;
+		border-radius: 5px;
 		color: #888;
-		height: 170px;
+		min-height: 170px;
 		.tip {
 			text-align: center;
 			line-height: 30px;
@@ -545,29 +310,6 @@ body {
 			&[readonly] {
 				background-color: #e5e5e5;
 				cursor: default;
-			}
-		}
-
-		.delete {
-			position: absolute;
-			right:20px;
-			top: 6px;
-			overflow: hidden;
-			z-index: 2;
-			cursor: pointer;
-			.can, .lid{
-				fill: transparent;
-				stroke: #ccc;
-				transition: fill 0.1s ease-out;
-			}
-			svg:hover{
-				.can, .lid{
-					stroke: transparent;
-					fill: $db-remove;
-				}
-				.lid {
-					stroke: transparent;
-				}
 			}
 		}
 
@@ -613,19 +355,18 @@ body {
 			.analytic { top: -3px; left: -4px }
 
 
-
 		}
 
 		button, a {
 			&#createuserapp {
-				background-color: $footer-color;
+				background-color: $green;
 				border: none;
 				box-shadow: none;
 				&:hover {
-					background-color: lighten($footer-color, 5%);
+					background-color: lighten($green, 5%);
 				}
 				&:active {
-					background-color: darken($footer-color, 5%);
+					background-color: darken($green, 5%);
 				}
 			}
 
@@ -660,6 +401,11 @@ body {
 			text-align: right;
 		}
 	}
+
+	.create-app [ng-model="newAppname"] {
+		background-color: #f3f3f3;
+	}
+
 	.get-started {
 		font-family: $font-extra-light;
 		.title {
@@ -1014,7 +760,7 @@ body {
 		cursor: pointer;
 	}
 	.glyphicon-plus-sign {
-		color: darken($footer-color, 10%);
+		color: darken($green, 10%);
 		font-weight: bolder; 
 	}
 	.glyphicon-minus-sign {
@@ -1348,12 +1094,12 @@ body {
 			margin: 2%;
 			padding-left: 50px;
 			padding-right: 50px;
-			border: 2px solid $footer-color;
+			border: 2px solid $green;
 			border-radius: 10px;
-			color: $footer-color;
+			color: $green;
 			background-color: white;
 			&:hover {
-				background-color: $footer-color;
+				background-color: $green;
 				color: white;
 			}
 		}
@@ -1370,6 +1116,7 @@ body {
 	height: 100%;
 	width: 100%;
 	top: 40vh;
+	z-index: 1000;
 }
 
 #invite {

@@ -42,9 +42,12 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
       var existing = session.getApps();
       var first = !existing.length;
       if(first){
-        var order = localStorage.getItem(session.getProfile().uid + 'order');
-        if(order) order = JSON.parse(order);
-        else first = false;
+        var profile = session.getProfile();
+        if(profile) {
+          var order = localStorage.getItem(profile.uid + 'order');
+          if(order) order = JSON.parse(order);
+          else first = false;
+        }
       }
       existing.forEach(function(app, index){
         var newRef = apps.filter(function(newApp){
@@ -77,6 +80,25 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
           return a_index - b_index;
         });
       }
+      //console.time('total')
+      existing.forEach(function(app){
+        //console.time(app.name);
+        app.metrics.totalRec = 0;
+        app.metrics.totalRec += parseInt(app.metrics.edgesAndVertices.Vertices) || 0;
+        app.metrics.totalRec += parseInt(app.metrics.edgesAndVertices.Edges) || 0;
+
+        var total = 0;
+        var calls = app.metrics.calls && Object.keys(app.metrics.calls);
+        if(calls && calls.length) {
+          calls.forEach(function(call){
+            total += call.indexOf('APICalls') !== -1 ? app.metrics.calls[call] : 0;
+          });
+        }
+
+        app.metrics.totalCalls = total;
+        //console.timeEnd(app.name);
+      });
+      //console.timeEnd('total')
       session.setApps(existing);
       if(done) done();
     });
@@ -292,12 +314,10 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
     }
     atomic.post(atob(server)+'app/'+ appName +'/search', request)
       .success(function(result) {
-        console.log(result)
-        done()
+        done();
       })
       .error(function(error) {
-        console.log(error)
-        throw error
+        throw error;
       })
   }
 
@@ -332,10 +352,8 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
-        console.log('success')
         atomic.delete(atob(server)+'user/' + getEmail(), {'appname' : app})
           .success(function(response){
-            console.log(response)
             done();
           })
       })

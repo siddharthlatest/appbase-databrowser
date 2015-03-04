@@ -13,13 +13,13 @@
       </div>
       <div class="collapse navbar-collapse" id="main-navbar-collapse">
          <ul class="nav navbar-nav navbar-right">
-            <li><a class="active">
+            <li><a href="#/" ng-class="['apps', 'oauth', 'dash', 'browser'].indexOf($parent.where()) !== -1 ? 'active' : ''">
                Apps
             </a></li>
-            <li><a>
+            <li><a href="http://docs.appbase.io">
                Documentation
             </a></li>
-            <li><a>
+            <li><a href="#/billing" ng-class="$parent.where() === 'billing' ? 'active' : ''">
                Billing
             </a></li>
             <li>
