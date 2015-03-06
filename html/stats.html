@@ -16,7 +16,7 @@
 		</div>
 		<div class="col-md-offset-6 col-md-3 text-center">
 			<span>This month</span><br>
-			<div class="chart" easypiechart options="chartOptions" percent="(chart.month*100)/cap">
+			<div class="chart" easypiechart options="chartOptions" percent="((chart?(chart.month?chart.month:0):0)*100)/(cap?cap:1)">
 				<span class="percent" ng-bind="chart.month"></span>
 			</div>
 		</div>

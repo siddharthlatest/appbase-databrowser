@@ -245,10 +245,10 @@ body {
   color: #555; }
 
 #intercom-container .intercom-launcher-button {
-  opacity: 0.3;
+  opacity: 0.3 !important;
   transition: opacity 0.2s ease !important; }
   #intercom-container .intercom-launcher-button:hover {
-    opacity: 1; }
+    opacity: 1 !important; }
 
 .intercom-powered-by-container {
   visibility: hidden; }

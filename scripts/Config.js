@@ -16,7 +16,7 @@ angular.module("AppbaseDashboard", ['ngAppbase',
   .run(FirstRun)
   .config(Routes);
 
-function FirstRun($rootScope, $location, stringManipulation, session, $route){
+function FirstRun($rootScope, $location, stringManipulation, session, $route, $timeout){
   $rootScope.db_loading = true;
   // changed the way sessions are stored, so to prevent errors:
   var oldSession = sessionStorage.getItem('apps');
@@ -148,7 +148,9 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     }
   }
   $rootScope.goToApps = function() {
-    $location.path('/apps');
+    $timeout(function(){
+      $location.path('/apps');
+    });
   }
   $rootScope.goToBrowser = function(path) {
     session.setBrowserURL(path);

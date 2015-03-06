@@ -35,10 +35,10 @@ body {
 #intercom-container .intercom-launcher-button {
 	// background-color: #bbb!important;
 	// border-color: #bbb!important;
-	opacity: 0.3;
+	opacity: 0.3!important;
 	transition: opacity 0.2s ease!important;
 	&:hover {
-		opacity: 1;
+		opacity: 1!important;
 	}
 }
 
