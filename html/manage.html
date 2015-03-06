@@ -1,7 +1,7 @@
 <div id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['dash', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
   <div class="container-fluid">
     <div class="title">
-        <a href="/developer/#/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{$parent.currentApp}}
+        <a ng-href="/developer/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{$parent.currentApp}}
         <div class="right-tools">
             <a href="" ng-click="shareApp($parent.currentApp)" class="delete share">Share</a>
             <a href="" ng-click="deleteApp($parent.currentApp)" class="delete">Delete</a>
