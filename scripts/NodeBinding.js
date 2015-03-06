@@ -165,7 +165,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     ns.remove = function() {
       ns.deleting = true;
       data.deleteNamespace(ns.name, function(error){
-        if(error) throw error;
+        if(error) sentry(error);
         ns.deleting = false;
       });
     }
@@ -225,7 +225,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     vertex.removeProperty = function(prop, done) {
       vertex.removingProp = prop;
       vertex.ref.removeData([prop], function(error){
-         if(error) throw error;
+         if(error) sentry(error);
          $timeout(function(){vertex.removingProp = false;});
          if(done) done();
       });

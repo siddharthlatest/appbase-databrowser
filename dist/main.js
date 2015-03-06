@@ -1,6 +1,11 @@
-/**
- * Created by Sagar on 30/8/14.
- */
+function sentry(error) {
+  if(Raven) {
+    Raven.captureException(error);
+  } else {
+    throw new Error(error);
+  }
+}
+
 (function(){
 angular.module("AppbaseDashboard", ['ngAppbase',
                                     'ngRoute',
@@ -35,6 +40,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $rootScope.logged = false;
   } else {
     $rootScope.logged = true;
+    externalLibs();
   }
 
   var url = sessionStorage.getItem('URL');
@@ -167,6 +173,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   }
   document.addEventListener('postLogin', function() {
     $rootScope.logged = true;
+    externalLibs();
     $route.reload();
   });
   document.addEventListener('logout', function(){
@@ -174,6 +181,35 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
       $rootScope.logged = false;
     });
   });
+
+  $rootScope.$on('$routeChangeSuccess', function(){
+    window.Intercom('update');
+  });
+
+  window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+
+  function externalLibs(){
+
+    var obj = {
+      name: 'unknown',
+      email: 'unknown',
+      uid: 'unknown'
+    };
+
+    var user = session.getProfile() || obj;
+
+    window.Raven.setUser({
+        email: user.email,
+        id: user.uid
+    });
+    
+    window.Intercom('boot', {
+      app_id: "jnzcgdd7",
+      name: user.name,
+      email: user.email
+    });
+
+  }
 } 
 
 function Routes($routeProvider){
@@ -893,6 +929,7 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
         });
       }
       //console.time('total')
+      var overall = 0;
       existing.forEach(function(app){
         //console.time(app.name);
         app.metrics.totalRec = 0;
@@ -908,10 +945,12 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
         }
 
         app.metrics.totalCalls = total;
+        overall += total;
         //console.timeEnd(app.name);
       });
       //console.timeEnd('total')
       session.setApps(existing);
+      window.Intercom('update', {'apps': existing.length, 'calls': overall});
       if(done) done();
     });
   }
@@ -1082,9 +1121,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         })
         done(vertices)
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
 
   data.getNamespaces = function(done) {
@@ -1105,9 +1142,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         }
         done(namespaces)
       })
-      .error(function(error) {
-        throw error
-      })
+      .error(sentry)
   };
 
   data.deleteNamespace = function(namespace, done) {
@@ -1128,9 +1163,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
       .success(function(result) {
         done();
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
 
   data.createApp = function(app, done) {
@@ -1145,20 +1178,17 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
               .success(function(){
                 done(null)
               })
-              .error(function(error){
-                throw error;
-              });
+              .error(sentry);
             })
-            .error(function(error) {
-              throw error
-            });
+            .error(sentry);
         } else {
-          throw 'Server Error, try again.'
+          if(angular.isObject(response) || angular.isArray(response)){
+            response = JSON.stringify(response);
+          }
+          sentry(new Error('App creation unexpected return ' + response))
         }
       })
-      .error(function(error) {
-        throw error
-      })
+      .error(sentry)
   } 
   
   data.deleteApp = function(app, done) {
@@ -1169,33 +1199,8 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
             done();
           })
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
-
-  // not sure
-  // data.deleteApp = function(app, done) {
-  //   atomic.delete(atob(server)+'app/'+ app, {'kill':true})
-  //     .success(function(response) {
-  //       if(typeof response === "string") {
-  //         done(response)
-  //       } else if(typeof response === "object") {
-  //         atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
-  //           .success(function(result) {
-  //             done(null)
-  //           })
-  //           .error(function(error) {
-  //             throw error
-  //           })
-  //       } else {
-  //         throw 'Server Error, try again.'
-  //       }
-  //     })
-  //     .error(function(error) {
-  //       throw error
-  //     })
-  // }
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
@@ -1219,13 +1224,9 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
                 .success(function(result) {
                   checkForDone();
                 })
-                .error(function(error) {
-                  throw error
-                })
+                .error(sentry)
             })
-            .error(function(error) {
-              throw error
-            })
+            .error(sentry)
         });
       })
   }
@@ -1261,9 +1262,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         }
         $rootScope.$apply();
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
 
   function getMetrics(app, secret, secretArrived){
@@ -1275,7 +1274,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         if(error.response === ""){
           console.log('Empty response for ' + app + '\'s metrics, retrying');
           getMetrics(app, secret, secretArrived);
-        } else throw error;
+        } else sentry(error);
       });
   }
 
@@ -1294,7 +1293,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         if(error.response === ""){
           console.log('Empty response for ' + app + ', retrying');
           getSecret(app, done);
-        } else throw error;
+        } else sentry(error);
       }); 
   }
 
@@ -1595,7 +1594,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     ns.remove = function() {
       ns.deleting = true;
       data.deleteNamespace(ns.name, function(error){
-        if(error) throw error;
+        if(error) sentry(error);
         ns.deleting = false;
       });
     }
@@ -1655,7 +1654,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     vertex.removeProperty = function(prop, done) {
       vertex.removingProp = prop;
       vertex.ref.removeData([prop], function(error){
-         if(error) throw error;
+         if(error) sentry(error);
          $timeout(function(){vertex.removingProp = false;});
          if(done) done();
       });
@@ -1784,11 +1783,14 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.domains.splice($scope.domains.indexOf(domain), 1);
     oauthFactory.removeDomain($scope.app, $scope.domains)
     .then(function(data){
-      if(data.status !== "success") throw data;
+      if(data.status !== "success") {
+        sentry(data);
+        throw new Error(data);
+      }
       $timeout(function(){
         $scope.loading = false;
       });
-    }, function(data){throw data;});
+    }, sentry);
   };
   $scope.addDomain = function(domain){
     if($scope.domains.indexOf(domain) !== -1){
@@ -1801,23 +1803,29 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
     oauthFactory.addDomain($scope.app, $scope.domains)
     .then(function(data){
-      if(data.status !== "success") throw data;
+      if(data.status !== "success") {
+        sentry(data);
+        throw new Error(data);
+      };
       $timeout(function(){
         $scope.loading = false;
         $scope.domainInput = '';
       });
-    },function(data){throw data;});
+    }, sentry);
   };
   $scope.removeProvider = function(provider){
     $scope.loadingProv = true;
     oauthFactory.removeProvider($scope.app, provider)
     .then(function(data){
-      if(data.status !== "success") throw data;
+      if(data.status !== "success") {
+        sentry(data);
+        throw new Error(data);
+      };
       $timeout(function(){
         delete $scope.userProviders[provider];
         $scope.loadingProv = false;
       });
-    }, function(data){throw data;});
+    }, sentry);
   };
   $scope.add = function(provider){
     $scope.provider = provider;
@@ -1832,7 +1840,9 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   }
   $scope.done = function(){
     $scope.editing = $scope.adding = false;
-    if(!$scope.app || !$scope.provider.provider || !$scope.clientID || !$scope.clientSecret) throw 'error';
+    if(!$scope.app || !$scope.provider.provider || !$scope.clientID || !$scope.clientSecret){
+      throw new Error('Missing information');
+    };
     $scope.loadingProv = true;
     oauthFactory.addProvider($scope.app, $scope.provider.provider, $scope.clientID, $scope.clientSecret)
     .then(function(data){
@@ -1841,7 +1851,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
         $scope.userProviders[$scope.provider.provider] = {response_type: 'code', parameters: {client_id: $scope.clientID, client_secret: $scope.clientSecret}};
         $scope.clientID = $scope.clientSecret = '';
       });
-    }, function(err){throw err});
+    }, sentry);
   }
   $scope.cancel = function(){
     $scope.editing = $scope.adding = false;
@@ -1868,13 +1878,16 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
       $scope.loading = true;
       oauthFactory.updateTime($scope.app, $scope.validate(time))
       .then(function(data){
-        if(data.status !== "success") throw data;
+        if(data.status !== "success") {
+          sentry(data);
+          throw new Error(data);
+        }
         $timeout(function(){
           $scope.expiryTime = $scope.validate(time);
           $scope.loading = false;
           $scope.timeInput = '';
         });
-      },function(data){throw data;});
+      }, sentry);
     }
   }
 
@@ -1903,9 +1916,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   oauthFactory.getProviders()
   .then(function(data){
     $scope.providers = data;
-  }, function(data){
-    throw data;
-  });
+  }, sentry);
 
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
   var app = session.appFromName(appName);
@@ -1944,13 +1955,13 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
           $scope.keys = data;
           $scope.provStatus = false;
         });
-      }, function(data){throw data});
+      }, sentry);
     } else {
       $timeout(function(){
         $scope.provStatus = false;
       });
     }
-  }, function(data){throw data});
+  }, sentry);
 }
 
 function OauthFactory($timeout, $q, session){
@@ -2020,9 +2031,7 @@ function OauthFactory($timeout, $q, session){
         session.setApps(apps_);
         received += 1;
         if(received === apps.length && done) done();
-      }, function(e){
-        throw e;
-      });
+      }, sentry);
     });
   }
 
@@ -2187,7 +2196,8 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
     
   $appbase.authPopup('google', { authorize: { scope: ['openid email'] } }, function(error, result, req) {
     if(error) {
-      throw error;
+      sentry(error);
+      throw new Error(error);
     }
     proceed(result);
   });
@@ -2417,6 +2427,13 @@ function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $time
             }
         }]
     }).open();
+
+    $rootScope.shareApp = function(app){
+      $rootScope.confirm('Share App',
+        'Enter the email of the user you want to share the app with', function(value){
+          console.log(value)
+        }, true);
+    }
   }
 }
 

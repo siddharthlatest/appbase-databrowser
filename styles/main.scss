@@ -32,6 +32,26 @@ body {
 	color: #555;
 }
 
+#intercom-container .intercom-launcher-button {
+	// background-color: #bbb!important;
+	// border-color: #bbb!important;
+	opacity: 0.3;
+	transition: opacity 0.2s ease!important;
+	&:hover {
+		opacity: 1;
+	}
+}
+
+.intercom-powered-by-container {
+	visibility: hidden;
+}
+
+#intercom-container .intercom-powered-by-enabled .intercom-composer {
+	bottom: 20px!important;
+}
+#intercom-container .intercom-sheet-content-container {
+	padding-bottom: 130px!important;
+}
 
 @keyframes slideOutLeft {
 	100% {
@@ -497,6 +517,12 @@ body {
 		text-decoration: underline;
 		font-size: 1em;
 		&:hover {color: lighten(red, 25%)}
+	}
+
+	.share {
+		color: $dark-blue;
+		margin-right: 10px;
+		&:hover {color: $blue}
 	}
 
 	.secret {

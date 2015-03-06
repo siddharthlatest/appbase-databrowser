@@ -81,6 +81,7 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
         });
       }
       //console.time('total')
+      var overall = 0;
       existing.forEach(function(app){
         //console.time(app.name);
         app.metrics.totalRec = 0;
@@ -96,10 +97,12 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
         }
 
         app.metrics.totalCalls = total;
+        overall += total;
         //console.timeEnd(app.name);
       });
       //console.timeEnd('total')
       session.setApps(existing);
+      window.Intercom('update', {'apps': existing.length, 'calls': overall});
       if(done) done();
     });
   }
@@ -270,9 +273,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         })
         done(vertices)
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
 
   data.getNamespaces = function(done) {
@@ -293,9 +294,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         }
         done(namespaces)
       })
-      .error(function(error) {
-        throw error
-      })
+      .error(sentry)
   };
 
   data.deleteNamespace = function(namespace, done) {
@@ -316,9 +315,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
       .success(function(result) {
         done();
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
 
   data.createApp = function(app, done) {
@@ -333,20 +330,17 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
               .success(function(){
                 done(null)
               })
-              .error(function(error){
-                throw error;
-              });
+              .error(sentry);
             })
-            .error(function(error) {
-              throw error
-            });
+            .error(sentry);
         } else {
-          throw 'Server Error, try again.'
+          if(angular.isObject(response) || angular.isArray(response)){
+            response = JSON.stringify(response);
+          }
+          sentry(new Error('App creation unexpected return ' + response))
         }
       })
-      .error(function(error) {
-        throw error
-      })
+      .error(sentry)
   } 
   
   data.deleteApp = function(app, done) {
@@ -357,33 +351,8 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
             done();
           })
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
-
-  // not sure
-  // data.deleteApp = function(app, done) {
-  //   atomic.delete(atob(server)+'app/'+ app, {'kill':true})
-  //     .success(function(response) {
-  //       if(typeof response === "string") {
-  //         done(response)
-  //       } else if(typeof response === "object") {
-  //         atomic.delete(atob(server)+'user/'+ session.getProfile().email, {"appname":app})
-  //           .success(function(result) {
-  //             done(null)
-  //           })
-  //           .error(function(error) {
-  //             throw error
-  //           })
-  //       } else {
-  //         throw 'Server Error, try again.'
-  //       }
-  //     })
-  //     .error(function(error) {
-  //       throw error
-  //     })
-  // }
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
@@ -407,13 +376,9 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
                 .success(function(result) {
                   checkForDone();
                 })
-                .error(function(error) {
-                  throw error
-                })
+                .error(sentry)
             })
-            .error(function(error) {
-              throw error
-            })
+            .error(sentry)
         });
       })
   }
@@ -449,9 +414,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         }
         $rootScope.$apply();
       })
-      .error(function(error) {
-        throw error;
-      })
+      .error(sentry)
   }
 
   function getMetrics(app, secret, secretArrived){
@@ -463,7 +426,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         if(error.response === ""){
           console.log('Empty response for ' + app + '\'s metrics, retrying');
           getMetrics(app, secret, secretArrived);
-        } else throw error;
+        } else sentry(error);
       });
   }
 
@@ -482,7 +445,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         if(error.response === ""){
           console.log('Empty response for ' + app + ', retrying');
           getSecret(app, done);
-        } else throw error;
+        } else sentry(error);
       }); 
   }
 

@@ -1,6 +1,11 @@
-/**
- * Created by Sagar on 30/8/14.
- */
+function sentry(error) {
+  if(Raven) {
+    Raven.captureException(error);
+  } else {
+    throw new Error(error);
+  }
+}
+
 (function(){
 angular.module("AppbaseDashboard", ['ngAppbase',
                                     'ngRoute',
@@ -35,6 +40,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
     $rootScope.logged = false;
   } else {
     $rootScope.logged = true;
+    externalLibs();
   }
 
   var url = sessionStorage.getItem('URL');
@@ -167,6 +173,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
   }
   document.addEventListener('postLogin', function() {
     $rootScope.logged = true;
+    externalLibs();
     $route.reload();
   });
   document.addEventListener('logout', function(){
@@ -174,6 +181,35 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route){
       $rootScope.logged = false;
     });
   });
+
+  $rootScope.$on('$routeChangeSuccess', function(){
+    window.Intercom('update');
+  });
+
+  window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+
+  function externalLibs(){
+
+    var obj = {
+      name: 'unknown',
+      email: 'unknown',
+      uid: 'unknown'
+    };
+
+    var user = session.getProfile() || obj;
+
+    window.Raven.setUser({
+        email: user.email,
+        id: user.uid
+    });
+    
+    window.Intercom('boot', {
+      app_id: "jnzcgdd7",
+      name: user.name,
+      email: user.email
+    });
+
+  }
 } 
 
 function Routes($routeProvider){

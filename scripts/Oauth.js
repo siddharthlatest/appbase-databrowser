@@ -19,11 +19,14 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.domains.splice($scope.domains.indexOf(domain), 1);
     oauthFactory.removeDomain($scope.app, $scope.domains)
     .then(function(data){
-      if(data.status !== "success") throw data;
+      if(data.status !== "success") {
+        sentry(data);
+        throw new Error(data);
+      }
       $timeout(function(){
         $scope.loading = false;
       });
-    }, function(data){throw data;});
+    }, sentry);
   };
   $scope.addDomain = function(domain){
     if($scope.domains.indexOf(domain) !== -1){
@@ -36,23 +39,29 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
     oauthFactory.addDomain($scope.app, $scope.domains)
     .then(function(data){
-      if(data.status !== "success") throw data;
+      if(data.status !== "success") {
+        sentry(data);
+        throw new Error(data);
+      };
       $timeout(function(){
         $scope.loading = false;
         $scope.domainInput = '';
       });
-    },function(data){throw data;});
+    }, sentry);
   };
   $scope.removeProvider = function(provider){
     $scope.loadingProv = true;
     oauthFactory.removeProvider($scope.app, provider)
     .then(function(data){
-      if(data.status !== "success") throw data;
+      if(data.status !== "success") {
+        sentry(data);
+        throw new Error(data);
+      };
       $timeout(function(){
         delete $scope.userProviders[provider];
         $scope.loadingProv = false;
       });
-    }, function(data){throw data;});
+    }, sentry);
   };
   $scope.add = function(provider){
     $scope.provider = provider;
@@ -67,7 +76,9 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   }
   $scope.done = function(){
     $scope.editing = $scope.adding = false;
-    if(!$scope.app || !$scope.provider.provider || !$scope.clientID || !$scope.clientSecret) throw 'error';
+    if(!$scope.app || !$scope.provider.provider || !$scope.clientID || !$scope.clientSecret){
+      throw new Error('Missing information');
+    };
     $scope.loadingProv = true;
     oauthFactory.addProvider($scope.app, $scope.provider.provider, $scope.clientID, $scope.clientSecret)
     .then(function(data){
@@ -76,7 +87,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
         $scope.userProviders[$scope.provider.provider] = {response_type: 'code', parameters: {client_id: $scope.clientID, client_secret: $scope.clientSecret}};
         $scope.clientID = $scope.clientSecret = '';
       });
-    }, function(err){throw err});
+    }, sentry);
   }
   $scope.cancel = function(){
     $scope.editing = $scope.adding = false;
@@ -103,13 +114,16 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
       $scope.loading = true;
       oauthFactory.updateTime($scope.app, $scope.validate(time))
       .then(function(data){
-        if(data.status !== "success") throw data;
+        if(data.status !== "success") {
+          sentry(data);
+          throw new Error(data);
+        }
         $timeout(function(){
           $scope.expiryTime = $scope.validate(time);
           $scope.loading = false;
           $scope.timeInput = '';
         });
-      },function(data){throw data;});
+      }, sentry);
     }
   }
 
@@ -138,9 +152,7 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   oauthFactory.getProviders()
   .then(function(data){
     $scope.providers = data;
-  }, function(data){
-    throw data;
-  });
+  }, sentry);
 
   var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
   var app = session.appFromName(appName);
@@ -179,13 +191,13 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
           $scope.keys = data;
           $scope.provStatus = false;
         });
-      }, function(data){throw data});
+      }, sentry);
     } else {
       $timeout(function(){
         $scope.provStatus = false;
       });
     }
-  }, function(data){throw data});
+  }, sentry);
 }
 
 function OauthFactory($timeout, $q, session){
@@ -255,9 +267,7 @@ function OauthFactory($timeout, $q, session){
         session.setApps(apps_);
         received += 1;
         if(received === apps.length && done) done();
-      }, function(e){
-        throw e;
-      });
+      }, sentry);
     });
   }
 

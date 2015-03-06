@@ -53,7 +53,8 @@ function SignupCtrl($rootScope, $scope, session, $route, $location){
     
   $appbase.authPopup('google', { authorize: { scope: ['openid email'] } }, function(error, result, req) {
     if(error) {
-      throw error;
+      sentry(error);
+      throw new Error(error);
     }
     proceed(result);
   });
