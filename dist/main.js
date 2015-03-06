@@ -214,7 +214,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   }
 } 
 
-function Routes($routeProvider){
+function Routes($routeProvider, $locationProvider){
   var browser = {
     controller: 'browser',
     templateUrl: '/developer/html/browser.html'
@@ -240,6 +240,8 @@ function Routes($routeProvider){
     controller: 'start',
     templateUrl: '/developer/html/start.html'
   };
+
+  $locationProvider.html5Mode(true).hashPrefix('!');
 
   $routeProvider
     .when('/', start)
