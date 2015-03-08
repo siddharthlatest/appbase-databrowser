@@ -12,7 +12,8 @@ angular.module("AppbaseDashboard", ['ngAppbase',
                                     'ng-breadcrumbs',
                                     'easypiechart',
                                     'ngAnimate',
-                                    'ngDialog'])
+                                    'ngDialog',
+                                    'highcharts-ng'])
   .run(FirstRun)
   .config(Routes);
 

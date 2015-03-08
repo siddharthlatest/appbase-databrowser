@@ -12,7 +12,8 @@ angular.module("AppbaseDashboard", ['ngAppbase',
                                     'ng-breadcrumbs',
                                     'easypiechart',
                                     'ngAnimate',
-                                    'ngDialog'])
+                                    'ngDialog',
+                                    'highcharts-ng'])
   .run(FirstRun)
   .config(Routes);
 
@@ -725,8 +726,7 @@ angular
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
 .directive('hideParent', HideParent)
-.directive('showParent', ShowParent)
-.directive('barchart', BarChart);
+.directive('showParent', ShowParent);
 
 
 function ImgSrc(){
@@ -743,41 +743,6 @@ function ImgSrc(){
       });
     }
   } 
-}
-
-function BarChart(){
-  return {
-
-      // required to make it work as an element
-      restrict: 'E',
-      template: '<div></div>',
-      replace: true,
-      scope: {
-        data: "=",
-        xkey: "=",
-        ykeys: "=",
-        labels: "=",
-        colors: "="
-      },
-      // observe and manipulate the DOM
-      link: function($scope, element, attrs) {
-
-          var graph = Morris.Area({
-            element: element,
-            data: $scope.data,
-            xkey: $scope.xkey,
-            ykeys: $scope.ykeys,
-            labels: $scope.labels,
-            lineColors: $scope.colors,
-            gridTextFamily: 'Source Sans Pro Regular'
-          });
-
-          $scope.$watch('data', function(newData){
-            graph.setData(newData);
-          });
-      }
-
-  };
 }
 
 function BackgroundColor() {
@@ -954,7 +919,18 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
       });
       //console.timeEnd('total')
       session.setApps(existing);
-      window.Intercom('update', {'apps': existing.length, 'calls': overall});
+
+      var obj = {
+        email: 'unknown',
+        name: 'unknown'
+      };
+
+      var user = session.getProfile() || obj;
+
+      window.Intercom('update', { 'apps': existing.length, 
+                                  'calls': overall, 
+                                  'name': user.name,
+                                  'email': user.email });
       if(done) done();
     });
   }
@@ -2237,114 +2213,176 @@ angular
 .controller('stats', StatsCtrl);
 
 function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
-  $scope.status = "Loading";
+  $scope.status = true;
   $scope.apps = session.getApps();
   $scope.app = $rootScope.getAppFromName($rootScope.currentApp);
 
   if(!$scope.app || !angular.isObject($scope.app) || !$scope.app.metrics) {
     $rootScope.goToApps();
   } else {
+    var app = $scope.app;
+    $scope.vert = app.metrics.edgesAndVertices.Vertices || 0;
+    $scope.edges = app.metrics.edgesAndVertices.Edges || 0;
+    
+    defaultValues();
+    graph(app.calls);
+  }
+
+
+
+  function getGraphData(timeFrame){
+    var calls = $scope.app.metrics.calls;
+    var month = 0;
+    var metrics = {};
+    var xAxis = [];
+    var types = ['rest', 'socket', 'search'];
+    types.forEach(function(type){
+      metrics[type] = [];
+    });
+
+    for (var key in calls){
+      if(key.indexOf('APICalls') !== -1) {
+        var split = key.split(':');
+        var date = parseInt(split[0]);
+        if(date > timeFrame) {
+          if(xAxis[xAxis.length-1] != date) {
+            updateArraySize();
+            xAxis.push(date);
+          }
+          var value = calls[key];
+          month += value;
+          types.forEach(function(type){
+            if(key.indexOf(type) !== -1){
+              metrics[type].push(value);
+            };
+          });
+        }
+      }
+    }
+    updateArraySize();
+
+    types.forEach(function(type){
+      if(!metrics[type].filter(function(data){
+        return data != 0;
+      }).length) {
+        delete metrics[type];
+      }
+    });
+
+    var xAxisLabels = [];
+    xAxis.forEach(function(date){
+      date = new Date(date);
+      var formated = (date.getMonth()+1) + '/' + date.getDate();
+      xAxisLabels.push(formated);
+    });
+
+    return { data: metrics, xAxis: xAxisLabels, month: month };
+
+    function updateArraySize(){
+      var lengths = [];
+      var max = 0;
+      types.forEach(function(type){
+        var length = metrics[type].length;
+        max = length > max ? length : max;
+      });
+      types.forEach(function(type){
+        var obj = metrics[type];
+        if(obj.length < max) obj.push(0);
+      });
+    }
+  }
+
+  $scope.graph = graph;
+
+  function graph(timeFrame){
+    $scope.chartConfig.loading = true;
+
+    var labels = {
+      rest: 'REST API Calls',
+      search: 'Search API Calls',
+      socket: 'Socket API Calls'
+    };
+
+    var now = new Date();
+    var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+
+    var presets = {
+      week: function(){
+        $scope.graphActive = 'week';
+        timeFrame = utc.setDate(utc.getDay() - 7);
+      },
+      month: function(){
+        $scope.graphActive = 'month';
+        timeFrame = utc.setMonth(utc.getMonth() - 1);
+      },
+      all: function(){
+        $scope.graphActive = 'all';
+        timeFrame = 0;
+      }
+    }
+
+    if(!timeFrame) {
+      presets.month();
+    } else {
+      if(presets[timeFrame]) presets[timeFrame]();
+    }
+
+    var retVal = getGraphData(timeFrame);
+    var data = retVal.data;
+
+    if(!$.isEmptyObject(data)){
+      $scope.chart.month = $scope.chart.month || retVal.month;
+
+      $scope.chartConfig.xAxis.categories =   retVal.xAxis;
+      $scope.chartConfig.series = [];
+
+      Object.keys(data).forEach(function(type){
+        $scope.chartConfig.series.push({
+          data: data[type],
+          name: labels[type]
+        });
+      });
+    } else {
+      $scope.noData = true;
+    }
+    
+
+    $scope.chartConfig.loading = false;
+
+  }
+
+  function defaultValues(){
     $scope.cap = 100000;
     $rootScope.$watch('balance', function(val){
       $scope.cap = val || 100000;
     });
     $scope.chart = {};
-    $scope.chart.month = $scope.chart.week = $scope.chart.day = 0;
-    $scope.chartOptions = {
-      animate:{
-          duration:0,
-          enabled:false
+    $scope.chart.month = 0;
+
+    $scope.chartConfig = {
+      options: {
+          chart: { type: 'spline' },
+          tooltip: {
+              style: {
+                  padding: 10,
+                  fontWeight: 'bold'
+              }
+          },
+          colors: ['#50BAEF', '#13C4A5'],
       },
-      barColor:'#138FCD',
-      scaleColor:false,
-      lineWidth:20,
-      lineCap:'circle'
+      series: [],
+      xAxis: { categories: [] },
+      yAxis: { title: '', floor: 0 },
+      loading: true,
+      title: { text: '' }
     };
-    $scope.morris = {
-      xkey: 'formatedDate',
-      ykeys: ['restAPICalls', 'socketAPICalls', 'searchAPICalls'],
-      labels: ['Rest API Calls', 'Socket API Calls', 'Search API Calls'],
-      colors: ['#1f9e5a', '#138FCD', '#777']
-    };
-    var app = $scope.app;
-    app.vertices = app.metrics.edgesAndVertices.Vertices;
-    app.edges = app.metrics.edgesAndVertices.Edges;
-    var calls = app.metrics.calls;
-    if(!calls){
-      app.metrics = [];
-    } else {
-      var metrics = [];
-      for(var name in calls){
-        if(name !== '_id' && name !== 'appname' && name !== 'last_access_at'){
-          var split = name.split(':');
-          var data = split[1];
-          var date = parseInt(split[0]);
-          var existing = false;
-          metrics.forEach(function(each){
-            if(each.date === date){
-              each[data] = calls[name];
-              existing = true;
-            }
-          });
-          if(!existing){
-            var toPush = {};
-            toPush.date = date;
-            date = new Date(date);
-            toPush.formatedDate = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-            toPush[data] = calls[name];
-            metrics.push(toPush);
-          }
-        }
-      }
-      app.metrics = metrics;
-      var grandTotal = 0;
-      app.metrics.forEach(function(each){
-        var total = 0;
-        total += (each.restAPICalls = each.restAPICalls || 0);
-        total += (each.socketAPICalls = each.socketAPICalls || 0);
-        total += (each.searchAPICalls = each.searchAPICalls || 0);
-        each.total = total;
-        grandTotal += total;
-      });
-      app.totalAPI = grandTotal;
 
-      var monthData=0, weekData=0, dayData;
-      var miliDay   = 1000 * 60 * 60 * 24;
-      var miliWeek  = miliDay * 7;
-      var miliMonth = miliDay * 30;
-      var now = Date.now();
-      
-      app.metrics.forEach(function(each){
-        if(now - each.date <= miliMonth) {
-          monthData += each.total;
-          if(now - each.date <= miliWeek){
-            weekData += each.total;
-            dayData = each.total;
-          }
-        }
-      });
-
-      app.day = dayData;
-      app.week = weekData;
-      app.month = monthData;
-    }
-
-    $scope.vert = app.vertices;
-    $scope.edges = app.edges;
-    $scope.total = app.totalAPI;
-    var metrics = app.metrics;
-    if(metrics.length){
-      $scope.morris.data = metrics;
-      $scope.chart.month = app.month;
-      $scope.chart.week = app.week;
-      $scope.chart.day = app.day;
-      $scope.noData = false;
-    } else {
-      $scope.noData = true;
-    }
-    $rootScope.db_loading = false;
-    $scope.status = false;
   }
+
+  $scope.commas = function(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
 }
 
 })();
@@ -2356,9 +2394,8 @@ angular
 
 function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $timeout, data, $location) {
   $rootScope.devProfile = session.getProfile();
-  if(!$rootScope.devProfile) {
-    $rootScope.db_loading = false;
-  } else {
+  $rootScope.db_loading = false;
+  if($rootScope.devProfile) {
     loadApps();
   }
 
@@ -2466,6 +2503,24 @@ function Start($rootScope, session, $location, $scope, $timeout) {
     //$scope.tutorialMode = true;
 
   }
+  // http://bootstraptour.com/api/#step-options
+  // var tour = new Tour({
+  //   steps: [
+  //   {
+  //     element: "#my-element",
+  //     title: "Title of my step",
+  //     content: "Content of my step",
+  //     onNext: func
+  //   },
+  //   {
+  //     element: "#my-other-element",
+  //     title: "Title of my step",
+  //     content: "Content of my step"
+  //   }
+  // ]});
+
+  // tour.init();
+  // tour.start();
 
   // if(!user || !apps.length) {
   // 	$rootScope.$on('appsLoaded', function(){

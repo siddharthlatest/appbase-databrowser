@@ -4,8 +4,7 @@ angular
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
 .directive('hideParent', HideParent)
-.directive('showParent', ShowParent)
-.directive('barchart', BarChart);
+.directive('showParent', ShowParent);
 
 
 function ImgSrc(){
@@ -22,41 +21,6 @@ function ImgSrc(){
       });
     }
   } 
-}
-
-function BarChart(){
-  return {
-
-      // required to make it work as an element
-      restrict: 'E',
-      template: '<div></div>',
-      replace: true,
-      scope: {
-        data: "=",
-        xkey: "=",
-        ykeys: "=",
-        labels: "=",
-        colors: "="
-      },
-      // observe and manipulate the DOM
-      link: function($scope, element, attrs) {
-
-          var graph = Morris.Area({
-            element: element,
-            data: $scope.data,
-            xkey: $scope.xkey,
-            ykeys: $scope.ykeys,
-            labels: $scope.labels,
-            lineColors: $scope.colors,
-            gridTextFamily: 'Source Sans Pro Regular'
-          });
-
-          $scope.$watch('data', function(newData){
-            graph.setData(newData);
-          });
-      }
-
-  };
 }
 
 function BackgroundColor() {

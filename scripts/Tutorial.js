@@ -6,9 +6,8 @@ angular
 
 function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $timeout, data, $location) {
   $rootScope.devProfile = session.getProfile();
-  if(!$rootScope.devProfile) {
-    $rootScope.db_loading = false;
-  } else {
+  $rootScope.db_loading = false;
+  if($rootScope.devProfile) {
     loadApps();
   }
 
@@ -116,6 +115,24 @@ function Start($rootScope, session, $location, $scope, $timeout) {
     //$scope.tutorialMode = true;
 
   }
+  // http://bootstraptour.com/api/#step-options
+  // var tour = new Tour({
+  //   steps: [
+  //   {
+  //     element: "#my-element",
+  //     title: "Title of my step",
+  //     content: "Content of my step",
+  //     onNext: func
+  //   },
+  //   {
+  //     element: "#my-other-element",
+  //     title: "Title of my step",
+  //     content: "Content of my step"
+  //   }
+  // ]});
+
+  // tour.init();
+  // tour.start();
 
   // if(!user || !apps.length) {
   // 	$rootScope.$on('appsLoaded', function(){

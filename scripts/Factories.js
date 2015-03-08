@@ -102,7 +102,18 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
       });
       //console.timeEnd('total')
       session.setApps(existing);
-      window.Intercom('update', {'apps': existing.length, 'calls': overall});
+
+      var obj = {
+        email: 'unknown',
+        name: 'unknown'
+      };
+
+      var user = session.getProfile() || obj;
+
+      window.Intercom('update', { 'apps': existing.length, 
+                                  'calls': overall, 
+                                  'name': user.name,
+                                  'email': user.email });
       if(done) done();
     });
   }

@@ -227,6 +227,10 @@ body {
 	}
 }
 
+.grayed {
+	opacity: 0.5;
+}
+
 #applications {
 	margin-top: -$manage-height;
 	font-family: $font-extra-light-i;
@@ -260,10 +264,6 @@ body {
 
 	.create-app {
 		transition: margin-left 0.3s ease;
-	}
-
-	.grayed {
-		opacity: 0.5;
 	}
 
 	.desc {
@@ -813,6 +813,18 @@ body {
  	}
 }
 
+.wellp {
+	padding: 15px 15px 10px;
+	background: white;
+	border-radius: 3px;	
+	box-shadow: 1px 1px 1px #dedede;
+	h2 {
+		text-align: left;
+		font-size: 2.0em;
+		margin-left: 20px;
+	}
+}
+
 #stats {
 	font-family: $font-extra-light;
 	padding: 0 15px;
@@ -854,8 +866,54 @@ body {
 		line-height: 110px;
 		z-index: 2;
 	}
-	svg{
-	  width: 100% !important
+	.highcharts-background {fill: white}
+	.graph .wellp{
+		width: 90%;
+	}
+	.push {
+		margin-top: 20px;
+	}
+	h2.graph-title {
+		margin-bottom: 5px;
+	}
+	.nav-tab {
+		text-align: left;
+		ul, li {
+			display: inline-block;
+		}
+		li:first-child {
+			margin-left: -20px;
+		}
+		li {
+			margin: 0 20px 20px;
+		}
+		a {
+			font-size: 1.2em;
+			color: #555;
+			padding: 0 3px;
+			cursor: pointer;
+		}
+		a.active {
+			border-bottom: 2px solid #666;
+		}
+	}
+	h3 {
+		display: inline-block;
+		margin-right: 10px;
+	}
+	.progress-bar {
+		background-color: darken($blue, 5%);
+	}
+	.plan {
+		text-align: left;
+		padding: 0 20px 20px;
+		font-size: 1.2em;
+		span {
+			float: right;
+			position: relative;
+			top: 1.4em;
+			right: 2px;
+		}
 	}
 }
 
@@ -876,7 +934,16 @@ body {
 #oauth {
 	font-family: $font-light;
 	font-size: 1.1em;
-	
+	.wellp {
+		padding: 10px 30px 25px;
+		margin-top: 15px;
+		h2 {
+			margin-left: 0;
+		}
+		ul {
+			margin-bottom: 0;
+		}
+	}
 	h4 {
 		font-family: $font-extra-light;
 		font-size: 2em;

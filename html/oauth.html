@@ -4,10 +4,9 @@
 	</div>
 	<div class="list ng-hide" ng-show="!status">
 		<div class="col-md-4">
-			<div>
-			<h4>Expiry time</h4>
+			<div class="wellp">
+			<h2>Expiry time</h2>
 			<p>Token expiration, from 60 minutes to 90 days. <span data-toggle="tooltip" data-placement="right" title="60m (60 minutes), 1d (1 day), 1w (1 week)" class="example">Example</span></p>
-			</div>
 			<div ng-hide="status" ng-class="{overlay: loading}">
 				<form ng-submit="updateExpiry(timeInput)">
 					<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">
@@ -18,10 +17,12 @@
 					</div>
 				</form>
 			</div>
-			<h4>Domains
+			</div>
+			<div class="wellp">
+			<h2>Domains
 				<span class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.">
 				</span>
-			</h4>
+			</h2>
 			<p>Domains allowed to make oauth requests. <span data-toggle="tooltip" data-placement="right" title="Correct: https://domain.com, http://domain.com:3254, abc.domain.com
 			  Incorrect: domain.com/foobar/this" class="example">Example</span></p>
 			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
@@ -44,11 +45,10 @@
 				</form>
 				</ul>
 			</div>
-			
-			<br>
+			</div>
 		</div>
-		<div class="col-md-8" id="provider">
-		  <h4>Provider settings</h4>
+		<div class="col-md-8 wellp" id="provider">
+		  <h2>Provider settings</h2>
 			<div ng-bind="provStatus" class="oa-dom" ng-show="provStatus"></div>
 			<div ng-hide="provStatus || editing" ng-class="{overlay: loadingProv}">
 				<ul class="list-group oa-dom">

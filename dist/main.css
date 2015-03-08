@@ -53,6 +53,105 @@
     animation: none;
   }
 }
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}
 @font-face {
   font-family: 'Source Sans Pro Extra Light Italic';
   src: url('/styles/fonts/source/sourcesanspro-extralightit.eot');
@@ -415,6 +514,9 @@ body {
   #view div[ng-view] {
     margin-top: 108px; }
 
+.grayed {
+  opacity: 0.5; }
+
 #applications {
   margin-top: -108px;
   font-family: "Source Sans Pro Extra Light Italic";
@@ -442,8 +544,6 @@ body {
       animation: fa-spin 1s infinite ease-in-out; }
   #applications .create-app {
     transition: margin-left 0.3s ease; }
-  #applications .grayed {
-    opacity: 0.5; }
   #applications .desc {
     font-size: 1.2em; }
   #applications .well {
@@ -853,6 +953,16 @@ body {
       top: 1px;
       font-size: 1em; }
 
+.wellp {
+  padding: 15px 15px 10px;
+  background: white;
+  border-radius: 3px;
+  box-shadow: 1px 1px 1px #dedede; }
+  .wellp h2 {
+    text-align: left;
+    font-size: 2em;
+    margin-left: 20px; }
+
 #stats {
   font-family: "Source Sans Pro Extra Light";
   padding: 0 15px;
@@ -887,8 +997,43 @@ body {
     display: inline-block;
     line-height: 110px;
     z-index: 2; }
-  #stats svg {
-    width: 100% !important; }
+  #stats .highcharts-background {
+    fill: white; }
+  #stats .graph .wellp {
+    width: 90%; }
+  #stats .push {
+    margin-top: 20px; }
+  #stats h2.graph-title {
+    margin-bottom: 5px; }
+  #stats .nav-tab {
+    text-align: left; }
+    #stats .nav-tab ul, #stats .nav-tab li {
+      display: inline-block; }
+    #stats .nav-tab li:first-child {
+      margin-left: -20px; }
+    #stats .nav-tab li {
+      margin: 0 20px 20px; }
+    #stats .nav-tab a {
+      font-size: 1.2em;
+      color: #555;
+      padding: 0 3px;
+      cursor: pointer; }
+    #stats .nav-tab a.active {
+      border-bottom: 2px solid #666; }
+  #stats h3 {
+    display: inline-block;
+    margin-right: 10px; }
+  #stats .progress-bar {
+    background-color: #39b1ed; }
+  #stats .plan {
+    text-align: left;
+    padding: 0 20px 20px;
+    font-size: 1.2em; }
+    #stats .plan span {
+      float: right;
+      position: relative;
+      top: 1.4em;
+      right: 2px; }
 
 .inner-loading {
   position: absolute;
@@ -905,6 +1050,13 @@ body {
 #oauth {
   font-family: "Source Sans Pro Light";
   font-size: 1.1em; }
+  #oauth .wellp {
+    padding: 10px 30px 25px;
+    margin-top: 15px; }
+    #oauth .wellp h2 {
+      margin-left: 0; }
+    #oauth .wellp ul {
+      margin-bottom: 0; }
   #oauth h4 {
     font-family: "Source Sans Pro Extra Light";
     font-size: 2em; }
@@ -1241,103 +1393,3 @@ body {
 
 .nav > li > a:focus {
   background-color: transparent; }
-
-@-webkit-keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ngdialog {
-  position: fixed;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 10000;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.ngdialog-overlay {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.4);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-content {
-  background: white;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-content {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-close:before {
-  content: '\00D7';
-  cursor: pointer;
-}
-
-body.ngdialog-open {
-  overflow: hidden;
-}
