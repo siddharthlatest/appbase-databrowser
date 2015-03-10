@@ -100,7 +100,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
     var presets = {
       week: function(){
         $scope.graphActive = 'week';
-        timeFrame = utc.setDate(utc.getDay() - 7);
+        timeFrame = utc.setDate(utc.getDate() - 7);
       },
       month: function(){
         $scope.graphActive = 'month';
