@@ -556,7 +556,8 @@ body {
     color: #888;
     min-height: 170px; }
     #applications .well table th {
-      font-family: "Source Sans Pro Semi Bold"; }
+      font-family: "Source Sans Pro Semi Bold";
+      cursor: default; }
     #applications .well table tr td {
       -webkit-user-select: none;
       -moz-user-select: none;
@@ -564,6 +565,8 @@ body {
       user-select: none;
       cursor: pointer;
       text-align: left; }
+    #applications .well table tr:first-child:hover > td, #applications .well table tr:first-child:hover > th {
+      background-color: white; }
     #applications .well .tip {
       text-align: center;
       line-height: 30px;
@@ -1348,21 +1351,21 @@ body {
   .modal-custom.modal-examples .content-block .docs {
     width: 80px;
     height: 80px; }
-  .modal-custom.modal-examples .content-block .docs {
-    background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain; }
-  .modal-custom.modal-examples .content-block .graph {
-    background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain; }
-  .modal-custom.modal-examples .content-block .auth {
-    background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain; }
-  .modal-custom.modal-examples .content-block .auth_providers {
-    background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain; }
-  .modal-custom.modal-examples .content-block .angular {
-    background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain; }
-  .modal-custom.modal-examples .content-block .js {
-    background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain; }
-  .modal-custom.modal-examples .content-block .fa-search {
-    font-size: 2em;
-    padding-top: 10px; }
+.modal-custom.modal-examples .docs {
+  background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain; }
+.modal-custom.modal-examples .graph {
+  background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain; }
+.modal-custom.modal-examples .auth {
+  background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain; }
+.modal-custom.modal-examples .auth_providers {
+  background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain; }
+.modal-custom.modal-examples .angular {
+  background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain; }
+.modal-custom.modal-examples .js {
+  background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain; }
+.modal-custom.modal-examples .fa-search {
+  font-size: 2em;
+  padding-top: 10px; }
 .modal-custom.modal-examples .modal-header {
   background: #138FCD; }
 .modal-custom.modal-examples ul {

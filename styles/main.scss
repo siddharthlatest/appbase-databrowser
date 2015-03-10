@@ -273,12 +273,19 @@ body {
 	.well {
 		table th {
 			font-family: $font-semi-bold;
+			cursor: default;
 		}
 
 		table tr td{
 			user-select: none;
 			cursor: pointer;
 			text-align: left;
+		}
+
+		table tr:first-child:hover {
+			&>td, &>th {
+				background-color: white;
+			}
 		}
 
 		background-color: #fdfdfd;
@@ -1373,14 +1380,16 @@ body {
 				width: 80px;
 				height: 80px;
 			}
-			.docs { background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain}
-			.graph { background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain }
-			.auth { background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain }
-			.auth_providers { background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain }
-			.angular { background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain }
-			.js { background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain }
-			.fa-search { font-size: 2em; padding-top: 10px;}
 		}
+		.docs { background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain}
+		.graph { background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain }
+		.auth { background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain }
+		.auth_providers {
+			background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain
+		}
+		.angular { background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain }
+		.js { background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain }
+		.fa-search { font-size: 2em; padding-top: 10px;}
 		.modal-header {
 			background: $dark-blue;
 		}
