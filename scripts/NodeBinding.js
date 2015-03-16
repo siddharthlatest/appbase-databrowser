@@ -69,7 +69,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
               nodeBinding.creating.splice(nodeBinding.creating.indexOf(nsObj.name), 1);
             }
             if(!addNamespaces(root, nsObj.name)) {
-              var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name,nsObj.searchable));
+              var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name));
               if(!initialPoll) {
                 p--;
                 $timeout(function(){
@@ -127,7 +127,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     }
   }
 
-  nodeBinding.bindAsNamespace = function($scope, namespace, searchable) {
+  nodeBinding.bindAsNamespace = function($scope, namespace) {
     nodeBinding.creating.push(namespace);
     var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
@@ -147,20 +147,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
       ns.ref.unbindVertices();
     }
 
-    ns.searchable = searchable || false;
     var ignoreToggleClick = false;
-
-    ns.toggleSearch = function() {
-      ns.toggling = true;
-      // prevents multiple clicks
-      if(ignoreToggleClick) return;
-      ignoreToggleClick = true;
-      data.namespaceSearchOptions(namespace, !ns.searchable, $timeout.bind(null, function() {
-        ns.toggling = false;
-        ns.searchable = !ns.searchable;
-        ignoreToggleClick = false;
-      }));
-    }
 
     ns.remove = function() {
       ns.deleting = true;

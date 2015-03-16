@@ -41,16 +41,6 @@
                   data-placement="top" >
             </span>
 
-            <span ng-show="node.isNS"
-                  ng-click="node.toggleSearch()"
-                  ng-class="node.toggling? 'fa-cog fa-spin' : (node.searchable? 'fa-eye' : 'fa-eye-slash');"
-                  class="fa node-options"
-                  title="Toggle search"
-                  data-toggle="tooltip"
-                  onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
-                  data-placement="top" >
-            </span>
-
             <span ng-show="!node.hasProps && node.properties"
                   ng-click="node.addProp()"
                   class="fa fa-pencil-square-o node-options"
