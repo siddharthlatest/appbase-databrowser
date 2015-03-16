@@ -247,7 +247,7 @@ function Routes($routeProvider, $locationProvider){
     templateUrl: '/developer/html/start.html'
   };
 
-  //$locationProvider.html5Mode(true).hashPrefix('!');
+  $locationProvider.html5Mode(true).hashPrefix('!');
 
   $routeProvider
     .when('/', start)
