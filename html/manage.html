@@ -3,7 +3,7 @@
     <div class="title">
         <a ng-href="/developer/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{$parent.currentApp}}
         <div class="right-tools">
-            <a href="" ng-click="shareApp($parent.currentApp)" class="delete share">Share</a>
+            <a href="" ng-click="share($parent.currentApp)" class="delete share">Share</a>
             <a href="" ng-click="deleteApp($parent.currentApp)" class="delete">Delete</a>
         </div>
     </div>

@@ -133,16 +133,16 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
           name: labels[type]
         });
       });
-    } else {
-      $scope.noData = true;
     }
-    
 
     $scope.chartConfig.loading = false;
 
   }
 
   function defaultValues(){
+    $scope.noData = $scope.app && $scope.app.metrics
+      && $scope.app.metrics.calls && $scope.app.metrics.calls.length;
+
     $scope.cap = 100000;
     $rootScope.$watch('balance', function(val){
       $scope.cap = val || 100000;

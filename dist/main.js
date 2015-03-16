@@ -91,8 +91,8 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
         title: title,
         message: message
         + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
-        closable: false,
         cssClass: 'modal-custom',
+        closable: false,
         buttons: [{
             label: 'Cancel',
             cssClass: 'btn-no',
@@ -110,6 +110,11 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
             }
         }]
     }).open();
+  }
+
+  $rootScope.shareApp = function(app){
+    $rootScope.sharing = true;
+    $('#share-modal').modal('show');
   }
 
   function getSecret(apps, app){
@@ -242,7 +247,7 @@ function Routes($routeProvider, $locationProvider){
     templateUrl: '/developer/html/start.html'
   };
 
-  $locationProvider.html5Mode(true).hashPrefix('!');
+  //$locationProvider.html5Mode(true).hashPrefix('!');
 
   $routeProvider
     .when('/', start)
@@ -725,6 +730,7 @@ angular
 .module("AppbaseDashboard")
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
+.directive('ngModal', NgModal)
 .directive('hideParent', HideParent)
 .directive('showParent', ShowParent);
 
@@ -743,6 +749,25 @@ function ImgSrc(){
       });
     }
   } 
+}
+
+function NgModal($timeout) {
+  return {
+    restrict: 'A',
+    scope: {
+      ngModal: '='
+    },
+    link: function(scope, element){
+      scope.$watch('ngModal', function(bool){
+        if(bool) element.modal('show');
+      });
+      $(element).on('hide.bs.modal', function (e) {
+        $timeout(function(){
+          scope.ngModal = false;
+        });
+      })
+    }
+  }
 }
 
 function BackgroundColor() {
@@ -820,7 +845,8 @@ angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
 .factory('session', ['stringManipulation', '$rootScope', 'data', '$q', SessionFactory])
-.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', DataFactory]);
+.factory('data',
+  ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', '$q', DataFactory]);
 
 function SessionFactory(stringManipulation, $rootScope, data, $q){
   var session = {};
@@ -1065,7 +1091,7 @@ function StringManipulationFactory(){
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope, $q) {
   var data = {};
   var appName;
   var secret;
@@ -1107,7 +1133,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   data.getNamespaces = function(done) {
     atomic.get(atob(server)+'app/'+ appName +'/namespaces')
       .success(function(result) {
-        if(result !== undefined && result.namesapces !== undefined && result.search_enabled !== undefined){
+        if(result !== undefined && result.namesapces !== undefined){
           return console.error("Unexpected response from server for namespaces:", result);
         }
         var namespaces = []
@@ -1115,7 +1141,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
           result.namespaces.forEach(function(obj) {
             obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
             if(obj.name !== 'system.indexes') {
-              obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
               namespaces.push(obj)
             }
           })
@@ -1130,20 +1155,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
       .success(function(result){
         done();
       }).error(done);
-  }
-
-  data.namespaceSearchOptions = function (ns, bool, done) {
-    var request = {"namespace": ns};
-    if(bool) {
-      request["enable"] = true;
-    } else {
-      request["disable"] = true;
-    }
-    atomic.post(atob(server)+'app/'+ appName +'/search', request)
-      .success(function(result) {
-        done();
-      })
-      .error(sentry)
   }
 
   data.createApp = function(app, done) {
@@ -1171,6 +1182,59 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
       .error(sentry)
   } 
   
+  data.getGeneric = function(app, what, done) {
+    var deferred = $q.defer();
+    atomic.get(atob(server) + 'app/' + app + '/' + what)
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  data.putUser = function(app, user) {
+    var deferred = $q.defer();
+    atomic.put(atob(server) + 'app/' + app + '/users', {user: user})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  data.deleteUser = function(app, user) {
+    var deferred = $q.defer();
+    var step1 = atomic.delete(atob(server) + 'user/' + user, {appname: app}).error(error);
+    var step2 = atomic.delete(atob(server) + 'app/' + app + '/users', {user: user}).error(error);
+    
+    step1.success(function(){
+      step2.success(function(){
+        deferred.resolve(data);
+      });
+    });
+
+    function error(err){
+      deferred.reject(err);
+    }
+    return deferred.promise;
+  }
+
+  data.putApp = function(user, app) {
+    var deferred = $q.defer();
+    atomic.put(atob(server) + 'user/' + user, {'appname': app})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {
@@ -1478,7 +1542,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
               nodeBinding.creating.splice(nodeBinding.creating.indexOf(nsObj.name), 1);
             }
             if(!addNamespaces(root, nsObj.name)) {
-              var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name,nsObj.searchable));
+              var p = root.children.push(nodeBinding.bindAsNamespace($scope,nsObj.name));
               if(!initialPoll) {
                 p--;
                 $timeout(function(){
@@ -1536,7 +1600,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     }
   }
 
-  nodeBinding.bindAsNamespace = function($scope, namespace, searchable) {
+  nodeBinding.bindAsNamespace = function($scope, namespace) {
     nodeBinding.creating.push(namespace);
     var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
@@ -1556,20 +1620,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
       ns.ref.unbindVertices();
     }
 
-    ns.searchable = searchable || false;
     var ignoreToggleClick = false;
-
-    ns.toggleSearch = function() {
-      ns.toggling = true;
-      // prevents multiple clicks
-      if(ignoreToggleClick) return;
-      ignoreToggleClick = true;
-      data.namespaceSearchOptions(namespace, !ns.searchable, $timeout.bind(null, function() {
-        ns.toggling = false;
-        ns.searchable = !ns.searchable;
-        ignoreToggleClick = false;
-      }));
-    }
 
     ns.remove = function() {
       ns.deleting = true;
@@ -2124,6 +2175,91 @@ function OauthFactory($timeout, $q, session){
 (function(){
 angular
 .module("AppbaseDashboard")
+.controller('sharingCtrl', SharingCtrl);
+
+function SharingCtrl($scope, $rootScope, data, $timeout, session){
+  var app;
+
+  $scope.addUser = function(){
+    var email = session.getProfile().email;
+    var adding = $scope.input;
+    app = app || $rootScope.currentApp;
+    $scope.refreshing = true;
+
+    data.getGeneric(app, 'owners').catch(sentry).then(function(owners){
+      if(owners.indexOf(email) !== -1) {
+        var user = data.putUser(app, adding).catch(sentry);
+        var application = data.putApp(adding, app).catch(sentry);
+
+        user.then(function(){
+          application.then(function(){
+            getUsers(owners);
+          });
+        });
+      } else {
+        $timeout(function(){
+          $scope.refreshing = false;
+        });
+      }
+    });
+  };
+
+  $rootScope.share = function(_app){
+    $scope.loading = true;
+    app = _app;
+    var email = session.getProfile().email;
+
+    $rootScope.sharing = true;
+    $scope.owner = false;
+    $scope.email = email;
+
+    getUsers();
+  }
+
+  $scope.delete = function(user){
+    app = app || $rootScope.currentApp;
+    $scope.refreshing = true;
+    data.deleteUser(app, user).catch(sentry).then(function(){
+      getUsers();
+    });
+  }
+
+  function getUsers(owners){
+    var users = data.getGeneric(app, 'users').catch(sentry);
+
+    if(!owners) data.getGeneric(app, 'owners').catch(sentry).then(process);
+    else process(owners);
+
+    function process(owners) {
+      var email = session.getProfile().email;
+      if(owners.indexOf(email) !== -1) {
+        $scope.owner = true;
+        $scope.placeholder = 'Add new user email';
+      } else {
+        $scope.placeholder = 'You need to own the app to add users';
+      }
+      users.then(function(users){
+        owners.forEach(function(owner){
+          if(users.indexOf(owner) === -1) {
+            users.unshift(owner);
+          }
+        });
+        $timeout(function(){
+          $scope.users = users;
+          $scope.refreshing = false;
+          $scope.loading = false;
+          $scope.input = '';
+        });
+      });
+    }
+  }
+}
+
+})();
+
+(function(){
+angular
+.module("AppbaseDashboard")
 .controller('signup', ['$rootScope', '$scope', 'session', '$route', '$location', SignupCtrl])
 .controller('sidebar', SidebarCtrl)
 .controller('navbar', NavbarCtrl);
@@ -2342,16 +2478,16 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
           name: labels[type]
         });
       });
-    } else {
-      $scope.noData = true;
     }
-    
 
     $scope.chartConfig.loading = false;
 
   }
 
   function defaultValues(){
+    $scope.noData = $scope.app && $scope.app.metrics
+      && $scope.app.metrics.calls && $scope.app.metrics.calls.length;
+
     $scope.cap = 100000;
     $rootScope.$watch('balance', function(val){
       $scope.cap = val || 100000;
@@ -2468,13 +2604,6 @@ function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $time
             }
         }]
     }).open();
-
-    $rootScope.shareApp = function(app){
-      $rootScope.confirm('Share App',
-        'Enter the email of the user you want to share the app with', function(value){
-          console.log(value)
-        }, true);
-    }
   }
 }
 

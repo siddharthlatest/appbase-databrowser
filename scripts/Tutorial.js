@@ -80,13 +80,6 @@ function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $time
             }
         }]
     }).open();
-
-    $rootScope.shareApp = function(app){
-      $rootScope.confirm('Share App',
-        'Enter the email of the user you want to share the app with', function(value){
-          console.log(value)
-        }, true);
-    }
   }
 }
 

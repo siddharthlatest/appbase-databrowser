@@ -91,8 +91,8 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
         title: title,
         message: message
         + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
-        closable: false,
         cssClass: 'modal-custom',
+        closable: false,
         buttons: [{
             label: 'Cancel',
             cssClass: 'btn-no',
@@ -110,6 +110,11 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
             }
         }]
     }).open();
+  }
+
+  $rootScope.shareApp = function(app){
+    $rootScope.sharing = true;
+    $('#share-modal').modal('show');
   }
 
   function getSecret(apps, app){
@@ -242,7 +247,7 @@ function Routes($routeProvider, $locationProvider){
     templateUrl: '/developer/html/start.html'
   };
 
-  $locationProvider.html5Mode(true).hashPrefix('!');
+  //$locationProvider.html5Mode(true).hashPrefix('!');
 
   $routeProvider
     .when('/', start)

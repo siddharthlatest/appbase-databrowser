@@ -3,7 +3,8 @@ angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
 .factory('session', ['stringManipulation', '$rootScope', 'data', '$q', SessionFactory])
-.factory('data', ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', DataFactory]);
+.factory('data',
+  ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', '$q', DataFactory]);
 
 function SessionFactory(stringManipulation, $rootScope, data, $q){
   var session = {};
@@ -248,7 +249,7 @@ function StringManipulationFactory(){
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope, $q) {
   var data = {};
   var appName;
   var secret;
@@ -290,7 +291,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   data.getNamespaces = function(done) {
     atomic.get(atob(server)+'app/'+ appName +'/namespaces')
       .success(function(result) {
-        if(result !== undefined && result.namesapces !== undefined && result.search_enabled !== undefined){
+        if(result !== undefined && result.namesapces !== undefined){
           return console.error("Unexpected response from server for namespaces:", result);
         }
         var namespaces = []
@@ -298,7 +299,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
           result.namespaces.forEach(function(obj) {
             obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
             if(obj.name !== 'system.indexes') {
-              obj.searchable = (result.search_enabled.indexOf(obj.name) !== -1)
               namespaces.push(obj)
             }
           })
@@ -313,20 +313,6 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
       .success(function(result){
         done();
       }).error(done);
-  }
-
-  data.namespaceSearchOptions = function (ns, bool, done) {
-    var request = {"namespace": ns};
-    if(bool) {
-      request["enable"] = true;
-    } else {
-      request["disable"] = true;
-    }
-    atomic.post(atob(server)+'app/'+ appName +'/search', request)
-      .success(function(result) {
-        done();
-      })
-      .error(sentry)
   }
 
   data.createApp = function(app, done) {
@@ -354,6 +340,59 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
       .error(sentry)
   } 
   
+  data.getGeneric = function(app, what, done) {
+    var deferred = $q.defer();
+    atomic.get(atob(server) + 'app/' + app + '/' + what)
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  data.putUser = function(app, user) {
+    var deferred = $q.defer();
+    atomic.put(atob(server) + 'app/' + app + '/users', {user: user})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
+  data.deleteUser = function(app, user) {
+    var deferred = $q.defer();
+    var step1 = atomic.delete(atob(server) + 'user/' + user, {appname: app}).error(error);
+    var step2 = atomic.delete(atob(server) + 'app/' + app + '/users', {user: user}).error(error);
+    
+    step1.success(function(){
+      step2.success(function(){
+        deferred.resolve(data);
+      });
+    });
+
+    function error(err){
+      deferred.reject(err);
+    }
+    return deferred.promise;
+  }
+
+  data.putApp = function(user, app) {
+    var deferred = $q.defer();
+    atomic.put(atob(server) + 'user/' + user, {'appname': app})
+    .success(function(data){
+      deferred.resolve(data);
+    })
+    .error(function(err){
+      deferred.reject(err);
+    });
+    return deferred.promise;
+  };
+
   data.deleteApp = function(app, done) {
     atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
       .success(function(response) {

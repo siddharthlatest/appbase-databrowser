@@ -3,6 +3,7 @@ angular
 .module("AppbaseDashboard")
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
+.directive('ngModal', NgModal)
 .directive('hideParent', HideParent)
 .directive('showParent', ShowParent);
 
@@ -21,6 +22,25 @@ function ImgSrc(){
       });
     }
   } 
+}
+
+function NgModal($timeout) {
+  return {
+    restrict: 'A',
+    scope: {
+      ngModal: '='
+    },
+    link: function(scope, element){
+      scope.$watch('ngModal', function(bool){
+        if(bool) element.modal('show');
+      });
+      $(element).on('hide.bs.modal', function (e) {
+        $timeout(function(){
+          scope.ngModal = false;
+        });
+      })
+    }
+  }
 }
 
 function BackgroundColor() {
