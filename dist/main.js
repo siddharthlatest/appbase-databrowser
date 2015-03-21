@@ -26,7 +26,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   }
   // end session fixing 
   
-  if(!angular.isArray())
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     Apps.clear();
     session.setProfile(null);
@@ -1229,18 +1228,19 @@ angular.module("AppbaseDashboard")
 function ExternalLibs($rootScope, $window, session){
 	document.addEventListener('postLogin', updateLibs);
 	$rootScope.$on('logged', updateLibs);
+	if($rootScope.logged) updateLibs();
 
 	function updateLibs(){
-		$window.Raven.setUser({
-		    email: user.email,
-		    id: user.uid
-		});
-
 		var user = session.getProfile() || {
 		  name: 'unknown',
 		  email: 'unknown',
 		  uid: 'unknown'
 		};
+
+		$window.Raven.setUser({
+		    email: user.email,
+		    id: user.uid
+		});
 
 		$window.Intercom('boot', {
 		  app_id: "jnzcgdd7",

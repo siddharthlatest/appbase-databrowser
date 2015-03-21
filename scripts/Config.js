@@ -26,7 +26,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   }
   // end session fixing 
   
-  if(!angular.isArray())
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     Apps.clear();
     session.setProfile(null);
