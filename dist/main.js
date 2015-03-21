@@ -1226,16 +1226,18 @@ angular.module("AppbaseDashboard")
   .run(ExternalLibs);
 
 function ExternalLibs($rootScope, $window, session){
+	var unknownUser = {
+	  name: 'unknown',
+	  email: 'unknown',
+	  uid: 'unknown'
+	};
+
 	document.addEventListener('postLogin', updateLibs);
 	$rootScope.$on('logged', updateLibs);
 	if($rootScope.logged) updateLibs();
 
 	function updateLibs(){
-		var user = session.getProfile() || {
-		  name: 'unknown',
-		  email: 'unknown',
-		  uid: 'unknown'
-		};
+		var user = session.getProfile() || unknownUser;
 
 		$window.Raven.setUser({
 		    email: user.email,
@@ -1255,6 +1257,8 @@ function ExternalLibs($rootScope, $window, session){
 	}
 
 	function updateIntercom(evt, stats){
+		var user = session.getProfile() || unknownUser;
+
 		$window.Intercom('update', {
 		  name: user.name,
 		  email: user.email,
