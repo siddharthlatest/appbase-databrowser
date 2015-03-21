@@ -18,7 +18,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
   
   var URL;
   URL = session.getBrowserURL(apps);
-  if(!URL) {
+  if(!URL || stringManipulation.urlToAppname(URL) !== appName) {
     URL = stringManipulation.appToURL(appName);
     session.setBrowserURL(URL);
   }
@@ -34,7 +34,6 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
   function gotSecret(secret){
     data.setAppCredentials(appName, secret);
     $scope.url = URL;
-
     $scope.goUp = function() {
       URL = stringManipulation.parentUrl($scope.url);
     }

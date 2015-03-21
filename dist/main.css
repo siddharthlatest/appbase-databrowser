@@ -259,6 +259,20 @@ body {
 #intercom-container .intercom-sheet-content-container {
   padding-bottom: 130px !important; }
 
+@-webkit-keyframes copied {
+  0% {
+    color: #2AD37A; }
+
+  100% {
+    color: #428bca; } }
+
+@keyframes copied {
+  0% {
+    color: #2AD37A; }
+
+  100% {
+    color: #428bca; } }
+
 @-webkit-keyframes slideOutLeft {
   100% {
     display: none; }
@@ -517,9 +531,6 @@ body {
 .grayed {
   opacity: 0.5; }
 
-.fa-check-square-o {
-  color: green !important; }
-
 #applications {
   margin-top: -108px;
   font-family: "Source Sans Pro Extra Light";
@@ -558,6 +569,13 @@ body {
     border-radius: 5px;
     color: #000;
     min-height: 170px; }
+    #applications .well .copy-board {
+      font-size: 1em;
+      color: #777; }
+    #applications .well .copy-board.fa-check {
+      color: #2AD37A;
+      font-size: 1.2em;
+      transition: all 0.5s ease-out; }
     #applications .well table th {
       font-family: "Source Sans Pro Semi Bold";
       cursor: default;
@@ -572,8 +590,6 @@ body {
       cursor: pointer; }
     #applications .well table tr td.name {
       text-align: left !important; }
-    #applications .well td a {
-      color: #777; }
     #applications .well table tr:first-child:hover > td, #applications .well table tr:first-child:hover > th {
       background-color: white; }
     #applications .well td .popover {
@@ -758,7 +774,16 @@ body {
       color: #1394d5; }
     #manage .secret a {
       font-family: "Source Sans Pro Regular";
-      text-decoration: underline; }
+      text-decoration: underline;
+      color: #50BAEF; }
+    #manage .secret a:active, #manage .secret a:focus, #manage .secret a:hover, #manage .secret a:visited {
+      border: 0;
+      outline: 0;
+      color: #50BAEF; }
+    #manage .secret a.zeroclipboard-is-active {
+      color: #28ca74 !important; }
+    #manage .secret a:not(.zeroclipboard-is-active) {
+      transition: color 1.5s ease; }
     #manage .secret span {
       cursor: pointer; }
   #manage .navbar-left {
@@ -970,6 +995,7 @@ body {
       font-size: 1em; }
 
 .wellp {
+  margin-top: 10px;
   padding: 15px 15px 10px;
   background: white;
   border-radius: 3px;
@@ -982,6 +1008,9 @@ body {
 .strike, a.strike, a.strike:hover {
   text-decoration: line-through;
   cursor: default; }
+
+text[style="cursor:pointer;color:#909090;font-size:9px;fill:#909090;"] {
+  display: none; }
 
 #stats {
   font-family: "Source Sans Pro Extra Light";

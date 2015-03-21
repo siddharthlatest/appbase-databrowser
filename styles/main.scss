@@ -53,6 +53,14 @@ body {
 	padding-bottom: 130px!important;
 }
 
+@keyframes copied {
+	0% {
+		color: $green
+	}
+	100% {
+		color: #428bca
+	}
+}
 @keyframes slideOutLeft {
 	100% {
 		display: none;
@@ -231,10 +239,6 @@ body {
 	opacity: 0.5;
 }
 
-.fa-check-square-o {
-	color: green!important;
-}
-
 #applications {
 	margin-top: -$manage-height;
 	font-family: $font-extra-light;
@@ -275,6 +279,17 @@ body {
 	}
 
 	.well {
+		.copy-board {
+			font-size: 1em;
+			color: #777;
+
+		}
+		.copy-board.fa-check {
+			color: $green;
+			font-size: 1.2em;
+			transition: all 0.5s ease-out;
+		}
+
 		table th {
 			font-family: $font-semi-bold;
 			cursor: default;
@@ -292,10 +307,6 @@ body {
 
 		table tr td.name{
 			text-align: left!important;
-		}
-
-		td a {
-			color: #777;
 		}
 
 		table tr:first-child:hover {
@@ -563,7 +574,10 @@ body {
 		font-size: 15px;
 		min-width: 350px;
 		span span {font-size: 10px; margin-left: 3px; opacity: 0.6; color: darken($blue, 17%)}
-		a { font-family: $font-regular; text-decoration: underline}
+		a { font-family: $font-regular; text-decoration: underline; color: $blue }
+		a:active, a:focus, a:hover, a:visited { border:0; outline: 0; color: $blue }
+		a.zeroclipboard-is-active { color: darken($green, 2%)!important }
+		a:not(.zeroclipboard-is-active) { transition: color 1.5s ease }
 		span { cursor: pointer; }
 	}
 
@@ -845,6 +859,7 @@ body {
 }
 
 .wellp {
+	margin-top: 10px;
 	padding: 15px 15px 10px;
 	background: white;
 	border-radius: 3px;	
@@ -859,6 +874,10 @@ body {
 .strike, a.strike, a.strike:hover {
 	text-decoration: line-through;
 	cursor: default;
+}
+
+text[style="cursor:pointer;color:#909090;font-size:9px;fill:#909090;"] {
+	display: none;
 }
 
 #stats {

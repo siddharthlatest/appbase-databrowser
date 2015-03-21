@@ -212,7 +212,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
 
     $timeout(function(){
       app.copied = false;
-    }, 2000);
+    }, 1500);
   }
 
   $scope.firstAPICall = function() {
@@ -771,7 +771,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
   
   var URL;
   URL = session.getBrowserURL(apps);
-  if(!URL) {
+  if(!URL || stringManipulation.urlToAppname(URL) !== appName) {
     URL = stringManipulation.appToURL(appName);
     session.setBrowserURL(URL);
   }
@@ -787,7 +787,6 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
   function gotSecret(secret){
     data.setAppCredentials(appName, secret);
     $scope.url = URL;
-
     $scope.goUp = function() {
       URL = stringManipulation.parentUrl($scope.url);
     }
@@ -2578,7 +2577,8 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
 
     URL = sessionStorage.getItem('URL');
     if(URL === null){
-      URL = apps ? apps[0].name : undefined;
+      URL = apps ? stringManipulation.appToURL(apps[0].name) : undefined;
+
     }
     return URL;
   };

@@ -116,7 +116,8 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
 
     URL = sessionStorage.getItem('URL');
     if(URL === null){
-      URL = apps ? apps[0].name : undefined;
+      URL = apps ? stringManipulation.appToURL(apps[0].name) : undefined;
+
     }
     return URL;
   };

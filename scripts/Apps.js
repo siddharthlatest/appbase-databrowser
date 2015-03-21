@@ -63,7 +63,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
 
     $timeout(function(){
       app.copied = false;
-    }, 2000);
+    }, 1500);
   }
 
   $scope.firstAPICall = function() {
