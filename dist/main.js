@@ -2454,7 +2454,7 @@ function Routes($routeProvider, $locationProvider){
     return deferred.promise;
   }
 
-  //$locationProvider.html5Mode(true).hashPrefix('!');
+  $locationProvider.html5Mode(true).hashPrefix('!');
 
 }
 
