@@ -231,9 +231,13 @@ body {
 	opacity: 0.5;
 }
 
+.fa-check-square-o {
+	color: green!important;
+}
+
 #applications {
 	margin-top: -$manage-height;
-	font-family: $font-extra-light-i;
+	font-family: $font-extra-light;
 	margin-bottom: 50px;
 	.main-title {
 		text-align: center;
@@ -274,17 +278,37 @@ body {
 		table th {
 			font-family: $font-semi-bold;
 			cursor: default;
+			text-align: center;
+		}
+
+		table th.name {
+			text-align: left;
 		}
 
 		table tr td{
 			user-select: none;
 			cursor: pointer;
-			text-align: left;
+		}
+
+		table tr td.name{
+			text-align: left!important;
+		}
+
+		td a {
+			color: #777;
 		}
 
 		table tr:first-child:hover {
 			&>td, &>th {
 				background-color: white;
+			}
+		}
+
+		td {
+			.popover {
+			  position: relative;
+			  display: block;
+			  margin: 20px;
 			}
 		}
 
@@ -294,7 +318,7 @@ body {
 		margin: 30px;
 		padding: 25px 30px 15px;
 		border-radius: 5px;
-		color: #888;
+		color: #000;
 		min-height: 170px;
 		.tip {
 			text-align: center;
@@ -832,6 +856,11 @@ body {
 	}
 }
 
+.strike, a.strike, a.strike:hover {
+	text-decoration: line-through;
+	cursor: default;
+}
+
 #stats {
 	font-family: $font-extra-light;
 	padding: 0 15px;
@@ -898,6 +927,8 @@ body {
 			font-size: 1.2em;
 			color: #555;
 			padding: 0 3px;
+		}
+		a:not(.strike){
 			cursor: pointer;
 		}
 		a.active {
@@ -1381,15 +1412,22 @@ body {
 				height: 80px;
 			}
 		}
-		.docs { background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain}
-		.graph { background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain }
-		.auth { background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain }
-		.auth_providers {
-			background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain
-		}
-		.angular { background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain }
-		.js { background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain }
-		.fa-search { font-size: 2em; padding-top: 10px;}
+
+		$url_docs: "http://docs.appbase.io/images/logos/dh_rest.svg";
+		$url_graph: "http://docs.appbase.io/images/logos/dh_graph.svg";
+		$url_auth: "http://docs.appbase.io/images/logos/dh_auth.svg";
+		$url_providers: "http://docs.appbase.io/images/logos/dh_auth_providers.svg";
+		$url_angular: "http://docs.appbase.io/images/logos/dh_angular.svg";
+		$url_js: "http://docs.appbase.io/images/logos/dh_js.svg";
+
+		.docs { background: url($url_docs) no-repeat center/contain }
+		.graph { background: url($url_graph) no-repeat center/contain }
+		.auth { background: url($url_auth) no-repeat center/contain }
+		.auth_providers { background: url($url_providers) no-repeat center/contain }
+		.angular { background: url($url_angular) no-repeat center/contain }
+		.js { background: url($url_js) no-repeat center/contain }
+		.fa-search { font-size: 2em; padding-top: 10px }
+
 		.modal-header {
 			background: $dark-blue;
 		}

@@ -2,192 +2,36 @@
 angular
 .module("AppbaseDashboard")
 .factory('stringManipulation', StringManipulationFactory)
-.factory('session', ['stringManipulation', '$rootScope', 'data', '$q', SessionFactory])
 .factory('data',
-  ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', '$q', DataFactory]);
-
-function SessionFactory(stringManipulation, $rootScope, data, $q){
-  var session = {};
-
-  session.setApps = function(apps) {
-    var toDelete = [];
-    if(angular.isArray(apps)){
-      apps.forEach(function(app, index){
-        if(!app) toDelete.push(index);
-      });
-      toDelete.forEach(function(index){
-        apps.splice(index, 1);
-      });
-    } else {
-      apps = []; 
-    }
-    sessionStorage.setItem('apps', JSON.stringify(apps));
-  };
-
-  session.getApps = function() {
-    if(session.getProfile()){
-      var apps = sessionStorage.getItem('apps');
-      return apps? JSON.parse(apps) : [];
-    } else return [];
-  };
-
-  session.appFromName = function(appName) {
-    var apps = session.getApps();
-    return apps? apps.filter(function(app){
-      return app.name === appName;
-    })[0] : undefined;
-  };
-
-  session.fetchApps = function(done) {
-    data.getDevsApps(function(apps){
-      var existing = session.getApps();
-      var first = !existing.length;
-      if(first){
-        var profile = session.getProfile();
-        if(profile) {
-          var order = localStorage.getItem(profile.uid + 'order');
-          if(order) order = JSON.parse(order);
-          else first = false;
-        }
-      }
-      existing.forEach(function(app, index){
-        var newRef = apps.filter(function(newApp){
-          return newApp.name === app.name;
-        })[0];
-        if(newRef){
-          app = newRef;
-        } else {
-          existing.splice(index, 1);
-        } 
-      }); // old removed
-
-      apps.forEach(function(app){
-        if(existing.filter(function(old){
-          return app.name === old.name;
-        }).length === 0){
-          existing.unshift(app);
-        }
-      }); // new added
-      //persists order after logout
-      if(first){
-        existing.sort(function(a,b){
-          //if a is greater, a should go after
-          //if a is new, a should go first
-          if(!a || !b) return 0;
-          var a_index = order.indexOf(a.name);
-          if(a_index === -1) return -1000000;
-          var b_index = order.indexOf(b.name);
-          if(b_index === -1) return 1000000;
-          return a_index - b_index;
-        });
-      }
-      //console.time('total')
-      var overall = 0;
-      existing.forEach(function(app){
-        //console.time(app.name);
-        app.metrics.totalRec = 0;
-        app.metrics.totalRec += parseInt(app.metrics.edgesAndVertices.Vertices) || 0;
-        app.metrics.totalRec += parseInt(app.metrics.edgesAndVertices.Edges) || 0;
-
-        var total = 0;
-        var calls = app.metrics.calls && Object.keys(app.metrics.calls);
-        if(calls && calls.length) {
-          calls.forEach(function(call){
-            total += call.indexOf('APICalls') !== -1 ? app.metrics.calls[call] : 0;
-          });
-        }
-
-        app.metrics.totalCalls = total;
-        overall += total;
-        //console.timeEnd(app.name);
-      });
-      //console.timeEnd('total')
-      session.setApps(existing);
-
-      var obj = {
-        email: 'unknown',
-        name: 'unknown'
-      };
-
-      var user = session.getProfile() || obj;
-
-      window.Intercom('update', { 'apps': existing.length, 
-                                  'calls': overall, 
-                                  'name': user.name,
-                                  'email': user.email });
-      if(done) done();
-    });
-  }
-
-  session.getAppSecret = function(appName) {
-    var apps = session.getApps();
-    return (apps.length? session.appFromName(appName).secret : undefined);
-  };
-
-  session.setProfile = function(profile) {
-    localStorage.setItem('devProfile', JSON.stringify(profile));
-  };
-
-  session.setBrowserURL = function(url) {
-    sessionStorage.setItem('URL', url);
-    $rootScope.currentApp = stringManipulation.urlToAppname(url);
-  };
-
-  session.getBrowserURL = function() {
-    var URL;
-    var apps;
-
-    URL = sessionStorage.getItem('URL');
-    if(URL === null){
-      apps = session.getApps();
-      URL = apps ? apps[0].name : undefined;
-    }
-    return URL;
-  };
-
-  session.getProfile = function() {
-    return JSON.parse(localStorage.getItem('devProfile'));
-  };
-
-  session.init = function(appName) {
-    secret = session.getAppSecret(appName)
-    if(secret !== undefined) {
-      data.setAppCredentials(appName, secret)
-      return true
-    } else {
-      return false
-    }
-  }
-
-  return session;
-}
+  ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', '$q', 'oauthFactory',DataFactory]);
 
 function StringManipulationFactory(){
-  var stringManipulation = {}
-  var baseUrl
+  var stringManipulation = {};
+  var baseUrl;
+
   stringManipulation.setBaseUrl = function(bUrl){
-    baseUrl = bUrl
-  }
+    baseUrl = bUrl;
+  };
 
   stringManipulation.getBaseUrl = function(bUrl){
-    return baseUrl
-  }
+    return baseUrl;
+  };
 
   stringManipulation.urlToAppname = function(url) {
-    return stringManipulation.parseURL(url).appName
-  }
+    return stringManipulation.parseURL(url).appName;
+  };
 
   stringManipulation.urlToPath = function(url) {
-    return stringManipulation.parseURL(url).path
-  }
+    return stringManipulation.parseURL(url).path;
+  };
 
   stringManipulation.pathToUrl = function(path) {
-    return baseUrl + path
-  }
+    return baseUrl + path;
+  };
   
   stringManipulation.parsePath = function(path) {
     return stringManipulation.parseURL(stringManipulation.pathToUrl(path));
-  }
+  };
 
   stringManipulation.parseURL = function(url) {
     if(!url) return {}; //return empty object for undefined
@@ -231,29 +75,57 @@ function StringManipulationFactory(){
       input = input.slice(1);
     }
     return input;
-  }
+  };
 
   stringManipulation.parentUrl = function(url) {
     return stringManipulation.pathToUrl(stringManipulation.parentPath(stringManipulation.urlToPath(url)))
-  }
+  };
 
   stringManipulation.parentPath = function(path) {
     var slashI;
     return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
-  }
+  };
 
   stringManipulation.appToURL = function(app) {
-    return "https://api.appbase.io/"+ app +"/v2/";
-  }
+    return "https://api.appbase.io/"+ app +"/v2_1/";
+  };
 
   return stringManipulation;
 }
 
-function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope, $q) {
+function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope, $q, oauthFactory) {
   var data = {};
   var appName;
   var secret;
   var server = "Ly9hY2NvdW50cy5hcHBiYXNlLmlvLw==";
+
+  var accountsAPI = data.accountsAPI = (function(){
+    var points = ['user', 'app'];
+    var methods = ['get', 'post', 'patch', 'put', 'delete'];
+    var retObj = {};
+
+    function req(method, point, subject, endpoint, body){
+      if(angular.isObject(endpoint)) {
+        body = endpoint;
+        endpoint = '';
+      }
+      if(!endpoint) endpoint = '';
+      if(!body) body = '';
+
+      return request(method, point, subject, body, endpoint);
+    }
+
+    points.forEach(function(point){
+      methods.forEach(function(method){
+        retObj[point] = retObj[point] || {};
+        retObj[point][method] = function(subject, endpoint, body){
+          return req(method, point, subject, endpoint, body);
+        };
+      });
+    });
+
+    return retObj;
+  })();
 
   function getEmail(){
     var profile = JSON.parse(localStorage.getItem('devProfile'));
@@ -276,139 +148,70 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
     return appName;
   }
 
-  data.getVerticesOfNamespace = function(namespace, done) {
-    atomic.post(stringManipulation.appToURL(appName) + namespace + '/~list',{"data":[""],"secret":secret})
-      .success(function(result) {
-        var vertices = []
-        result.forEach(function(obj) {
-          vertices.push(obj.rootPath)
-        })
-        done(vertices)
-      })
-      .error(sentry)
-  }
-
   data.getNamespaces = function(done) {
-    atomic.get(atob(server)+'app/'+ appName +'/namespaces')
-      .success(function(result) {
-        if(result !== undefined && result.namesapces !== undefined){
-          return console.error("Unexpected response from server for namespaces:", result);
+    accountsAPI.app.get(appName, 'namespaces').then(function(result){
+      var namespaces = [];
+      result.namespaces = result.namespaces || [];
+      result.namespaces.forEach(function(namespace) {
+        namespace.name = namespace.name.slice(namespace.name.indexOf('.') + 1);
+        if(namespace.name !== 'system.indexes' && namespace.name !== 'indexes') {
+          namespaces.push(namespace);
         }
-        var namespaces = []
-        if(result.namespaces) {
-          result.namespaces.forEach(function(obj) {
-            obj.name = obj.name.slice(obj.name.indexOf('.') + 1)
-            if(obj.name !== 'system.indexes') {
-              namespaces.push(obj)
-            }
-          })
+        if(done) {
+          done(namespaces);
         }
-        done(namespaces)
-      })
-      .error(sentry)
+      });
+    });
   };
 
   data.deleteNamespace = function(namespace, done) {
-    atomic.delete(atob(server)+'app/'+ appName +'/namespaces', {"namespace": namespace, "secret": secret})
-      .success(function(result){
-        done();
-      }).error(done);
+    var body = {namespace: namespace, secret: secret};
+    accountsAPI.app.delete(appName, 'namespaces', body).then(done);
   }
 
   data.createApp = function(app, done) {
-    atomic.put(atob(server)+'app/'+ app)
-      .success(function(response) {
-        if(typeof response === "string") {
-          done(response)
-        } else if(typeof response === "object") {
-          atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
-            .success(function(result) {
-              atomic.put(atob(server)+'app/'+app+'/owners', {"owner":getEmail()})
-              .success(function(){
-                done(null)
-              })
-              .error(sentry);
-            })
-            .error(sentry);
-        } else {
-          if(angular.isObject(response) || angular.isArray(response)){
-            response = JSON.stringify(response);
-          }
-          sentry(new Error('App creation unexpected return ' + response))
+    accountsAPI.app.put(app).then(function(response){
+      if(typeof response === "string") {
+        done(response);
+      } else if(angular.isObject(response)) {
+        $q.all(
+          accountsAPI.user.put(getEmail(), {appname: app}),
+          accountsAPI.app.put(app, 'owners', {owner: getEmail()})
+        ).then(done);
+      } else {
+        if(angular.isObject(response) || angular.isArray(response)){
+          response = JSON.stringify(response);
         }
-      })
-      .error(sentry)
-  } 
-  
-  data.getGeneric = function(app, what, done) {
-    var deferred = $q.defer();
-    atomic.get(atob(server) + 'app/' + app + '/' + what)
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
+        sentry(new Error('App creation unexpected return ' + response))
+      }
     });
-    return deferred.promise;
-  };
+  } 
 
   data.putUser = function(app, user) {
-    var deferred = $q.defer();
-    atomic.put(atob(server) + 'app/' + app + '/users', {user: user})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
-    });
-    return deferred.promise;
+    return accountsAPI.app.put(app, 'users', {user: user});
   };
 
   data.deleteUser = function(app, user) {
-    var deferred = $q.defer();
-    var step1 = atomic.delete(atob(server) + 'user/' + user, {appname: app}).error(error);
-    var step2 = atomic.delete(atob(server) + 'app/' + app + '/users', {user: user}).error(error);
-    
-    step1.success(function(){
-      step2.success(function(){
-        deferred.resolve(data);
-      });
-    });
-
-    function error(err){
-      deferred.reject(err);
-    }
-    return deferred.promise;
-  }
+    return $q.all(
+      accountsAPI.user.delete(user, {appname: app}),
+      accountsAPI.app.delete(app, 'users', {user: user})
+    );
+  };
 
   data.putApp = function(user, app) {
-    var deferred = $q.defer();
-    atomic.put(atob(server) + 'user/' + user, {'appname': app})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
-    });
-    return deferred.promise;
+    return accountsAPI.user.put(user, {appname: app});
   };
 
   data.deleteApp = function(app, done) {
-    atomic.delete(atob(server)+'app/'+ app, {'kill':true, 'secret': secret})
-      .success(function(response) {
-        atomic.delete(atob(server)+'user/' + getEmail(), {'appname' : app})
-          .success(function(response){
-            done();
-          })
-      })
-      .error(sentry)
+    $q.all(
+      accountsAPI.app.delete(app, {kill: true, secret: secret}),
+      accountsAPI.user.delete(getEmail(), {appname: app})
+    ).then(done);
   }
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
-    //fetch from uid
-    atomic.get(atob(server)+'user/'+ getUID())
-      .success(function(apps) {
+    accountsAPI.user.get(getUID()).error(sentry).then(function(apps) {
         if(!apps.length) return done();
         var appsRemaining = apps.length;
         var checkForDone = function() {
@@ -419,84 +222,59 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
         }
         apps.forEach(function(app) {
           //add into email
-          atomic.put(atob(server)+'user/'+ getEmail(), {"appname":app})
-            .success(function(result) {
-              //delete from uid
-              atomic.delete(atob(server)+'user/'+ getUID(), {"appname":app})
-                .success(function(result) {
-                  checkForDone();
-                })
-                .error(sentry)
-            })
-            .error(sentry)
+          $q.all(
+            accountsAPI.user.put(getEmail(), {appname: app}),
+            accountsAPI.user.delete(getUID(), {appname: app})
+          ).then(checkForDone);
         });
-      })
-  }
+      });
+  };
   
   data.getDevsAppsWithEmail = function(done) {
-    atomic.get(atob(server)+'user/'+ getEmail())
-      .success(function(apps) {
-        var appsAndSecrets = [];
-        var appsArrived = 0;
-        var secretArrived = function(app, secret, metrics) {
-          appsArrived += 1;
-          appsAndSecrets.push({
-            name: app,
-            secret: secret,
-            metrics: metrics
-          });
-          if(appsArrived === apps.length) {
-            done(appsAndSecrets);
-          }
-        }
-        apps.forEach(function(app) {
-          data.getAppsSecret(app, function(secret) {
-            getMetrics(app, secret, secretArrived);
-          });
-        });
-        if(apps.length === 0){
-          done([]);
+    accountsAPI.user.get(getEmail()).then(function(apps){
+      if(!apps.length){
+        done([]);
+        $timeout(function(){
           $rootScope.noApps = true;
           $rootScope.noCalls = $rootScope.noCalls || true;
-        } else {
-          $rootScope.noApps = false;
+        });
+        
+      } else {
+        $timeout(function(){
           $rootScope.noCalls = $rootScope.noCalls || false;
-        }
-        $rootScope.$apply();
-      })
-      .error(sentry)
-  }
+        });
+      }
+      done(apps);
 
-  function getMetrics(app, secret, secretArrived){
-    atomic.get(atob(server)+'app/'+app+'/metrics')
-      .success(function(metrics){
-        secretArrived(app, secret, metrics);
-      })
-      .error(function(data, error) {
-        if(error.response === ""){
-          console.log('Empty response for ' + app + '\'s metrics, retrying');
-          getMetrics(app, secret, secretArrived);
-        } else sentry(error);
-      });
+    });
   }
 
   data.getDevsApps = function(done) {
     data.uidToEmail(data.getDevsAppsWithEmail.bind(null, done));
   }
   
-  data.getAppsSecret = getSecret;
+  data.getAppsSecret = function(app, done) {
+    return accountsAPI.app.get(app);
+  }
 
-  function getSecret(app, done) {
-    atomic.get(atob(server)+'app/'+ app)
-      .success(function(result) {
-        done(result.secret);
-      })
-      .error(function(data, error) {
-        if(error.response === ""){
-          console.log('Empty response for ' + app + ', retrying');
-          getSecret(app, done);
-        } else sentry(error);
-      }); 
+  function request(req_type, app, subject, body, endpoint) {
+    var deferred = $q.defer();
+    var url = atob(server) + app + '/' + subject + '/' + endpoint;
+    var promise = atomic[req_type](url, body);
+
+    promise.success(deferred.resolve);
+
+    promise.error(function(data, error){
+      if(error.response === ""){
+        console.log(url + ' generated empty response. Trying again.');
+        request(req_type, app, subject, body, endpoint);
+      } else deferred.reject(error);
+    });
+
+    //deferred.promise.catch(sentry);
+    deferred.promise['error'] = deferred.promise['catch'];
+    deferred.promise['success'] = deferred.promise['then'];
+    return deferred.promise;
   }
 
   return data;

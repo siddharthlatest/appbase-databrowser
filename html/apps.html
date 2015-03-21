@@ -38,18 +38,36 @@
                     </form>
                     <table class="table table-hover" ng-show="apps.length">
                         <tr>
-                            <th>Name</th>
+                            <th class="name">Name</th>
                             <th>Total records</th>
                             <th>Total calls</th>
+                            <th class="copy text-center">Secret</th>
                         </tr>
                         <tr ng-repeat="app in apps"
-                            ng-click="goToDash(app.name)"
                             ng-class="fetching ? 'grayed':''"
                             ng-show="deleting !== app.name" >
 
-                           <td ng-bind="app.name"></td>
-                           <td>{{app.metrics ? app.metrics.totalRec : '0'}}</td>
-                           <td>{{app.metrics ? app.metrics.totalCalls : '0'}}</td>
+                            <td ng-click="goToDash(app.name)" ng-bind="app.name" class="name"></td>
+                            <td ng-click="goToDash(app.name)">
+                                <span ng-bind="app.stats.records"
+                                      ng-class="!app.stats.records && app.stats.records !== 0 ? 'fa fa-circle-o-notch fa-spin' : ''">
+                                </span>
+                            </td>
+                            <td ng-click="goToDash(app.name)">
+                                <span ng-bind="app.stats.calls"
+                                      ng-class="!app.stats.calls && app.stats.calls !== 0 ? 'fa fa-circle-o-notch fa-spin' : ''">
+                                </span>
+                            </td>
+                            <td class="copy">
+                                <a class="fa text-center"
+                                   ng-class="app.secret ? (app.copied ? 'fa-check-square-o' : 'fa-clipboard') : 'fa-ellipsis-h'"
+                                   clip-copy="app.secret"
+                                   clip-click="copy(app)"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Tooltip on top">
+                                </a>
+                            </td>
 
                         </tr>
                     </table>

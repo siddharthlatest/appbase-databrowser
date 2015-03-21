@@ -3,16 +3,16 @@ angular
 .module("AppbaseDashboard")
 .controller('sharingCtrl', SharingCtrl);
 
-function SharingCtrl($scope, $rootScope, data, $timeout, session){
+function SharingCtrl($scope, $rootScope, data, $timeout, session, $routeParams){
   var app;
 
   $scope.addUser = function(){
     var email = session.getProfile().email;
     var adding = $scope.input;
-    app = app || $rootScope.currentApp;
+    app = app || $routeParams.app;
     $scope.refreshing = true;
 
-    data.getGeneric(app, 'owners').catch(sentry).then(function(owners){
+    data.accountsAPI.app.get(app, 'owners').then(function(owners){
       if(owners.indexOf(email) !== -1) {
         var user = data.putUser(app, adding).catch(sentry);
         var application = data.putApp(adding, app).catch(sentry);
@@ -28,6 +28,7 @@ function SharingCtrl($scope, $rootScope, data, $timeout, session){
         });
       }
     });
+
   };
 
   $rootScope.share = function(_app){
@@ -43,7 +44,7 @@ function SharingCtrl($scope, $rootScope, data, $timeout, session){
   }
 
   $scope.delete = function(user){
-    app = app || $rootScope.currentApp;
+    app = app || $routeParams.app;
     $scope.refreshing = true;
     data.deleteUser(app, user).catch(sentry).then(function(){
       getUsers();
@@ -51,9 +52,9 @@ function SharingCtrl($scope, $rootScope, data, $timeout, session){
   }
 
   function getUsers(owners){
-    var users = data.getGeneric(app, 'users').catch(sentry);
+    var users = data.accountsAPI.app.get(app, 'users');
 
-    if(!owners) data.getGeneric(app, 'owners').catch(sentry).then(process);
+    if(!owners) data.accountsAPI.app.get(app, 'owners').then(process);
     else process(owners);
 
     function process(owners) {

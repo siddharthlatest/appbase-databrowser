@@ -2,13 +2,13 @@
 angular
 .module("AppbaseDashboard")
 .factory('nodeBinding',['data', '$location',
-  'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog',NodeBinding]);
+  'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
 function debug(a) {
   return JSON.parse(JSON.stringify(a))
 }
 
-function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog) {
+function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog, $route) {
   var nodeBinding = {};
   nodeBinding.creating = [];
   function addNamespaces(node, childName) {
@@ -131,7 +131,8 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     nodeBinding.creating.push(namespace);
     var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
-      $rootScope.goToBrowser(stringManipulation.pathToUrl(namespace));
+      session.setBrowserURL(stringManipulation.pathToUrl(namespace));
+      $route.reload();
     }
     ns.expand = function() {
       ns.expanded = true;

@@ -8,15 +8,16 @@
 			<h2 class="graph-title">Usage</h2>
 			<ul class="nav-tab">
 			  <li>
-			  	<a ng-click="graph('week')" ng-class="graphActive === 'week' ? 'active' : ''">
-			  		Week
+			  	<a ng-click="!(strike.week || strike.month || graphActive === 'week') && graph('week')"
+			  	   ng-class="{'active': graphActive === 'week', 'strike': strike.week || strike.month}">
+					Week
 			  	</a></li>
 			  <li>
-			  	<a ng-click="graph('month')" ng-class="graphActive === 'month' ? 'active' : ''">
-			  		Month
+			  	<a ng-click="!(strike.month || graphActive === 'month') && graph('month')"
+			  	   ng-class="{'active': graphActive === 'month', 'strike': strike.month}"> Month
 			  	</a></li>
-			  <li><a ng-click="graph('all')" ng-class="graphActive === 'all' ? 'active' : ''">
-			  	All
+			  <li><a ng-click="(graphActive !== 'all') && graph('all')"
+			         ng-class="{'active': graphActive === 'all'}"> All
 			  </a></li>
 			</ul>
 			<div class="graph">

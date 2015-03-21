@@ -1,28 +1,45 @@
 (function(){
 angular
 .module("AppbaseDashboard")
-.controller('stats', StatsCtrl);
+.controller('dash', DashCtrl);
 
-function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
+function DashCtrl($routeParams, stringManipulation, $scope, $rootScope, $location, $timeout, Apps, $routeParams){
   $scope.status = true;
-  $scope.apps = session.getApps();
-  $scope.app = $rootScope.getAppFromName($rootScope.currentApp);
+  $scope.apps = Apps.get();
+  $scope.strike = {};
+  $scope.app = $rootScope.getAppFromName($routeParams.app);
 
-  if(!$scope.app || !angular.isObject($scope.app) || !$scope.app.metrics) {
+  if(!$scope.app || !angular.isObject($scope.app)) {
     $rootScope.goToApps();
   } else {
     var app = $scope.app;
-    $scope.vert = app.metrics.edgesAndVertices.Vertices || 0;
-    $scope.edges = app.metrics.edgesAndVertices.Edges || 0;
+    $scope.loading = true;
+    if(!app.metrics){
+      app.$metrics().then(function(){
+        var metrics = app.metrics;
+
+        $timeout(function(){
+          $scope.vert = metrics.edgesAndVertices.Vertices || 0;
+          $scope.edges = metrics.edgesAndVertices.Edges || 0;
+
+          defaultValues(metrics);
+          graph();
+        });
+      });
+    } else {
+      $scope.vert = app.metrics.edgesAndVertices.Vertices || 0;
+      $scope.edges = app.metrics.edgesAndVertices.Edges || 0;
+      
+      defaultValues(app.metrics);
+      graph();
+    }
     
-    defaultValues();
-    graph(app.calls);
   }
 
 
 
-  function getGraphData(timeFrame){
-    var calls = $scope.app.metrics.calls;
+  function getGraphData(timeFrame, metrics){
+    var calls = metrics.calls;
     var month = 0;
     var metrics = {};
     var xAxis = [];
@@ -31,6 +48,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
       metrics[type] = [];
     });
 
+    // better performance than keys
     for (var key in calls){
       if(key.indexOf('APICalls') !== -1) {
         var split = key.split(':');
@@ -86,6 +104,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
   $scope.graph = graph;
 
   function graph(timeFrame){
+    var metrics = $scope.app.metrics;
     $scope.chartConfig.loading = true;
 
     var labels = {
@@ -112,13 +131,13 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
       }
     }
 
-    if(!timeFrame) {
-      presets.month();
-    } else {
-      if(presets[timeFrame]) presets[timeFrame]();
+    if(!timeFrame) timeFrame = 'month';
+    if(presets[timeFrame]) {
+      var timeLabel = timeFrame;
+      presets[timeFrame]();
     }
 
-    var retVal = getGraphData(timeFrame);
+    var retVal = getGraphData(timeFrame, metrics);
     var data = retVal.data;
 
     if(!$.isEmptyObject(data)){
@@ -133,15 +152,19 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
           name: labels[type]
         });
       });
+    } else {
+      if(timeLabel && timeLabel !== 'all') {
+        $scope.strike[timeLabel] = true;
+        graph(timeLabel === 'week' ? 'month' : 'all');
+      }
     }
 
     $scope.chartConfig.loading = false;
 
   }
 
-  function defaultValues(){
-    $scope.noData = $scope.app && $scope.app.metrics
-      && $scope.app.metrics.calls && $scope.app.metrics.calls.length;
+  function defaultValues(metrics){
+    $scope.noData = metrics && !angular.isObject(metrics.calls);
 
     $scope.cap = 100000;
     $rootScope.$watch('balance', function(val){
@@ -171,7 +194,7 @@ function StatsCtrl($routeParams, stringManipulation, $scope, session, $rootScope
   }
 
   $scope.commas = function(number) {
-    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if(number) return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
 }

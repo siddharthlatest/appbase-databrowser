@@ -1,104 +1,23 @@
 (function(){
 angular
 .module("AppbaseDashboard")
-.controller('start', Start)
-.run(Authenticate);
+.controller('start', Start);
 
-function Authenticate($rootScope, session, oauthFactory, $appbase, $route, $timeout, data, $location) {
-  $rootScope.devProfile = session.getProfile();
-  $rootScope.db_loading = false;
-  if($rootScope.devProfile) {
-    loadApps();
-  }
-
-  document.addEventListener('logout', function() {
-    $timeout(function(){
-      $rootScope.logged = false;
-      $appbase.unauth();
-      session.setApps([]);
-      session.setProfile(null);
-      $route.reload();
-    });
-  });
-
-  document.addEventListener('login', loadApps);
-
-  $rootScope.loadApps = loadApps;
-
-  function loadApps(callback){
-    console.time('load')
-    session.fetchApps(function(){
-      $timeout(function(){
-        console.timeEnd('load')
-        $rootScope.$broadcast('appsLoaded');
-        $rootScope.apps = session.getApps();
-        $rootScope.db_loading = false;
-        if(angular.isFunction(callback)) callback($rootScope.apps);
-      });
-      oauthFactory.updateApps();
-    });
-  }
-
-  $rootScope.deleteApp = function(app) {
-    var a = new BootstrapDialog({
-        title: 'Delete app',
-        message: 'Are you sure you want to delete <span class="bold">' + app +
-        '</span>?<br>Enter the app name to confirm.<br><br>'
-        + '<div class="form-group"><input type="text" class="form-control" /></div>'
-        ,
-        closable: false,
-        cssClass: 'modal-custom',
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(value === app){
-                $rootScope.deleting = app;
-                data.deleteApp(app, function(error) {
-                  if(error){
-                    $rootScope.deleting = '';
-                    throw error;
-                  }
-                  else {
-                    $rootScope.$apply(function(){
-                      $location.path('/apps');
-                    });
-                  }
-                });
-                dialog.close();
-              } else {
-                input.addClass('has-error');
-              }
-            }
-        }]
-    }).open();
-  }
-}
-
-function Start($rootScope, session, $location, $scope, $timeout) {
+function Start($rootScope, session, $location, $scope, $timeout, Apps) {
   var user = session.getProfile();
-  var apps = session.getApps();
-  var currentApp = $rootScope.currentApp;
+  var lastApp = Apps.get()[0].name;
 
-  if(currentApp) {
-  	$location.path(currentApp + '/dash');
+  if(lastApp) {
+  	$location.path(lastApp + '/dash');
   } else {
-    $rootScope.loadApps(function(apps){
-      if(!apps.length) {
-        $timeout(function(){
-          tutorial();
-        });
-      } else {
-        $location.path('/apps');
-      }
+    Apps.refresh().then(function(apps){
+      $timeout(function(){
+        if(!apps.length) {
+            tutorial();
+        } else {
+          $location.path('/apps');
+        }
+      });
     });
   }
 
@@ -128,9 +47,6 @@ function Start($rootScope, session, $location, $scope, $timeout) {
   // tour.start();
 
   // if(!user || !apps.length) {
-  // 	$rootScope.$on('appsLoaded', function(){
-  // 		console.log('loaded')
-  // 	})
   // } else console.log(apps)
 }
 

@@ -1,12 +1,11 @@
 (function(){
 angular
 .module("AppbaseDashboard")
-.controller('oauthd', OauthCtrl)
+.controller('oauth', OauthCtrl)
 .factory("oauthFactory", OauthFactory);
 
-function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope, $location){
+function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope, $location, Apps, $routeParams){
   $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
-
   $scope.status = "Loading...";
   $scope.loading = $scope.loadingProv = $scope.editing = false;
   $scope.callbackDomain = oauthFactory.getOauthdConfig().oauthd;
@@ -154,25 +153,30 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     $scope.providers = data;
   }, sentry);
 
-  var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  var app = session.appFromName(appName);
+  var appName = $routeParams.app;
+  var apps = Apps.get();
+  var app = $rootScope.getAppFromName(appName, apps);
   if(!app) {
     $rootScope.goToApps();
+    return;
   } else {
     $rootScope.logged = true;
-    $rootScope.currentApp = appName;
     $scope.app = appName;
   }
-  var sessionApps = JSON.parse(sessionStorage.getItem('apps'));
-  $scope.apps = sessionApps;
   $rootScope.db_loading = false;
   
   $scope.cancel();
   $scope.status = $scope.provStatus = "Loading...";
   $scope.domains = [];
   $scope.userProviders = {};
-  oauthFactory.getApp(app.name, app.secret)
-  .then(function(oauth){
+
+  if(!app.oauth) {
+    app.$oauth().then(function(oauth){
+      processOauth(oauth);
+    });
+  } else processOauth(app.oauth);
+
+  function processOauth(oauth){
     oauth = oauth.data;
     $timeout(function() {
       $scope.status = false;
@@ -197,10 +201,10 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
         $scope.provStatus = false;
       });
     }
-  }, sentry);
+  }
 }
 
-function OauthFactory($timeout, $q, session){
+function OauthFactory($timeout, $q){
   var oauth = {};
   var config = { 
     oauthd: "https://auth.appbase.io",
@@ -253,18 +257,18 @@ function OauthFactory($timeout, $q, session){
   };
 
   oauth.updateApps = function(done){
-    var apps = session.getApps();
+    var apps = Apps.get();
     var received = 0;
     apps.forEach(function(app){
-      oauth.getApp(app.name, session.getAppSecret(app.name))
+      oauth.getApp(app.name, app.secret)
       .then(function(data){
-        var apps_ = session.getApps();
+        var apps_ = Apps.get();
         apps_.forEach(function(b){
           if(b.name === app.name){
             b.oauth = data.data;
           }
         });
-        session.setApps(apps_);
+        Apps.set(apps_);
         received += 1;
         if(received === apps.length && done) done();
       }, sentry);

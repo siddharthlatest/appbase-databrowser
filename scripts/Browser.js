@@ -2,51 +2,58 @@
 angular
 .module("AppbaseDashboard")
 .controller("browser",
-             ['$scope', '$appbase', '$timeout', '$location',
-              'data', 'stringManipulation', 'breadcrumbs', 'ngDialog', 'nodeBinding',
-              'session', '$rootScope', BrowserCtrl]);
+             ['$scope', '$appbase', '$timeout', 'data', 'stringManipulation', 'breadcrumbs',
+             'ngDialog', 'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', BrowserCtrl]);
 
-function BrowserCtrl($scope,$appbase,$timeout,$location,data,stringManipulation,breadcrumbs,ngDialog,nodeBinding,session,$rootScope){
+function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
+  breadcrumbs, ngDialog, nodeBinding, session, $rootScope, Apps, $routeParams){
+
+  var apps = Apps.get();
   $scope.status = "Loading";
-  var appName = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.parentPath($location.path()));
-  var app = session.appFromName(appName);
-  if(!app) {
-    $rootScope.goToApps();
-  } else {
-    $rootScope.currentApp = appName;
-  }
+  var appName = $routeParams.app;
+  var app = $rootScope.getAppFromName(appName);
 
+  if(!app) $rootScope.goToApps();
+  else $scope.currentApp = appName;
+  
   var URL;
-  URL = session.getBrowserURL();
+  URL = session.getBrowserURL(apps);
   if(!URL) {
     URL = stringManipulation.appToURL(appName);
     session.setBrowserURL(URL);
   }
 
-  if(!session.init(appName)) {
-    $rootScope.goToApps();
-  }
-
-  $scope.url = URL;
-
-  $scope.goUp = function() {
-    URL = stringManipulation.parentUrl($scope.url);
-  }
-  var path = stringManipulation.urlToPath($scope.url);
-
-  if(path === undefined) {
-    $scope.node = nodeBinding.bindAsRoot($scope)
-  } else if(path.indexOf('/') === -1) {
-    $scope.node = nodeBinding.bindAsNamespace($scope, path)
+  if(!app.secret) {
+    app.$secret().then(function(data){
+      gotSecret(app.secret);
+    });
   } else {
-    $scope.node = nodeBinding.bindAsVertex($scope , path)
+    gotSecret(app.secret);
   }
-  $scope.node.expand()
 
-  $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
-  $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
-  $rootScope.db_loading = false;
-  $scope.status = false;
+  function gotSecret(secret){
+    data.setAppCredentials(appName, secret);
+    $scope.url = URL;
+
+    $scope.goUp = function() {
+      URL = stringManipulation.parentUrl($scope.url);
+    }
+    var path = stringManipulation.urlToPath($scope.url);
+
+    if(path === undefined) {
+      $scope.node = nodeBinding.bindAsRoot($scope)
+    } else if(path.indexOf('/') === -1) {
+      $scope.node = nodeBinding.bindAsNamespace($scope, path)
+    } else {
+      $scope.node = nodeBinding.bindAsVertex($scope , path)
+    }
+    $scope.node.expand()
+
+    $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
+    $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
+    $rootScope.db_loading = false;
+    $scope.status = false;
+  }
   
   $scope.addEdgeInto = function(node) {
     var namespaces = [];

@@ -1,6 +1,157 @@
 .morris-hover{position:absolute;z-index:1000}.morris-hover.morris-default-style{border-radius:10px;padding:6px;color:#666;background:rgba(255,255,255,0.8);border:solid 2px rgba(230,230,230,0.8);font-family:sans-serif;font-size:12px;text-align:center}.morris-hover.morris-default-style .morris-hover-row-label{font-weight:bold;margin:0.25em 0}
 .morris-hover.morris-default-style .morris-hover-point{white-space:nowrap;margin:0.1em 0}
 
+.ngdialog.ngdialog-theme-dialog-small {
+  padding-bottom: 5vh;
+  padding-top: 5vh;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
+  background: #fff;
+  color: #444;
+  line-height: 1.5em;
+  margin: 0 auto;
+  max-width: 100%;
+  padding: 1em;
+  position: relative;
+  width: 60%;
+  max-height: 85vh;
+  overflow: auto;
+  border-radius:5px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
+  cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
+  background: transparent;
+  color: #bbb;
+  content: "\00D7";
+  font-size: 26px;
+  font-weight: 400;
+  height: 30px;
+  line-height: 26px;
+  position: absolute;
+  right: 3px;
+  text-align: center;
+  top: 3px;
+  width: 30px;
+}
+
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
+.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
+  color: #777;
+}
+
+@media (max-width: 568px) {
+  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
+    -webkit-animation: none;
+    animation: none;
+  }
+}
+@-webkit-keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ngdialog-fadeout {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes ngdialog-fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.ngdialog,
+.ngdialog *,
+.ngdialog *:before,
+.ngdialog *:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.ngdialog {
+  position: fixed;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ngdialog-overlay {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-overlay {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-content {
+  background: white;
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadein 0.5s;
+  animation: ngdialog-fadein 0.5s;
+}
+
+.ngdialog.ngdialog-closing .ngdialog-content {
+  -webkit-backface-visibility: hidden;
+  -webkit-animation: ngdialog-fadeout 0.5s;
+  animation: ngdialog-fadeout 0.5s;
+}
+
+.ngdialog-close:before {
+  content: '\00D7';
+  cursor: pointer;
+}
+
+body.ngdialog-open {
+  overflow: hidden;
+}
 @font-face {
   font-family: 'Source Sans Pro Extra Light Italic';
   src: url('/styles/fonts/source/sourcesanspro-extralightit.eot');
@@ -366,9 +517,12 @@ body {
 .grayed {
   opacity: 0.5; }
 
+.fa-check-square-o {
+  color: green !important; }
+
 #applications {
   margin-top: -108px;
-  font-family: "Source Sans Pro Extra Light Italic";
+  font-family: "Source Sans Pro Extra Light";
   margin-bottom: 50px; }
   #applications .main-title {
     text-align: center;
@@ -402,20 +556,30 @@ body {
     margin: 30px;
     padding: 25px 30px 15px;
     border-radius: 5px;
-    color: #888;
+    color: #000;
     min-height: 170px; }
     #applications .well table th {
       font-family: "Source Sans Pro Semi Bold";
-      cursor: default; }
+      cursor: default;
+      text-align: center; }
+    #applications .well table th.name {
+      text-align: left; }
     #applications .well table tr td {
       -webkit-user-select: none;
       -moz-user-select: none;
       -ms-user-select: none;
       user-select: none;
-      cursor: pointer;
-      text-align: left; }
+      cursor: pointer; }
+    #applications .well table tr td.name {
+      text-align: left !important; }
+    #applications .well td a {
+      color: #777; }
     #applications .well table tr:first-child:hover > td, #applications .well table tr:first-child:hover > th {
       background-color: white; }
+    #applications .well td .popover {
+      position: relative;
+      display: block;
+      margin: 20px; }
     #applications .well .tip {
       text-align: center;
       line-height: 30px;
@@ -815,6 +979,10 @@ body {
     font-size: 2em;
     margin-left: 20px; }
 
+.strike, a.strike, a.strike:hover {
+  text-decoration: line-through;
+  cursor: default; }
+
 #stats {
   font-family: "Source Sans Pro Extra Light";
   padding: 0 15px;
@@ -868,7 +1036,8 @@ body {
     #stats .nav-tab a {
       font-size: 1.2em;
       color: #555;
-      padding: 0 3px;
+      padding: 0 3px; }
+    #stats .nav-tab a:not(.strike) {
       cursor: pointer; }
     #stats .nav-tab a.active {
       border-bottom: 2px solid #666; }
@@ -1201,17 +1370,17 @@ body {
     width: 80px;
     height: 80px; }
 .modal-custom.modal-examples .docs {
-  background: url(http://docs.appbase.io/images/logos/dh_rest.svg) no-repeat center/contain; }
+  background: url("http://docs.appbase.io/images/logos/dh_rest.svg") no-repeat center/contain; }
 .modal-custom.modal-examples .graph {
-  background: url(http://docs.appbase.io/images/logos/dh_graph.svg) no-repeat center/contain; }
+  background: url("http://docs.appbase.io/images/logos/dh_graph.svg") no-repeat center/contain; }
 .modal-custom.modal-examples .auth {
-  background: url(http://docs.appbase.io/images/logos/dh_auth.svg) no-repeat center/contain; }
+  background: url("http://docs.appbase.io/images/logos/dh_auth.svg") no-repeat center/contain; }
 .modal-custom.modal-examples .auth_providers {
-  background: url(http://docs.appbase.io/images/logos/dh_auth_providers.svg) no-repeat center/contain; }
+  background: url("http://docs.appbase.io/images/logos/dh_auth_providers.svg") no-repeat center/contain; }
 .modal-custom.modal-examples .angular {
-  background: url(http://docs.appbase.io/images/logos/dh_angular.svg) no-repeat center/contain; }
+  background: url("http://docs.appbase.io/images/logos/dh_angular.svg") no-repeat center/contain; }
 .modal-custom.modal-examples .js {
-  background: url(http://docs.appbase.io/images/logos/dh_js.svg) no-repeat center/contain; }
+  background: url("http://docs.appbase.io/images/logos/dh_js.svg") no-repeat center/contain; }
 .modal-custom.modal-examples .fa-search {
   font-size: 2em;
   padding-top: 10px; }
@@ -1245,155 +1414,3 @@ body {
 
 .nav > li > a:focus {
   background-color: transparent; }
-
-.ngdialog.ngdialog-theme-dialog-small {
-  padding-bottom: 5vh;
-  padding-top: 5vh;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-content {
-  background: #fff;
-  color: #444;
-  line-height: 1.5em;
-  margin: 0 auto;
-  max-width: 100%;
-  padding: 1em;
-  position: relative;
-  width: 60%;
-  max-height: 85vh;
-  overflow: auto;
-  border-radius:5px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close {
-  cursor: pointer;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:before {
-  background: transparent;
-  color: #bbb;
-  content: "\00D7";
-  font-size: 26px;
-  font-weight: 400;
-  height: 30px;
-  line-height: 26px;
-  position: absolute;
-  right: 3px;
-  text-align: center;
-  top: 3px;
-  width: 30px;
-}
-
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:hover:before,
-.ngdialog.ngdialog-theme-dialog-small .ngdialog-close:active:before {
-  color: #777;
-}
-
-@media (max-width: 568px) {
-  .ngdialog.ngdialog-theme-dialog-small .ngdialog-button:focus {
-    -webkit-animation: none;
-    animation: none;
-  }
-}
-@-webkit-keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes ngdialog-fadeout {
-  0% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-  }
-}
-
-@-webkit-keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes ngdialog-fadein {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-.ngdialog,
-.ngdialog *,
-.ngdialog *:before,
-.ngdialog *:after {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.ngdialog {
-  position: fixed;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 10000;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.ngdialog-overlay {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.4);
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-overlay {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-content {
-  background: white;
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadein 0.5s;
-  animation: ngdialog-fadein 0.5s;
-}
-
-.ngdialog.ngdialog-closing .ngdialog-content {
-  -webkit-backface-visibility: hidden;
-  -webkit-animation: ngdialog-fadeout 0.5s;
-  animation: ngdialog-fadeout 0.5s;
-}
-
-.ngdialog-close:before {
-  content: '\00D7';
-  cursor: pointer;
-}
-
-body.ngdialog-open {
-  overflow: hidden;
-}

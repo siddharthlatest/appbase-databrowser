@@ -1,31 +1,31 @@
-<div id="manage" ng-controller="navbar" ng-class="(!$parent.logged || $parent.db_loading || ['dash', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
+<div id="manage" ng-controller="topnav" ng-class="(!$parent.logged || $parent.db_loading || ['dash', 'browser', 'oauth'].indexOf($parent.where())===-1)?'man-hide':'man-show'">
   <div class="container-fluid">
     <div class="title">
-        <a ng-href="/developer/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{$parent.currentApp}}
+        <a ng-href="/developer/apps">{{$parent.devProfile.firstname}}{{$parent.devProfile.firstname ? "'s" : ""}} Applications</a> / {{routeParams.app}}
         <div class="right-tools">
-            <a href="" ng-click="share($parent.currentApp)" class="delete share">Share</a>
-            <a href="" ng-click="deleteApp($parent.currentApp)" class="delete">Delete</a>
+            <a href="" ng-click="share(routeParams.app)" class="delete share">Share</a>
+            <a href="" ng-click="deleteApp(routeParams.app)" class="delete">Delete</a>
         </div>
     </div>
     <nav class="navbar">
 
     	<ul class="nav navbar-nav navbar-left">
             <li>
-                <a ng-href="/developer/{{$parent.currentApp}}/dash"
+                <a ng-href="/developer/{{routeParams.app}}/dash"
                    ng-class="{active: $parent.where()==='dash'}">
                    Dashboard
                 </a>
             </li>
 
     		<li>
-                <a ng-href="/developer/{{$parent.currentApp}}/browser"
+                <a ng-href="/developer/{{routeParams.app}}/browser"
                    ng-class="{active: $parent.where()==='browser'}">
                     Data Browser
                 </a>
             </li>
 
     		<li>
-                <a ng-href="/developer/{{$parent.currentApp}}/oauth"
+                <a ng-href="/developer/{{routeParams.app}}/oauth"
                    ng-class="{active: $parent.where()==='oauth'}">
                     Authentication
                 </a>
@@ -40,8 +40,8 @@
                     </span>
                 </span>
                 <span class="secret" ng-show="secretShown">
-                    <span ng-bind="$parent.currentSecret" ng-click="secretShown = false"></span>
-                    <a href="">Copy</a>
+                    <span ng-bind="secret" ng-click="secretShown = false"></span>
+                    <a href="" clip-copy="secret">Copy</a>
                     </span>
                 </span>
             </li>

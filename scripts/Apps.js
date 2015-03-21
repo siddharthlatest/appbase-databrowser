@@ -9,21 +9,27 @@ angular
                      'stringManipulation', 
                      '$rootScope', 
                      'oauthFactory', 
-                     '$appbase', 
+                     'Apps', 
                      AppsCtrl ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, $appbase) {
+function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, Apps) {
   $scope.api = false;
   $scope.devProfile = $rootScope.devProfile = session.getProfile();
-  $scope.apps = session.getApps() || [];
-
+  $scope.apps = Apps.get();
+  
   $rootScope.db_loading = !$scope.apps;
   $scope.fetching = true;
 
-  $rootScope.loadApps(function(){
+  Apps.refresh().then(function(apps){
     $timeout(function(){
-      $scope.apps = session.getApps();
+      $scope.apps = apps;
+      apps.forEach(function(app){
+        var promises = ['metrics', 'secret'];
+        promises.forEach(function(prop){
+          if(!app[prop]) app['$' + prop]();
+        });
+      });
       $scope.fetching = false;
       $rootScope.db_loading = false;
     });
@@ -38,16 +44,26 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
         $scope.fetching = false;
         alert('Name taken. Try another name.');
       } else {
-        $rootScope.loadApps(function(){
+        $rootScope.loadApps(function(apps){
           $timeout(function(){
-            $scope.apps = session.getApps();
+            $scope.apps = apps;
             $scope.creating = false;
             $scope.fetching = false;
             $rootScope.goToDash(app);
           });
         });
       } 
-    })
+    });
+  };
+
+  $scope.copy = function(app) {
+    $timeout(function(){
+      app.copied = true;
+    });
+
+    $timeout(function(){
+      app.copied = false;
+    }, 2000);
   }
 
   $scope.firstAPICall = function() {

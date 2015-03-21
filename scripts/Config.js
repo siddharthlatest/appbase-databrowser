@@ -1,11 +1,3 @@
-function sentry(error) {
-  if(Raven) {
-    Raven.captureException(error);
-  } else {
-    throw new Error(error);
-  }
-}
-
 (function(){
 angular.module("AppbaseDashboard", ['ngAppbase',
                                     'ngRoute',
@@ -13,11 +5,11 @@ angular.module("AppbaseDashboard", ['ngAppbase',
                                     'easypiechart',
                                     'ngAnimate',
                                     'ngDialog',
-                                    'highcharts-ng'])
-  .run(FirstRun)
-  .config(Routes);
+                                    'highcharts-ng',
+                                    'ngClipboard'])
+  .run(FirstRun);
 
-function FirstRun($rootScope, $location, stringManipulation, session, $route, $timeout){
+function FirstRun($rootScope, $location, stringManipulation, session, $route, $timeout, Apps, $routeParams){
   $rootScope.db_loading = true;
   // changed the way sessions are stored, so to prevent errors:
   var oldSession = sessionStorage.getItem('apps');
@@ -36,55 +28,13 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   
   if(!angular.isArray())
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
-    session.setApps(null);
+    Apps.clear();
     session.setProfile(null);
     $rootScope.logged = false;
   } else {
+    $rootScope.$broadcast('logged');
     $rootScope.logged = true;
-    externalLibs();
   }
-
-  var url = sessionStorage.getItem('URL');
-  $rootScope.currentApp = url ? stringManipulation.urlToAppname(url) : '';
-
-  var apps = session.getApps();
-
-  if(apps.length) {
-    var profile = session.getProfile();
-    if(profile){
-      var order = localStorage.getItem(profile.uid + 'order');
-      if(order) {
-        order = JSON.parse(order);
-        $rootScope.currentApp = order[0];
-      } else {
-        $rootScope.currentApp = apps[0];
-      }
-    }
-  }
-  
-  $rootScope.$watch('currentApp', function(app){
-    sessionStorage.setItem('URL', stringManipulation.appToURL(app));
-    var apps = session.getApps();
-
-    if(app && apps.length){
-      $rootScope.currentSecret = getSecret(apps, app);
-
-      var appRef = apps.filter(function(b){
-        return b.name === app;
-      })[0];
-
-      apps.splice(apps.indexOf(appRef), 1);
-      apps.unshift(appRef); //moved app to top of array
-      session.setApps(apps);
-      
-      var order = [];
-      apps.forEach(function(app){
-        order.push(app.name);
-      });
-      
-      localStorage.setItem(session.getProfile().uid + 'order', JSON.stringify(order));
-    }
-  });
 
   $rootScope.confirm = function(title, message, callback, field){
     var a = new BootstrapDialog({
@@ -130,7 +80,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   $rootScope.getAppFromName = getAppFromName;
 
   function getAppFromName(name){
-    var apps = session.getApps();
+    var apps = Apps.get();
     if (apps && apps.length) {
       var filter = apps.filter(function(each){
         return each.name === name;
@@ -149,7 +99,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   }
   $rootScope.goToDash = function(app) {
     if(app) {
-      $rootScope.currentApp = app;
       $location.path('/' + app + '/dash');
     }
   }
@@ -160,17 +109,12 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   }
   $rootScope.goToBrowser = function(path) {
     session.setBrowserURL(path);
-    $rootScope.currentApp = stringManipulation.urlToAppname(path);
-    $location.path('/' + $rootScope.currentApp + '/browser/');
+    $route.reload();
   }
   $rootScope.goToStats = function(path){
-    if(path) $rootScope.currentApp = path;
-    else path = $rootScope.currentApp;
     $location.path('/' + path + '/dash/');
   }
   $rootScope.goToOauth = function(path){
-    if(path) $rootScope.currentApp = path;
-    else path = $rootScope.currentApp;
     $location.path('/' + path + '/oauth/');
   }
   $rootScope.where = function(here){
@@ -181,7 +125,6 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
   }
   document.addEventListener('postLogin', function() {
     $rootScope.logged = true;
-    externalLibs();
     $route.reload();
   });
   document.addEventListener('logout', function(){
@@ -189,77 +132,8 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
       $rootScope.logged = false;
     });
   });
-
-  $rootScope.$on('$routeChangeSuccess', function(){
-    window.Intercom('update');
-  });
-
-  window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
-
-  function externalLibs(){
-
-    var obj = {
-      name: 'unknown',
-      email: 'unknown',
-      uid: 'unknown'
-    };
-
-    var user = session.getProfile() || obj;
-
-    window.Raven.setUser({
-        email: user.email,
-        id: user.uid
-    });
-    
-    window.Intercom('boot', {
-      app_id: "jnzcgdd7",
-      name: user.name,
-      email: user.email
-    });
-
-  }
 } 
 
-function Routes($routeProvider, $locationProvider){
-  var browser = {
-    controller: 'browser',
-    templateUrl: '/developer/html/browser.html'
-  }, stats = {
-    controller: 'stats',
-    templateUrl: '/developer/html/stats.html'
-  }, apps = {
-    controller: 'apps',
-    templateUrl: '/developer/html/apps.html'
-  }, signup = {
-    controller: 'signup',
-    templateUrl: '/developer/html/signup.html'
-  }, oauth = {
-    controller: 'oauthd',
-    templateUrl: '/developer/html/oauth.html'
-  }, invite = {
-    controller: 'invite',
-    templateUrl: '/developer/html/invite.html'
-  }, billing = {
-    controller: 'billing',
-    templateUrl: '/developer/html/billing.html'
-  }, start = {
-    controller: 'start',
-    templateUrl: '/developer/html/start.html'
-  };
-
-  $locationProvider.html5Mode(true).hashPrefix('!');
-
-  $routeProvider
-    .when('/', start)
-    .when('/invite', invite)
-    .when('/billing', billing)
-    .when('/signup', signup)
-    .when('/:path/browser', browser)
-    .when('/:path/dash', stats)
-    .when('/:path/oauth', oauth)
-    .when('/apps', apps)
-    .otherwise({ redirectTo: '/' });
-}
 })();
 
 
