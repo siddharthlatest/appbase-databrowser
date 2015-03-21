@@ -18,12 +18,9 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
       oldSession = JSON.parse(oldSession);
       if(!angular.isArray(oldSession)) clearSession();
     } catch(e){
-      clearSession();
+      Apps.clear();
     }
-  } else clearSession();
-  function clearSession(){
-    sessionStorage.setItem('apps', '[]');
-  }
+  } else Apps.clear();
   // end session fixing 
   
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){

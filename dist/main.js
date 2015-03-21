@@ -18,12 +18,9 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
       oldSession = JSON.parse(oldSession);
       if(!angular.isArray(oldSession)) clearSession();
     } catch(e){
-      clearSession();
+      Apps.clear();
     }
-  } else clearSession();
-  function clearSession(){
-    sessionStorage.setItem('apps', '[]');
-  }
+  } else Apps.clear();
   // end session fixing 
   
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
@@ -2774,9 +2771,10 @@ angular
 
 function Start($rootScope, session, $location, $scope, $timeout, Apps) {
   var user = session.getProfile();
-  var lastApp = Apps.get()[0].name;
+  var lastApps = Apps.get();
 
-  if(lastApp) {
+  if(lastApps.length) {
+    var lastApp = lastApps[0].name;
   	$location.path(lastApp + '/dash');
   } else {
     Apps.refresh().then(function(apps){
