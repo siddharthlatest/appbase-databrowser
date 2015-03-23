@@ -5,11 +5,12 @@ angular
 .controller('topnav', TopNavCtrl)
 .run(Authenticate);
 
-function TopNavCtrl($scope, $routeParams, Apps, $timeout) {
+function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location) {
+  var appName;
   $scope.routeParams = $routeParams;
 
   $scope.$on('$routeChangeSuccess', function(next, current){
-    var appName = current.params.app;
+    appName = current.params.app;
     if(appName){
       var app = Apps.get().filter(function(app){
         return app.name === appName;
@@ -21,6 +22,45 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout) {
       })
     } 
   });
+
+  $scope.deleteApp = function(app){
+    BootstrapDialog.show({
+        title: 'Delete app',
+        message: 'Are you sure you want to delete <span class="bold">' + app +
+        '</span>?<br>Enter the app name to confirm.<br><br>'
+        + '<div class="form-group"><input type="text" class="form-control" /></div>'
+        ,
+        closable: false,
+        cssClass: 'modal-custom',
+        buttons: [{
+            label: 'Cancel',
+            cssClass: 'btn-no',
+            action: function(dialog) {
+                dialog.close();
+            }
+        }, {
+            label: 'Yes',
+            cssClass: 'btn-yes',
+            action: function(dialog) {
+              var input = dialog.getModalBody().find('.form-group');
+              var value = input.find('input').val();
+              if(value === app){
+                data.deleteApp(app).then(function(){
+                  $timeout(function(){
+                    $location.path('/apps');
+                  });
+                }).catch(function(error){
+                  sentry(error);
+                }).finally(function(){
+                  dialog.close();
+                });
+              } else {
+                input.addClass('has-error');
+              }
+            }
+        }]
+    });
+  }
 }
 
 function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $routeParams){
@@ -111,10 +151,15 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
       updated = true;
       refreshing = false;
 
-      session.setApps(apps);
-
       $timeout(function(){
         apps = attachAllPromises(_apps);
+
+        session.setApps(apps);
+        var profile = session.getProfile();
+        if(profile && profile.uid) {
+          localStorage.setItem(profile.uid + 'order', JSON.stringify(_apps));
+        }
+        
         $rootScope.db_loading = false;
         deferred.resolve(apps);
       });
@@ -221,48 +266,6 @@ function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $lo
 
   document.addEventListener('login', Apps.refresh);
 
-  $rootScope.deleteApp = function(app) {
-    var a = new BootstrapDialog({
-        title: 'Delete app',
-        message: 'Are you sure you want to delete <span class="bold">' + app +
-        '</span>?<br>Enter the app name to confirm.<br><br>'
-        + '<div class="form-group"><input type="text" class="form-control" /></div>'
-        ,
-        closable: false,
-        cssClass: 'modal-custom',
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(value === app){
-                $rootScope.deleting = app;
-                data.deleteApp(app, function(error) {
-                  if(error){
-                    $rootScope.deleting = '';
-                    throw error;
-                  }
-                  else {
-                    $rootScope.$apply(function(){
-                      $location.path('/apps');
-                    });
-                  }
-                });
-                dialog.close();
-              } else {
-                input.addClass('has-error');
-              }
-            }
-        }]
-    }).open();
-  }
 }
 
 })();

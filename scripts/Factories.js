@@ -207,11 +207,11 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
     return accountsAPI.user.put(user, {appname: app});
   };
 
-  data.deleteApp = function(app, done) {
-    $q.all(
+  data.deleteApp = function(app) {
+    return $q.all(
       accountsAPI.app.delete(app, {kill: true, secret: secret}),
       accountsAPI.user.delete(getEmail(), {appname: app})
-    ).then(done);
+    );
   }
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
