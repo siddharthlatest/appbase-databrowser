@@ -170,21 +170,26 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   }
 
   data.createApp = function(app, done) {
+    var deferred = $q.defer();
+
     accountsAPI.app.put(app).then(function(response){
       if(typeof response === "string") {
-        done(response);
+        deferred.reject();
       } else if(angular.isObject(response)) {
         $q.all(
           accountsAPI.user.put(getEmail(), {appname: app}),
           accountsAPI.app.put(app, 'owners', {owner: getEmail()})
-        ).then(done);
+        ).then(deferred.resolve).catch(deferred.reject);
       } else {
         if(angular.isObject(response) || angular.isArray(response)){
           response = JSON.stringify(response);
         }
-        sentry(new Error('App creation unexpected return ' + response))
+        sentry(new Error('App creation unexpected return ' + response));
+        deferred.reject();
       }
     });
+
+    return deferred.promise;
   } 
 
   data.putUser = function(app, user) {
@@ -260,6 +265,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   function request(req_type, app, subject, body, endpoint) {
     var deferred = $q.defer();
     var url = atob(server) + app + '/' + subject + '/' + endpoint;
+    if(!body) body = {};
     var promise = atomic[req_type](url, body);
 
     promise.success(deferred.resolve);

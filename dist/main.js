@@ -169,39 +169,37 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   
   $rootScope.db_loading = !$scope.apps;
   $scope.fetching = true;
+  refresh();
 
-  Apps.refresh().then(function(apps){
-    $timeout(function(){
-      $scope.apps = apps;
-      apps.forEach(function(app){
-        var promises = ['metrics', 'secret'];
-        promises.forEach(function(prop){
-          if(!app[prop]) app['$' + prop]();
+  function refresh(done){
+    Apps.refresh().then(function(apps){
+      $timeout(function(){
+        $scope.apps = apps;
+        apps.forEach(function(app){
+          var promises = ['metrics', 'secret'];
+          promises.forEach(function(prop){
+            if(!app[prop]) app['$' + prop]();
+          });
         });
+        $scope.fetching = false;
+        $rootScope.db_loading = false;
+        if(done) done();
       });
-      $scope.fetching = false;
-      $rootScope.db_loading = false;
     });
-  });
+  }
 
   $scope.createApp = function (app) {
     $scope.creating = true;
     $scope.fetching = true;
-    data.createApp(app, function(error) {
-      if(error) {
+    data.createApp(app).then(function(){
+      refresh(function(){
         $scope.creating = false;
-        $scope.fetching = false;
-        alert('Name taken. Try another name.');
-      } else {
-        $rootScope.loadApps(function(apps){
-          $timeout(function(){
-            $scope.apps = apps;
-            $scope.creating = false;
-            $scope.fetching = false;
-            $rootScope.goToDash(app);
-          });
-        });
-      } 
+        $rootScope.goToDash(app);
+      });
+    }).catch(function(){
+      $scope.creating = false;
+      $scope.fetching = false;  
+      alert('Name taken. Try another name.');
     });
   };
 
@@ -1437,21 +1435,26 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   }
 
   data.createApp = function(app, done) {
+    var deferred = $q.defer();
+
     accountsAPI.app.put(app).then(function(response){
       if(typeof response === "string") {
-        done(response);
+        deferred.reject();
       } else if(angular.isObject(response)) {
         $q.all(
           accountsAPI.user.put(getEmail(), {appname: app}),
           accountsAPI.app.put(app, 'owners', {owner: getEmail()})
-        ).then(done);
+        ).then(deferred.resolve).catch(deferred.reject);
       } else {
         if(angular.isObject(response) || angular.isArray(response)){
           response = JSON.stringify(response);
         }
-        sentry(new Error('App creation unexpected return ' + response))
+        sentry(new Error('App creation unexpected return ' + response));
+        deferred.reject();
       }
     });
+
+    return deferred.promise;
   } 
 
   data.putUser = function(app, user) {
@@ -1527,6 +1530,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   function request(req_type, app, subject, body, endpoint) {
     var deferred = $q.defer();
     var url = atob(server) + app + '/' + subject + '/' + endpoint;
+    if(!body) body = {};
     var promise = atomic[req_type](url, body);
 
     promise.success(deferred.resolve);

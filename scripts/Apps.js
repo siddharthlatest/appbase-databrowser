@@ -20,39 +20,37 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   
   $rootScope.db_loading = !$scope.apps;
   $scope.fetching = true;
+  refresh();
 
-  Apps.refresh().then(function(apps){
-    $timeout(function(){
-      $scope.apps = apps;
-      apps.forEach(function(app){
-        var promises = ['metrics', 'secret'];
-        promises.forEach(function(prop){
-          if(!app[prop]) app['$' + prop]();
+  function refresh(done){
+    Apps.refresh().then(function(apps){
+      $timeout(function(){
+        $scope.apps = apps;
+        apps.forEach(function(app){
+          var promises = ['metrics', 'secret'];
+          promises.forEach(function(prop){
+            if(!app[prop]) app['$' + prop]();
+          });
         });
+        $scope.fetching = false;
+        $rootScope.db_loading = false;
+        if(done) done();
       });
-      $scope.fetching = false;
-      $rootScope.db_loading = false;
     });
-  });
+  }
 
   $scope.createApp = function (app) {
     $scope.creating = true;
     $scope.fetching = true;
-    data.createApp(app, function(error) {
-      if(error) {
+    data.createApp(app).then(function(){
+      refresh(function(){
         $scope.creating = false;
-        $scope.fetching = false;
-        alert('Name taken. Try another name.');
-      } else {
-        $rootScope.loadApps(function(apps){
-          $timeout(function(){
-            $scope.apps = apps;
-            $scope.creating = false;
-            $scope.fetching = false;
-            $rootScope.goToDash(app);
-          });
-        });
-      } 
+        $rootScope.goToDash(app);
+      });
+    }).catch(function(){
+      $scope.creating = false;
+      $scope.fetching = false;  
+      alert('Name taken. Try another name.');
     });
   };
 
