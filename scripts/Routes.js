@@ -2,7 +2,42 @@
 
 angular
 .module("AppbaseDashboard")
-.config(['$routeProvider', '$locationProvider', Routes]);
+.config(['$routeProvider', '$locationProvider', Routes])
+.controller('start', Start);
+
+function Start(session, $location, Apps) {
+  var user = session.getProfile();
+  var lastApps = Apps.get();
+
+  if(lastApps.length) {
+    var lastApp = lastApps[0].name;
+    $location.path(lastApp + '/dash');
+  } else {
+    $location.path('/apps');
+  }
+
+  // http://bootstraptour.com/api/#step-options
+  // var tour = new Tour({
+  //   steps: [
+  //   {
+  //     element: "#my-element",
+  //     title: "Title of my step",
+  //     content: "Content of my step",
+  //     onNext: func
+  //   },
+  //   {
+  //     element: "#my-other-element",
+  //     title: "Title of my step",
+  //     content: "Content of my step"
+  //   }
+  // ]});
+
+  // tour.init();
+  // tour.start();
+
+  // if(!user || !apps.length) {
+  // } else console.log(apps)
+}
 
 function Routes($routeProvider, $locationProvider){
 
@@ -25,9 +60,6 @@ function Routes($routeProvider, $locationProvider){
       name: 'oauth',
       path: '/:app/oauth',
       dependencies: ['secret']
-    }, {
-      name: 'signup',
-      path: '/signup'
     }, {
       name: 'invite',
       path: '/invite'

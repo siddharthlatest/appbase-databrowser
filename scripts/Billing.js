@@ -3,7 +3,7 @@ angular
 .module('AppbaseDashboard')
 .controller('billing', BillingCtrl);
 
-function BillingCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout, $document){
+function BillingCtrl($routeParams, utils, $scope, session, $rootScope, $location, $timeout, $document){
   //var stripeKey = 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv';//test key
   var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
   $rootScope.db_loading = true;

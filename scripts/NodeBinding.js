@@ -2,13 +2,13 @@
 angular
 .module("AppbaseDashboard")
 .factory('nodeBinding',['data', '$location',
-  'stringManipulation','$timeout','$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
+  'utils','$timeout','$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
 function debug(a) {
   return JSON.parse(JSON.stringify(a))
 }
 
-function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $rootScope, session, ngDialog, $route) {
+function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, session, ngDialog, $route) {
   var nodeBinding = {};
   nodeBinding.creating = [];
   function addNamespaces(node, childName) {
@@ -22,9 +22,9 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
 
   nodeBinding.bindAsRoot = function($scope) {
     var root = {isR: true};
-    root.name = stringManipulation.getBaseUrl();
+    root.name = utils.getBaseUrl();
     root.meAsRoot = function() {
-      $rootScope.goToBrowser(stringManipulation.pathToUrl(''));
+      $rootScope.goToBrowser(utils.pathToUrl(''));
     }
     root.expand = function() {
       root.children = [];
@@ -131,7 +131,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     nodeBinding.creating.push(namespace);
     var ns =  {name: namespace, isNS: true, ref: $appbase.ns(namespace)}
     ns.meAsRoot = function() {
-      session.setBrowserURL(stringManipulation.pathToUrl(namespace));
+      session.setBrowserURL(utils.pathToUrl(namespace));
       $route.reload();
     }
     ns.expand = function() {
@@ -170,7 +170,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
       }
       return v;
     }
-    var parsedPath = stringManipulation.parsePath(path);
+    var parsedPath = utils.parsePath(path);
     var vertex = useThisVertex || {
       ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
     }    
@@ -202,7 +202,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
     }
 
     vertex.meAsRoot = function() {
-      $rootScope.goToBrowser(stringManipulation.pathToUrl(path));
+      $rootScope.goToBrowser(utils.pathToUrl(path));
     }
 
     vertex.contract = function() {
@@ -221,7 +221,7 @@ function NodeBinding(data, $location, stringManipulation, $timeout, $appbase, $r
 
     vertex.removeSelfEdge = function() {
       vertex.deleting = true;
-      var isARootVertex = (stringManipulation.parsePath(path).obj_path === undefined);
+      var isARootVertex = (utils.parsePath(path).obj_path === undefined);
       isARootVertex? vertex.ref.destroy() : vertex.ref.inVertex().removeEdge(vertex.name);
       //destroy if root vertex, remove edge if not
     }

@@ -2,10 +2,10 @@
 angular
 .module("AppbaseDashboard")
 .controller("browser",
-             ['$scope', '$appbase', '$timeout', 'data', 'stringManipulation', 'breadcrumbs',
+             ['$scope', '$appbase', '$timeout', 'data', 'utils', 'breadcrumbs',
              'ngDialog', 'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', BrowserCtrl]);
 
-function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
+function BrowserCtrl($scope, $appbase, $timeout, data, utils,
   breadcrumbs, ngDialog, nodeBinding, session, $rootScope, Apps, $routeParams){
 
   var apps = Apps.get();
@@ -18,8 +18,8 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
   
   var URL;
   URL = session.getBrowserURL(apps);
-  if(!URL || stringManipulation.urlToAppname(URL) !== appName) {
-    URL = stringManipulation.appToURL(appName);
+  if(!URL || utils.urlToAppname(URL) !== appName) {
+    URL = utils.appToURL(appName);
     session.setBrowserURL(URL);
   }
 
@@ -35,9 +35,9 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
     data.setAppCredentials(appName, secret);
     $scope.url = URL;
     $scope.goUp = function() {
-      URL = stringManipulation.parentUrl($scope.url);
+      URL = utils.parentUrl($scope.url);
     }
-    var path = stringManipulation.urlToPath($scope.url);
+    var path = utils.urlToPath($scope.url);
 
     if(path === undefined) {
       $scope.node = nodeBinding.bindAsRoot($scope)
@@ -48,7 +48,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
     }
     $scope.node.expand()
 
-    $scope.baseUrl = stringManipulation.cutLeadingTrailingSlashes(stringManipulation.getBaseUrl())
+    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl())
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
     $rootScope.db_loading = false;
     $scope.status = false;
@@ -92,7 +92,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, stringManipulation,
                 params.ref = $appbase.ns(params.namespace).v(params.vId)
               } else {
                 params.vPath = $dialogScope.vPath
-                var parsedPath = stringManipulation.parsePath(params.vPath);
+                var parsedPath = utils.parsePath(params.vPath);
                 params.ref = $appbase.ns(parsedPath.ns).v(parsedPath.v);
               }
 

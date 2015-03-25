@@ -4,7 +4,9 @@ angular
 .controller('oauth', OauthCtrl)
 .factory("oauthFactory", OauthFactory);
 
-function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $timeout, $filter, data, session, $rootScope, $location, Apps, $routeParams){
+function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
+  $filter, data, session, $rootScope, $location, Apps, $routeParams){
+
   $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
   $scope.status = "Loading...";
   $scope.loading = $scope.loadingProv = $scope.editing = false;
@@ -82,8 +84,15 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
     oauthFactory.addProvider($scope.app, $scope.provider.provider, $scope.clientID, $scope.clientSecret)
     .then(function(data){
       $timeout(function(){
+        var obj = {
+          response_type: 'code',
+          parameters: {
+            client_id: $scope.clientID,
+            client_secret: $scope.clientSecret
+          }
+        };
         $scope.loadingProv = false;
-        $scope.userProviders[$scope.provider.provider] = {response_type: 'code', parameters: {client_id: $scope.clientID, client_secret: $scope.clientSecret}};
+        $scope.userProviders[$scope.provider.provider] = obj;
         $scope.clientID = $scope.clientSecret = '';
       });
     }, sentry);
@@ -159,10 +168,8 @@ function OauthCtrl($scope, oauthFactory, stringManipulation, $routeParams, $time
   if(!app) {
     $rootScope.goToApps();
     return;
-  } else {
-    $rootScope.logged = true;
-    $scope.app = appName;
-  }
+  } else $scope.app = appName;
+
   $rootScope.db_loading = false;
   
   $scope.cancel();
@@ -224,7 +231,12 @@ function OauthFactory($timeout, $q){
   
   oauth.createApp = function(appName, secret, domains){
     var deferred = $q.defer();
-    atomic.post(url + 'apps', {name: appName, domains: domains, secret: secret, tokenExpiry: 1000*60*60*24*30})
+    atomic.post(url + 'apps', {
+      name: appName,
+      domains: domains,
+      secret: secret,
+      tokenExpiry: 1000*60*60*24*30
+    })
     .success(function(data){
       deferred.resolve(data);
     })

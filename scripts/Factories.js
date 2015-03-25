@@ -1,39 +1,55 @@
 (function(){
 angular
 .module("AppbaseDashboard")
-.factory('stringManipulation', StringManipulationFactory)
+.factory('utils', utilsFactory)
 .factory('data',
-  ['$timeout', '$location', '$appbase', 'stringManipulation', '$rootScope', '$q', 'oauthFactory',DataFactory]);
+  ['$timeout', '$location', '$appbase', 'utils', '$rootScope', '$q', 'oauthFactory',DataFactory]);
 
-function StringManipulationFactory(){
-  var stringManipulation = {};
+function utilsFactory(){
+  var utils = {};
   var baseUrl;
 
-  stringManipulation.setBaseUrl = function(bUrl){
+  utils.appNamesToObj = function(_apps){
+    var retArr = [];
+    _apps.forEach(function(app){
+      retArr.push({name: app});
+    });
+    return retArr;
+  };
+
+  utils.appObjToNames = function(_apps){
+    var retArr = [];
+    _apps.forEach(function(app){
+      retArr.push(app.name);
+    });
+    return retArr;
+  };
+
+  utils.setBaseUrl = function(bUrl){
     baseUrl = bUrl;
   };
 
-  stringManipulation.getBaseUrl = function(bUrl){
+  utils.getBaseUrl = function(bUrl){
     return baseUrl;
   };
 
-  stringManipulation.urlToAppname = function(url) {
-    return stringManipulation.parseURL(url).appName;
+  utils.urlToAppname = function(url) {
+    return utils.parseURL(url).appName;
   };
 
-  stringManipulation.urlToPath = function(url) {
-    return stringManipulation.parseURL(url).path;
+  utils.urlToPath = function(url) {
+    return utils.parseURL(url).path;
   };
 
-  stringManipulation.pathToUrl = function(path) {
+  utils.pathToUrl = function(path) {
     return baseUrl + path;
   };
   
-  stringManipulation.parsePath = function(path) {
-    return stringManipulation.parseURL(stringManipulation.pathToUrl(path));
+  utils.parsePath = function(path) {
+    return utils.parseURL(utils.pathToUrl(path));
   };
 
-  stringManipulation.parseURL = function(url) {
+  utils.parseURL = function(url) {
     if(!url) return {}; //return empty object for undefined
     var intermediate, appname, version, path, namespace, key, obj_path, v;
     intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
@@ -65,7 +81,7 @@ function StringManipulationFactory(){
     return retObj;
   }
 
-  stringManipulation.cutLeadingTrailingSlashes = function(input) {
+  utils.cutLeadingTrailingSlashes = function(input) {
     if(typeof input !== 'string')
       return
     while(input.charAt(input.length - 1) === '/') {
@@ -77,23 +93,24 @@ function StringManipulationFactory(){
     return input;
   };
 
-  stringManipulation.parentUrl = function(url) {
-    return stringManipulation.pathToUrl(stringManipulation.parentPath(stringManipulation.urlToPath(url)))
+  utils.parentUrl = function(url) {
+    var parentPath = utils.parentPath(utils.urlToPath(url));
+    return utils.pathToUrl(parentPath);
   };
 
-  stringManipulation.parentPath = function(path) {
+  utils.parentPath = function(path) {
     var slashI;
     return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
   };
 
-  stringManipulation.appToURL = function(app) {
+  utils.appToURL = function(app) {
     return "https://api.appbase.io/"+ app +"/v2_1/";
   };
 
-  return stringManipulation;
+  return utils;
 }
 
-function DataFactory($timeout, $location, $appbase, stringManipulation, $rootScope, $q, oauthFactory) {
+function DataFactory($timeout, $location, $appbase, utils, $rootScope, $q, oauthFactory) {
   var data = {};
   var appName;
   var secret;
@@ -141,7 +158,7 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
     $appbase.credentials(app, s);
     appName = app;
     secret = s;
-    stringManipulation.setBaseUrl(stringManipulation.appToURL(appName));
+    utils.setBaseUrl(utils.appToURL(appName));
   }
 
   data.getAppname = function() {
@@ -216,7 +233,9 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
   
   // checks if the user has any apps with registered with uid, pushes them with emailid
   data.uidToEmail = function(done) {
-    accountsAPI.user.get(getUID()).error(sentry).then(function(apps) {
+    var UID = getUID();
+    if(UID) {
+      accountsAPI.user.get(getUID()).error(sentry).then(function(apps) {
         if(!apps.length) return done();
         var appsRemaining = apps.length;
         var checkForDone = function() {
@@ -233,25 +252,28 @@ function DataFactory($timeout, $location, $appbase, stringManipulation, $rootSco
           ).then(checkForDone);
         });
       });
+    } else done();
   };
   
   data.getDevsAppsWithEmail = function(done) {
-    accountsAPI.user.get(getEmail()).then(function(apps){
-      if(!apps.length){
-        done([]);
-        $timeout(function(){
-          $rootScope.noApps = true;
-          $rootScope.noCalls = $rootScope.noCalls || true;
-        });
-        
-      } else {
-        $timeout(function(){
-          $rootScope.noCalls = $rootScope.noCalls || false;
-        });
-      }
-      done(apps);
-
-    });
+    var email = getEmail();
+    if(email) {
+      accountsAPI.user.get(getEmail()).then(function(apps){
+        if(!apps.length){
+          done([]);
+          $timeout(function(){
+            $rootScope.noApps = true;
+            $rootScope.noCalls = $rootScope.noCalls || true;
+          });
+          
+        } else {
+          $timeout(function(){
+            done(apps);
+            $rootScope.noCalls = $rootScope.noCalls || false;
+          });
+        }
+      });
+    } else done([]);
   }
 
   data.getDevsApps = function(done) {

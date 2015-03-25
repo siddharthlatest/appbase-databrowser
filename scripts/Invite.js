@@ -3,7 +3,7 @@ angular
 .module('AppbaseDashboard')
 .controller('invite', InviteCtrl);
 
-function InviteCtrl($routeParams, stringManipulation, $scope, session, $rootScope, $location, $timeout){
+function InviteCtrl($routeParams, utils, $scope, session, $rootScope, $location, $timeout){
   $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");

@@ -25,8 +25,10 @@ function ExternalLibs($rootScope, $window, session){
 	};
 
 	document.addEventListener('postLogin', updateLibs);
-	$rootScope.$on('logged', updateLibs);
 	if($rootScope.logged) updateLibs();
+	$rootScope.$watch('looged', function(logged){
+		if(logged) updateLibs();
+	});
 
 	function updateLibs(){
 		var user = session.getProfile() || unknownUser;

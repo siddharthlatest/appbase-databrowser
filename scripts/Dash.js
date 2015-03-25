@@ -3,7 +3,7 @@ angular
 .module("AppbaseDashboard")
 .controller('dash', DashCtrl);
 
-function DashCtrl($routeParams, stringManipulation, $scope, $rootScope, $location, $timeout, Apps, $routeParams){
+function DashCtrl($routeParams, $scope, $rootScope, $location, $timeout, Apps, $routeParams){
   $scope.status = true;
   $scope.apps = Apps.get();
   $scope.strike = {};

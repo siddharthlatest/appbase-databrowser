@@ -1,16 +1,20 @@
 <div class="container-fluid" id="applications">
     <div class="row">
         <div class="col-xs-12 main-title">
-            <span ng-bind="devProfile.name"></span>{{devProfile.name ? "'s" : "Your" }} Apps
+            <span ng-bind="devProfile.name">
+            </span><span ng-show="devProfile.name" class="ng-hide">'s</span>
+            <span ng-show="!devProfile.name" class="ng-hide">Your</span>
+            Apps
         </div>
         <div class="fetching">
             <div ng-show="fetching">
                 <span class="fa fa-refresh ab-spin"></span>
             </div>
         </div>
-        <div class="col-xs-12 text-center">
+        <div class="col-xs-12 text-center" ng-show="apps.length">
             <div class="form-horizontal col-md-8 col-xs-12 create-app col-md-offset-2">
-                <div class="row wrapper well test" ng-submit="createApp(newAppname); newAppname ='' ;">
+                <div class="row wrapper well test"
+                     ng-submit="createApp(newAppname)">
                     <form>
                         <div class="form-group new-app input-line">
                             <div class="col-xs-12">
@@ -24,7 +28,9 @@
                         </div>
                         <div class="form-group">
                             <div class="col-xs-12">
-                                <button class="form-control btn btn-success" type="submit" id="createuserapp">
+                                <button class="form-control btn btn-success"
+                                        type="submit"
+                                        id="createuserapp" >
                                     Create App
                                 </button>
                             </div>
@@ -88,14 +94,18 @@
                     </div>
                 </a>
                 <h2>Live Tutorial</h2>
-                <span class="desc">Build a chat app using our online tutorial in 4 steps</span>
+                <span class="desc">
+                    Build a chat app using our online tutorial in 4 steps
+                </span>
             </div>
             <div class="col-xs-12 col-sm-4">
                 <a href="" ng-click="firstAPICall()">
                     <div class="circle api"><span class="fa fa-check-square-o"></span></div>
                 </a>
                 <h2>Make the first API call</h2>
-                <span class="desc">Create your first app, and make the first API call in under 5 minutes</span>
+                <span class="desc">
+                    Create your first app, and make the first API call in under 5 minutes
+                </span>
             </div>
 
             <div class="col-xs-12 col-sm-4">

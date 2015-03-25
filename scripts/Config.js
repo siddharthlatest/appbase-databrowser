@@ -9,7 +9,7 @@ angular.module("AppbaseDashboard", ['ngAppbase',
                                     'ngClipboard'])
   .run(FirstRun);
 
-function FirstRun($rootScope, $location, stringManipulation, session, $route, $timeout, Apps, $routeParams){
+function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $routeParams){
   $rootScope.db_loading = true;
   // changed the way sessions are stored, so to prevent errors:
   var oldSession = sessionStorage.getItem('apps');
@@ -27,10 +27,7 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
     Apps.clear();
     session.setProfile(null);
     $rootScope.logged = false;
-  } else {
-    $rootScope.$broadcast('logged');
-    $rootScope.logged = true;
-  }
+  } else $rootScope.logged = true;
 
   $rootScope.confirm = function(title, message, callback, field){
     var a = new BootstrapDialog({
@@ -120,12 +117,9 @@ function FirstRun($rootScope, $location, stringManipulation, session, $route, $t
     return $location.path().split('/')[2];
   }
   document.addEventListener('postLogin', function() {
-    $rootScope.logged = true;
-    $route.reload();
-  });
-  document.addEventListener('logout', function(){
-    $rootScope.$apply(function(){
-      $rootScope.logged = false;
+    $timeout(function(){
+      $rootScope.logged = true;
+      $route.reload();
     });
   });
 } 

@@ -5,70 +5,14 @@ angular
 .controller('topnav', TopNavCtrl)
 .run(Authenticate);
 
-function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location) {
-  var appName;
-  $scope.routeParams = $routeParams;
-
-  $scope.$on('$routeChangeSuccess', function(next, current){
-    appName = current.params.app;
-    if(appName){
-      var app = Apps.get().filter(function(app){
-        return app.name === appName;
-      })[0];
-      app.$secret().then(function(){
-        $timeout(function(){
-          $scope.secret = app.secret;
-        });
-      })
-    } 
-  });
-
-  $scope.deleteApp = function(app){
-    BootstrapDialog.show({
-        title: 'Delete app',
-        message: 'Are you sure you want to delete <span class="bold">' + app +
-        '</span>?<br>Enter the app name to confirm.<br><br>'
-        + '<div class="form-group"><input type="text" class="form-control" /></div>'
-        ,
-        closable: false,
-        cssClass: 'modal-custom',
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(value === app){
-                data.deleteApp(app).then(function(){
-                  $timeout(function(){
-                    $location.path('/apps');
-                  });
-                }).catch(function(error){
-                  sentry(error);
-                }).finally(function(){
-                  dialog.close();
-                });
-              } else {
-                input.addClass('has-error');
-              }
-            }
-        }]
-    });
-  }
-}
-
-function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $routeParams){
+function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $routeParams, utils){
   var apps = getFromSession();
   var refreshing = false;
   var callsCalc = false;
   var updated = false;
   var calls = {};
+  var appNamesToObj = utils.appNamesToObj;
+  var appObjToNames = utils.appObjToNames;
 
   $rootScope.$on('$routeChangeSuccess', updateOrder);
 
@@ -146,13 +90,29 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
     }
     var deferred = $q.defer();
     refreshing = deferred.promise;
-
     session.fetchApps().then(function(_apps){
       updated = true;
       refreshing = false;
 
+      var appsObj = appNamesToObj(_apps);
+      appsObj.forEach(function(app){
+        var index;
+        apps.every(function(oldApp, _index){
+          if(oldApp.name === app.name) {
+            index = _index;
+            return false;
+          }
+          return true;
+        });
+        if(index) {
+          Object.getOwnPropertyNames(apps[index]).forEach(function(prop){
+            if(!prop.lastIndexOf('$', 0)) return;
+            app[prop] = apps[index][prop];
+          });
+        }
+      });
       $timeout(function(){
-        apps = attachAllPromises(_apps);
+        apps = attachAllPromises(appsObj);
 
         session.setApps(apps);
         var profile = session.getProfile();
@@ -171,22 +131,6 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
     return deferred.promise;
   }
 
-  function appNamesToObj(_apps){
-    var retArr = [];
-    _apps.forEach(function(app){
-      retArr.push({name: app});
-    });
-    return retArr;
-  }
-
-  function appObjToNames(_apps){
-    var retArr = [];
-    _apps.forEach(function(app){
-      retArr.push(app.name);
-    });
-    return retArr;
-  }
-
   function attachAllPromises(_apps){
     var appsArr = [];
     _apps.forEach(function(app){
@@ -196,33 +140,45 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
     return appsArr;
   }
 
-  function attachPromises(app){
-    var appObj = {};
+  function attachPromises(appObj){
+    if(angular.isString(appObj)) appObj = { name: appObj };
+
+    var deferred = $q.defer();
+    deferred.resolve();
+    var emptyPromise = deferred.promise;
     
-    appObj.name = angular.isObject(app) ? app.name : app;
-
     appObj.$metrics = function(){
-      return data.accountsAPI.app.get(appObj.name, 'metrics').then(function(data){
-        appObj.stats = computeMetrics(data);
-        appObj.metrics = data;
+      if(!appObj.metrics){
+        return data.accountsAPI.app.get(appObj.name, 'metrics').then(function(data){
+          appObj.stats = computeMetrics(data);
+          appObj.metrics = data;
 
-        calls[app] = appObj.stats.calls;
-        updateCalls();
-      });
+          calls[appObj.name] = appObj.stats.calls;
+          updateCalls();
+        });
+      }
+      return emptyPromise;
     };
 
     appObj.$secret = function(){
-      return data.getAppsSecret(appObj.name).then(function(data){
-        appObj.secret = data.secret;
-      });
+      if(!appObj.secret){
+        return data.getAppsSecret(appObj.name).then(function(data){
+          appObj.secret = data.secret;
+          write();
+        });
+      }
+      return emptyPromise;
     };
 
     appObj.$oauth = function(){
-      var promise = oauthFactory.getApp(appObj.name);
-      promise.then(function(data){
-        appObj.oauth = data;
-      });
-      return promise;
+      if(!appObj.oauth) {
+        var promise = oauthFactory.getApp(appObj.name);
+        promise.then(function(data){
+          appObj.oauth = data;
+        });
+        return promise;
+      }
+      return emptyPromise;
     };
 
     return appObj;
@@ -247,12 +203,73 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
   return retObj;
 }
 
-function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $location, Apps) {
-  $rootScope.devProfile = session.getProfile();
-  $rootScope.db_loading = false;
-  if($rootScope.devProfile) {
-    Apps.refresh();
+function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, session) {
+  var appName;
+  $scope.routeParams = $routeParams;
+
+  $scope.$on('$routeChangeSuccess', function(next, current){
+    if(!session.getProfile()) return;
+    appName = current.params.app;
+    if(appName){
+      var app = Apps.get().filter(function(app){
+        return app.name === appName;
+      })[0];
+      if(!app.secret) {
+        app.$secret().then(function(){
+          $timeout(function(){
+            $scope.secret = app.secret;
+          });
+        });
+      } else $timeout(function(){
+        $scope.secret = app.secret;
+      });
+      
+    } 
+  });
+
+  $scope.deleteApp = function(app){
+    BootstrapDialog.show({
+        title: 'Delete app',
+        message: 'Are you sure you want to delete <span class="bold">' + app +
+        '</span>?<br>Enter the app name to confirm.<br><br>'
+        + '<div class="form-group"><input type="text" class="form-control" /></div>'
+        ,
+        closable: false,
+        cssClass: 'modal-custom',
+        buttons: [{
+            label: 'Cancel',
+            cssClass: 'btn-no',
+            action: function(dialog) {
+                dialog.close();
+            }
+        }, {
+            label: 'Yes',
+            cssClass: 'btn-yes',
+            action: function(dialog) {
+              var input = dialog.getModalBody().find('.form-group');
+              var value = input.find('input').val();
+              if(value === app){
+                data.deleteApp(app).then(function(){
+                  $timeout(function(){
+                    $location.path('/apps');
+                  });
+                }).catch(function(error){
+                  sentry(error);
+                }).finally(function(){
+                  dialog.close();
+                });
+              } else {
+                input.addClass('has-error');
+              }
+            }
+        }]
+    });
   }
+}
+
+function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $location, Apps) {
+
+  auth();
 
   document.addEventListener('logout', function() {
     $timeout(function(){
@@ -264,7 +281,17 @@ function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $lo
     });
   });
 
-  document.addEventListener('login', Apps.refresh);
+  $rootScope.$watch('logged', function(logged){
+    if(logged) auth();
+  });
+
+  function auth(){
+    $rootScope.devProfile = session.getProfile();
+    $rootScope.db_loading = false;
+    if($rootScope.devProfile) {
+      Apps.refresh();
+    }
+  }
 
 }
 

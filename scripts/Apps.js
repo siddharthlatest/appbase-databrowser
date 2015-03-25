@@ -6,14 +6,14 @@ angular
                      '$route', 
                      'data', 
                      '$timeout', 
-                     'stringManipulation', 
+                     'utils', 
                      '$rootScope', 
                      'oauthFactory', 
                      'Apps', 
                      AppsCtrl ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $rootScope, oauthFactory, Apps) {
+function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, oauthFactory, Apps) {
   $scope.api = false;
   $scope.devProfile = $rootScope.devProfile = session.getProfile();
   $scope.apps = Apps.get();
@@ -25,18 +25,24 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
   function refresh(done){
     Apps.refresh().then(function(apps){
       $timeout(function(){
+        $rootScope.db_loading = false;
+        if(!apps.length) tutorial();
         $scope.apps = apps;
         apps.forEach(function(app){
           var promises = ['metrics', 'secret'];
           promises.forEach(function(prop){
-            if(!app[prop]) app['$' + prop]();
+            app['$' + prop]();
           });
         });
         $scope.fetching = false;
-        $rootScope.db_loading = false;
         if(done) done();
       });
     });
+  }
+
+  function tutorial(){
+    if(!session.getProfile()) return;
+    
   }
 
   $scope.createApp = function (app) {
@@ -96,6 +102,6 @@ function AppsCtrl($scope, session, $route, data, $timeout, stringManipulation, $
     });
   }
 
-  $scope.appToURL = stringManipulation.appToURL;
+  $scope.appToURL = utils.appToURL;
 }
 })();

@@ -1,24 +1,37 @@
 (function(){
 angular
 .module("AppbaseDashboard")
-.factory('session', ['stringManipulation', '$rootScope', 'data', '$q', SessionFactory]);
+.factory('session', ['utils', '$rootScope', 'data', '$q', SessionFactory]);
 
-function SessionFactory(stringManipulation, $rootScope, data, $q){
+function SessionFactory(utils, $rootScope, data, $q){
   var session = {};
 
-  session.setApps = function(apps) {
-    var newAppsArray = [];
-    if(angular.isArray(apps)){
-      apps.forEach(function(app, index){
-        if(!app) return;
-        var clone = $.extend({}, app);
-        for(var prop in clone) {
-          if(!prop.lastIndexOf('$', 0)) delete clone[prop];
-        }
-        newAppsArray.push(clone);
-      });
+  var writing = false;
+
+  session.setApps = function(apps){
+    if(writing) $rootScope.$on('doneWriting', function(){
+      session.setApps(apps);
+    });
+    else {
+      writing = true;
+      setApps(apps);
     }
-    sessionStorage.setItem('apps', JSON.stringify(newAppsArray));
+  }
+
+  function setApps(apps) {
+    apps = angular.isArray(apps) ? apps : [];
+
+    var newArray = [];
+    apps.forEach(function(app){
+      var obj = { name: app.name };
+      if(app.secret) obj.secret = app.secret;
+      newArray.push(obj);
+    });
+    
+    sessionStorage.setItem('apps', JSON.stringify(newArray));
+
+    writing = false;
+    $rootScope.$broadcast('doneWriting');
   };
 
   session.getApps = function() {
@@ -116,7 +129,7 @@ function SessionFactory(stringManipulation, $rootScope, data, $q){
 
     URL = sessionStorage.getItem('URL');
     if(URL === null){
-      URL = apps ? stringManipulation.appToURL(apps[0].name) : undefined;
+      URL = apps ? utils.appToURL(apps[0].name) : undefined;
 
     }
     return URL;
