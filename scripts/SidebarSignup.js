@@ -1,6 +1,6 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .controller('navbar', NavbarCtrl);
 
 

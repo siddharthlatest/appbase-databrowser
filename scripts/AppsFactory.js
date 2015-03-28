@@ -1,11 +1,11 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .factory('Apps', AppsFactory)
 .controller('topnav', TopNavCtrl)
 .run(Authenticate);
 
-function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $routeParams, utils){
+function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils){
   var apps = getFromSession();
   var refreshing = false;
   var callsCalc = false;
@@ -32,8 +32,33 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
       return updated;
     },
     refresh: refresh,
-    write: write
+    write: write,
+    appFromName: appFromName
   };
+
+  function appFromName(name){
+    var deferred = $q.defer();
+
+    if (apps && apps.length) {
+      var app = getApp(name);
+      if(app) deferred.resolve(app);
+      else
+        refresh().then(function(){
+          var app = getApp(name);
+          if(app) deferred.resolve(app);
+          else deferred.reject();
+        }, deferred.reject);
+    }
+
+    return deferred.promise;
+
+    function getApp(name){
+      var filter = apps.filter(function(each){
+        return each.name === name;
+      });
+      return filter.length ? filter[0] : false;
+    }
+  }
 
   function updateOrder(next, current){
     var app = current && current.params && current.params.app;
@@ -91,6 +116,7 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
     var deferred = $q.defer();
     refreshing = deferred.promise;
     session.fetchApps().then(function(_apps){
+      deferred.notify();
       updated = true;
       refreshing = false;
 
@@ -118,9 +144,11 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
         var profile = session.getProfile();
         if(profile && profile.uid) {
           localStorage.setItem(profile.uid + 'order', JSON.stringify(_apps));
+          if(!apps.length) {
+            $rootScope.$broadcast('intercomStats', { calls: 0, apps: 0 });
+          }
         }
         
-        $rootScope.db_loading = false;
         deferred.resolve(apps);
       });
     }).catch(function(err){
@@ -170,17 +198,6 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
       return emptyPromise;
     };
 
-    appObj.$oauth = function(){
-      if(!appObj.oauth) {
-        var promise = oauthFactory.getApp(appObj.name);
-        promise.then(function(data){
-          appObj.oauth = data;
-        });
-        return promise;
-      }
-      return emptyPromise;
-    };
-
     return appObj;
   }
 
@@ -203,28 +220,19 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, oauthFactory, $rou
   return retObj;
 }
 
-function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, session) {
-  var appName;
+function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, session, Loader) {
+  var appName, secret;
   $scope.routeParams = $routeParams;
 
   $scope.$on('$routeChangeSuccess', function(next, current){
     if(!session.getProfile()) return;
-    appName = current.params.app;
-    if(appName){
-      var app = Apps.get().filter(function(app){
-        return app.name === appName;
-      })[0];
-      if(!app.secret) {
-        app.$secret().then(function(){
-          $timeout(function(){
-            $scope.secret = app.secret;
-          });
+    Apps.appFromName(current.params.app).then(function(app){
+      app.$secret().then(function(){
+        $timeout(function(){
+          $scope.secret = secret = app.secret;
         });
-      } else $timeout(function(){
-        $scope.secret = app.secret;
       });
-      
-    } 
+    });
   });
 
   $scope.deleteApp = function(app){
@@ -249,14 +257,18 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, sessi
               var input = dialog.getModalBody().find('.form-group');
               var value = input.find('input').val();
               if(value === app){
-                data.deleteApp(app).then(function(){
-                  $timeout(function(){
-                    $location.path('/apps');
+                dialog.close();
+                Loader(10);
+                Apps.appFromName(app).then(function(appObj){
+                  appObj.$secret().then(function(){
+                    data.deleteApp(app, appObj.secret).then(function(){
+                      $timeout(function(){
+                        $location.path('/apps');
+                      });
+                    }).catch(function(error){
+                      sentry(error);
+                    });
                   });
-                }).catch(function(error){
-                  sentry(error);
-                }).finally(function(){
-                  dialog.close();
                 });
               } else {
                 input.addClass('has-error');
@@ -265,9 +277,14 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, sessi
         }]
     });
   }
+
+  $scope.shareApp = function(app){
+    $scope.sharing = true;
+    $('#share-modal').modal('show');
+  }
 }
 
-function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $location, Apps) {
+function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps) {
 
   auth();
 
@@ -277,7 +294,7 @@ function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $lo
       $appbase.unauth();
       Apps.clear();
       session.setProfile(null);
-      $route.reload();
+      $location.path('/login');
     });
   });
 
@@ -287,7 +304,6 @@ function Authenticate($rootScope, session, $appbase, $route, $timeout, data, $lo
 
   function auth(){
     $rootScope.devProfile = session.getProfile();
-    $rootScope.db_loading = false;
     if($rootScope.devProfile) {
       Apps.refresh();
     }

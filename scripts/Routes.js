@@ -1,9 +1,18 @@
 (function(){
 
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .config(['$routeProvider', '$locationProvider', Routes])
-.controller('start', Start);
+.controller('start', Start)
+.factory('Loader', Loader);
+
+function Loader($rootScope, $timeout) {
+  return function(progress){
+    $timeout(function(){
+      $rootScope.loadLine = progress;
+    });
+  }
+}
 
 function Start(session, $location, Apps) {
   var user = session.getProfile();
@@ -50,23 +59,30 @@ function Routes($routeProvider, $locationProvider){
       path: '/apps'
     }, {
       name: 'browser',
-      path: '/:app/browser',
-      dependencies: ['secret']
+      path: '/:app/browser'
     }, {
       name: 'dash',
       path: '/:app/dash',
-      dependencies: ['metrics', 'stats']
+      resolve: {
+        build: function(DashboardBuild, $route) {
+          return DashboardBuild.build($route.current.params.app);
+        }
+      }
     }, {
       name: 'oauth',
       path: '/:app/oauth',
-      dependencies: ['secret']
+      resolve: {
+        build: function(OauthBuild, $route) {
+          return OauthBuild.build($route.current.params.app);
+        }
+      }
     }, {
       name: 'invite',
       path: '/invite'
     }, {
       name: 'billing',
       path: '/billing'
-    },
+    }
   ];
 
   var baseUrl = '/developer/html/';
@@ -75,36 +91,16 @@ function Routes($routeProvider, $locationProvider){
       controller: controller.name,
       templateUrl: baseUrl + controller.name + '.html'
     };
-    if(controller.dependencies) {
-      routeObj.resolve = function(Apps, $q){
-        return buildResolve(Apps, $q, controller.dependencies);
-      };
-    }
+    if(controller.resolve) routeObj.resolve = controller.resolve;
     $routeProvider.when(controller.path, routeObj);
   });
+
+  $routeProvider.when('/login', { templateUrl: baseUrl + 'login.html'});
 
 
   $routeProvider.otherwise( { redirectTo: '/' } );
 
-  function buildResolve(Apps, $q, dependencies){
-    var deferred = $q.defer();
-    var apps = Apps.get();
-
-    if(!Apps.updated()){
-      var promises = [];
-      dependencies.forEach(function(dependency){
-        var depName = '$' + dependency;
-        var promise = angular.isFunction(apps[depName]) ? apps[depName]() : apps[depName];
-        promises.push(promise);
-      });
-
-      $q.all(promises).then(deferred.resolve);
-    } else deferred.resolve();
-
-    return deferred.promise;
-  }
-
-  $locationProvider.html5Mode(true).hashPrefix('!');
+  if(!window.localEnv) $locationProvider.html5Mode(true).hashPrefix('!');
 
 }
 

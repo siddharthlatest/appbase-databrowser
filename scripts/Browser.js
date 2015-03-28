@@ -1,6 +1,6 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .controller("browser",
              ['$scope', '$appbase', '$timeout', 'data', 'utils', 'breadcrumbs',
              'ngDialog', 'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', BrowserCtrl]);
@@ -11,25 +11,24 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
   var apps = Apps.get();
   $scope.status = "Loading";
   var appName = $routeParams.app;
-  var app = $rootScope.getAppFromName(appName);
+  var URL, app;
 
-  if(!app) $rootScope.goToApps();
-  else $scope.currentApp = appName;
-  
-  var URL;
-  URL = session.getBrowserURL(apps);
-  if(!URL || utils.urlToAppname(URL) !== appName) {
-    URL = utils.appToURL(appName);
-    session.setBrowserURL(URL);
-  }
+  Apps.appFromName(appName).then(function(_app){
+    app = _app;
+    URL = session.getBrowserURL(apps);
+    
+    if(!URL || utils.urlToAppname(URL) !== appName) {
+      URL = utils.appToURL(appName);
+      session.setBrowserURL(URL);
+    }
 
-  if(!app.secret) {
     app.$secret().then(function(data){
       gotSecret(app.secret);
     });
-  } else {
-    gotSecret(app.secret);
-  }
+
+  }, function(){
+    $rootScope.goToApps();
+  });
 
   function gotSecret(secret){
     data.setAppCredentials(appName, secret);
@@ -50,7 +49,6 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
 
     $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl())
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
-    $rootScope.db_loading = false;
     $scope.status = false;
   }
   

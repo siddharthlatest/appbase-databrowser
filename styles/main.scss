@@ -125,6 +125,30 @@ body {
 	}
 }
 
+.load-wrap{
+	position: fixed;
+	width: 100vw;
+	z-index: 10;
+}
+.loading-line {
+	position: relative;
+	height: 3px;
+	background: $dark-blue;
+	width: 0;
+}
+.loading-tip {
+	position: relative;
+	left: -50px;
+	top: -15px;
+	width: 40px;
+	height: 3px;
+	color: transparent;
+	content: 'a';
+	background: $dark-blue;
+	box-shadow: $blue 4px 0 6px 1px;
+	display: inline-block;
+}
+
 .ng-enter {
 	animation: slideInRight 0.3s both ease-out;
 }
@@ -259,7 +283,7 @@ body {
 	.fetching {
 		position: absolute;
 		left: 50%;
-		top: 50px;
+		top: 40px;
 		width: 100px;
 		height: 100px;
 		line-height: 100px;

@@ -6,7 +6,6 @@ angular
 function BillingCtrl($routeParams, utils, $scope, session, $rootScope, $location, $timeout, $document){
   //var stripeKey = 'pk_SdFKltkp5kyf3nih2EypYgFVOqIRv';//test key
   var stripeKey = 'pk_XCCvCuWKPx07ODJUXqFr7K4cdHvAS'; //production key
-  $rootScope.db_loading = true;
   if($scope.devProfile = session.getProfile()) {
     $('body').append($('<div>').load('/developer/html/dialog-payment.html'));
 
@@ -123,10 +122,7 @@ function BillingCtrl($routeParams, utils, $scope, session, $rootScope, $location
               e.preventDefault();
             });
           }
-        },
-        complete: $timeout.bind($timeout, function(){
-          $rootScope.db_loading = false;
-        })
+        }
       });
       
       $('#cancel-subscription').on('click',function(e){
@@ -225,8 +221,6 @@ function BillingCtrl($routeParams, utils, $scope, session, $rootScope, $location
         }
       };
     } 
-  } else {
-      $rootScope.db_loading = false;
   }
 }
 

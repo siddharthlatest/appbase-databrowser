@@ -1,6 +1,6 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .controller("apps",[ '$scope',
                      'session',
                      '$route', 
@@ -8,24 +8,25 @@ angular
                      '$timeout', 
                      'utils', 
                      '$rootScope', 
-                     'oauthFactory', 
-                     'Apps', 
+                     'Apps',
+                     'Loader',
                      AppsCtrl ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, oauthFactory, Apps) {
+function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader){
+  $scope.apps = Apps.get();
+  $scope.fetching = true;
   $scope.api = false;
   $scope.devProfile = $rootScope.devProfile = session.getProfile();
-  $scope.apps = Apps.get();
   
-  $rootScope.db_loading = !$scope.apps;
-  $scope.fetching = true;
+  Loader(25);
+
   refresh();
 
   function refresh(done){
     Apps.refresh().then(function(apps){
+      Loader(80);
       $timeout(function(){
-        $rootScope.db_loading = false;
         if(!apps.length) tutorial();
         $scope.apps = apps;
         apps.forEach(function(app){
@@ -34,9 +35,12 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, oa
             app['$' + prop]();
           });
         });
+        Loader(100);
         $scope.fetching = false;
         if(done) done();
       });
+    }, sentry, function(){
+      Loader(70);
     });
   }
 
@@ -48,11 +52,9 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, oa
   $scope.createApp = function (app) {
     $scope.creating = true;
     $scope.fetching = true;
+    Loader(20);
     data.createApp(app).then(function(){
-      refresh(function(){
-        $scope.creating = false;
-        $rootScope.goToDash(app);
-      });
+      $rootScope.goToDash(app);
     }).catch(function(){
       $scope.creating = false;
       $scope.fetching = false;  

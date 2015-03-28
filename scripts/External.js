@@ -1,4 +1,5 @@
 window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+window.localEnv = window.location.hostname === '127.0.0.1';
 
 function sentry(error) {
   if(Raven) {
@@ -14,10 +15,10 @@ function debug(obj) {
 
 (function(){
 
-angular.module("AppbaseDashboard")
+angular.module('AppbaseDashboard')
   .run(ExternalLibs);
 
-function ExternalLibs($rootScope, $window, session){
+function ExternalLibs($rootScope, $window, session, $location){
 	var unknownUser = {
 	  name: 'unknown',
 	  email: 'unknown',
@@ -46,7 +47,23 @@ function ExternalLibs($rootScope, $window, session){
 		
 		$rootScope.$on('intercomStats', updateIntercom);
 		$rootScope.$on('$routeChangeSuccess', function(){
+		  if(window.localEnv) {
+		  	setTimeout(function() {
+		  		$('a').each(function(){
+			  		var el = $(this);
+			  		var href = el.attr('href');
+			  		if(href && href.indexOf('/developer/') !== -1 && href.indexOf('/developer/#/') === -1) {
+			  			href = href.split('/developer/');
+			  			href[0] = '/developer/#/';
+			  			el.attr('href', href.join(''));
+			  		}
+			  	});
+		  	}, 500);
+		  }
 		  $window.Intercom('update');
+		  if(typeof(ga) === 'function'){
+		    ga('send', 'pageview', ['/developer',$location.path()].join(''));
+		  }
 		});
 	}
 

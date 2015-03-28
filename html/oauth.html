@@ -1,13 +1,11 @@
+<ng-include src="'/developer/html/manage.html'"></ng-include>
 <div class="col-xs-12 oa-tab" id="oauth">
-	<div class="inner-loading" ng-hide="!status">
-		<span class="fa fa-refresh fa-spin fa-4x"></span>
-	</div>
-	<div class="list ng-hide" ng-show="!status">
+	<div class="list">
 		<div class="col-md-4">
 			<div class="wellp">
 			<h2>Expiry time</h2>
 			<p>Token expiration, from 60 minutes to 90 days. <span data-toggle="tooltip" data-placement="right" title="60m (60 minutes), 1d (1 day), 1w (1 week)" class="example">Example</span></p>
-			<div ng-hide="status" ng-class="{overlay: loading}">
+			<div ng-class="{overlay: loading}">
 				<form ng-submit="updateExpiry(timeInput)">
 					<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">
 						<input type="text" class="form-control" placeholder="Current value: {{readTime(expiryTime)}}" ng-model="timeInput"/>
@@ -25,8 +23,7 @@
 			</h2>
 			<p>Domains allowed to make oauth requests. <span data-toggle="tooltip" data-placement="right" title="Correct: https://domain.com, http://domain.com:3254, abc.domain.com
 			  Incorrect: domain.com/foobar/this" class="example">Example</span></p>
-			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
-			<div ng-hide="status" ng-class="{overlay: loading}">
+			<div ng-class="{overlay: loading}">
 				<ul class="list-group oa-dom">
 				<form ng-submit="addDomain(domainInput)">
 					<li ng-repeat="domain in domains | filter:'!'+'127.0.0.1' | filter:'!'+'localhost'" class="list-group-item oa-dom-item">

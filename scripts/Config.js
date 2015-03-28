@@ -1,5 +1,5 @@
 (function(){
-angular.module("AppbaseDashboard", ['ngAppbase',
+angular.module('AppbaseDashboard', ['ngAppbase',
                                     'ngRoute',
                                     'ng-breadcrumbs',
                                     'easypiechart',
@@ -10,7 +10,6 @@ angular.module("AppbaseDashboard", ['ngAppbase',
   .run(FirstRun);
 
 function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $routeParams){
-  $rootScope.db_loading = true;
   // changed the way sessions are stored, so to prevent errors:
   var oldSession = sessionStorage.getItem('apps');
   if(oldSession){
@@ -27,6 +26,7 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     Apps.clear();
     session.setProfile(null);
     $rootScope.logged = false;
+    $location.path('/login');
   } else $rootScope.logged = true;
 
   $rootScope.confirm = function(title, message, callback, field){
@@ -55,11 +55,6 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     }).open();
   }
 
-  $rootScope.shareApp = function(app){
-    $rootScope.sharing = true;
-    $('#share-modal').modal('show');
-  }
-
   function getSecret(apps, app){
     if(angular.isObject(app)) {
       return app.secret;
@@ -68,19 +63,6 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     return apps.filter(function(each){
       return each.name === app;
     })[0].secret;
-  }
-
-  $rootScope.getAppFromName = getAppFromName;
-
-  function getAppFromName(name){
-    var apps = Apps.get();
-    if (apps && apps.length) {
-      var filter = apps.filter(function(each){
-        return each.name === name;
-      });
-
-      return filter.length ? filter[0] : null;
-    } else return null;
   }
 
   $rootScope.goToInvite = function() {
@@ -119,9 +101,10 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
   document.addEventListener('postLogin', function() {
     $timeout(function(){
       $rootScope.logged = true;
-      $route.reload();
+      $location.path('/');
     });
   });
+
 } 
 
 })();

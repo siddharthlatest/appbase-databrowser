@@ -1,6 +1,6 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .factory('session', ['utils', '$rootScope', 'data', '$q', SessionFactory]);
 
 function SessionFactory(utils, $rootScope, data, $q){
@@ -39,12 +39,6 @@ function SessionFactory(utils, $rootScope, data, $q){
       var apps = sessionStorage.getItem('apps');
       return apps? JSON.parse(apps) : [];
     } else return [];
-  };
-
-  session.appFromName = function(appName, apps) {
-    return apps ? apps.filter(function(app){
-      return app.name === appName;
-    })[0] : undefined;
   };
 
   session.fetchApps = function() {

@@ -11,19 +11,18 @@
 </head>
 <body>
 <div id="nav" ng-include="'/developer/html/navbar.html'"></div>
-<div class="container-fluid view-wrapper ng-hide" ng-show="!$parent.db_loading">
+<div class="load-wrap">
+	<div class="loading-line" loading="loadLine"></div>
+	<div class="loading-tip"></div>
+</div>
+<div class="container-fluid view-wrapper">
 	<div class="row view-wrapper">
-		<div ng-include="'/developer/html/login.html'" class="col-xs-12 ng-hide" id="db-login" ng-show="!$parent.logged &&!$parent.db_loading"></div>
 		<div class="col-xs-12" id="view">
-			<ng-include src="'/developer/html/manage.html'"></ng-include>
-			<div ng-view ng-hide="!$parent.logged || $parent.db_loading"></div>
+			<div ng-view></div>
 		</div>
 	</div>
 </div>
-<div ng-include="'/developer/html/share.html'" class="ng-hide" ng-show="$parent.sharing"></div>
-<div ng-show="$parent.db_loading" id="loading">
-	<span class="fa fa-refresh fa-spin fa-2x"></span> 
-</div>
+<div ng-include="'/developer/html/share.html'" ng-show="$parent.sharing"></div>
 <script src="//cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js"></script>
 <script src="https://js.stripe.com/v2/"></script>
 <script src="/developer/dist/vendor.min.js"></script>

@@ -1,6 +1,6 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .factory('nodeBinding',['data', '$location',
   'utils','$timeout','$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
@@ -20,7 +20,7 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
     return false;
   }
 
-  nodeBinding.bindAsRoot = function($scope) {
+  nodeBinding.bindAsRoot = function($scope) {    
     var root = {isR: true};
     root.name = utils.getBaseUrl();
     root.meAsRoot = function() {
@@ -33,7 +33,10 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
       pollNamespaces(function(){
         root.loading = false;
       });
-      setInterval(pollNamespaces, 2000);
+      var polling = setInterval(pollNamespaces, 2000);
+      $scope.$on('$destroy', function(){
+        clearInterval(polling);
+      })
     }
     root.contract = function(){
       root.expanded = false;

@@ -1,6 +1,6 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .controller('sharingCtrl', SharingCtrl);
 
 function SharingCtrl($scope, $rootScope, data, $timeout, session, $routeParams){

@@ -1,36 +1,43 @@
+<ng-include src="'/developer/html/manage.html'"></ng-include>
 <div class="col-xs-12" id="stats">
-	<div ng-show="noData" class="no-data">
+	<div ng-show="data.noData" class="no-data">
 		<div class="sad">:(</div>
 		<span>No data to display.</span>
 	</div>
-	<div ng-show="!noData">
+	<div ng-show="!data.noData">
 		<div class="col-xs-12 col-md-8 wellp">
 			<h2 class="graph-title">Usage</h2>
 			<ul class="nav-tab">
 			  <li>
-			  	<a ng-click="!(strike.week || strike.month || graphActive === 'week') && graph('week')"
-			  	   ng-class="{'active': graphActive === 'week', 'strike': strike.week || strike.month}">
+			  	<a ng-click="!(data.strike.week || data.strike.month || data.graphActive === 'week') && graph('week')"
+			  	   ng-class="{'active': data.graphActive === 'week', 'strike': data.strike.week || data.strike.month}">
 					Week
 			  	</a></li>
 			  <li>
-			  	<a ng-click="!(strike.month || graphActive === 'month') && graph('month')"
-			  	   ng-class="{'active': graphActive === 'month', 'strike': strike.month}"> Month
+			  	<a ng-click="!(data.strike.month || data.graphActive === 'month') && graph('month')"
+			  	   ng-class="{'active': data.graphActive === 'month', 'strike': data.strike.month}"> Month
 			  	</a></li>
-			  <li><a ng-click="(graphActive !== 'all') && graph('all')"
-			         ng-class="{'active': graphActive === 'all'}"> All
+			  <li><a ng-click="(data.graphActive !== 'all') && graph('all')"
+			         ng-class="{'active': data.graphActive === 'all'}"> All
 			  </a></li>
 			</ul>
 			<div class="graph">
-				<highchart id="chart1" config="chartConfig"></highchart>
+				<highchart id="chart1" config="data.chartConfig"></highchart>
 			</div>
 		</div>
 		<div class="col-xs-12 col-md-4">
 			<div class="wellp usage">
 				<div class="plan">
 					<h3>API Calls</h3>
-					<span>{{chart ? commas(chart.month) : ''}} / {{commas(cap)}}</span>
+					<span>
+						<text ng-bind="commas(data.chart.month)"></text>
+						/
+						<text ng-bind="commas(data.cap)"></text>
+					</span>
 					<div class="progress">
-					  <div class="progress-bar" role="progressbar" aria-valuenow="{{((chart?(chart.month?chart.month:0):0)*100)/(cap?cap:1)}}" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+					  <div class="progress-bar"
+					  	   role="progressbar"
+					  	   ng-style="{width: (data.chart.month*100/data.cap) + '%' }">
 					  </div>
 					</div>
 				</div>
@@ -40,10 +47,10 @@
 			<div class="wellp usage">
 				<div class="plan">
 					<div><h3>Vertices</h3>
-					<span>{{chart ? commas(vert) : ''}}</span></div>
+					<span ng-bind="commas(data.vert)"></span></div>
 					
 					<div><h3>Edges</h3>
-					<span>{{chart ? commas(edges) : ''}}</span></div>
+					<span ng-bind="commas(data.edges)"></span></div>
 				
 				</div>
 			</div>

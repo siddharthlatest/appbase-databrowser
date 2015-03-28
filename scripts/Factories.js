@@ -1,9 +1,9 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .factory('utils', utilsFactory)
 .factory('data',
-  ['$timeout', '$location', '$appbase', 'utils', '$rootScope', '$q', 'oauthFactory',DataFactory]);
+  ['$timeout', '$location', '$appbase', 'utils', '$q', '$http', DataFactory]);
 
 function utilsFactory(){
   var utils = {};
@@ -110,7 +110,7 @@ function utilsFactory(){
   return utils;
 }
 
-function DataFactory($timeout, $location, $appbase, utils, $rootScope, $q, oauthFactory) {
+function DataFactory($timeout, $location, $appbase, utils, $q, $http) {
   var data = {};
   var appName;
   var secret;
@@ -224,7 +224,7 @@ function DataFactory($timeout, $location, $appbase, utils, $rootScope, $q, oauth
     return accountsAPI.user.put(user, {appname: app});
   };
 
-  data.deleteApp = function(app) {
+  data.deleteApp = function(app, secret) {
     return $q.all(
       accountsAPI.app.delete(app, {kill: true, secret: secret}),
       accountsAPI.user.delete(getEmail(), {appname: app})
@@ -258,21 +258,7 @@ function DataFactory($timeout, $location, $appbase, utils, $rootScope, $q, oauth
   data.getDevsAppsWithEmail = function(done) {
     var email = getEmail();
     if(email) {
-      accountsAPI.user.get(getEmail()).then(function(apps){
-        if(!apps.length){
-          done([]);
-          $timeout(function(){
-            $rootScope.noApps = true;
-            $rootScope.noCalls = $rootScope.noCalls || true;
-          });
-          
-        } else {
-          $timeout(function(){
-            done(apps);
-            $rootScope.noCalls = $rootScope.noCalls || false;
-          });
-        }
-      });
+       accountsAPI.user.get(getEmail()).then(done);
     } else done([]);
   }
 
@@ -284,22 +270,29 @@ function DataFactory($timeout, $location, $appbase, utils, $rootScope, $q, oauth
     return accountsAPI.app.get(app);
   }
 
-  function request(req_type, app, subject, body, endpoint) {
+  function request(req_type, app, subject, body, endpoint, try_num) {
     var deferred = $q.defer();
     var url = atob(server) + app + '/' + subject + '/' + endpoint;
-    if(!body) body = {};
-    var promise = atomic[req_type](url, body);
+    //console.log(req_type, ': ', url, ', body: ', body)
+    var promise = $http({
+      method: req_type,
+      url: url,
+      data: body || {},
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
     promise.success(deferred.resolve);
-
     promise.error(function(data, error){
       if(error.response === ""){
-        console.log(url + ' generated empty response. Trying again.');
-        request(req_type, app, subject, body, endpoint);
+        console.log(url + ' generated empty response.');
+        if(try_num && try_num <= 5) request(req_type, app, subject, body, endpoint, try_num+1);
+        else request(req_type, app, subject, body, endpoint, 1);
       } else deferred.reject(error);
     });
 
-    //deferred.promise.catch(sentry);
+    deferred.promise.catch(sentry);
     deferred.promise['error'] = deferred.promise['catch'];
     deferred.promise['success'] = deferred.promise['then'];
     return deferred.promise;

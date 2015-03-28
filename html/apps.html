@@ -1,4 +1,4 @@
-<div class="container-fluid" id="applications">
+<div class="container-fluid ng-hide" id="applications" ng-show="!db_loading">
     <div class="row">
         <div class="col-xs-12 main-title">
             <span ng-bind="devProfile.name">
@@ -6,12 +6,7 @@
             <span ng-show="!devProfile.name" class="ng-hide">Your</span>
             Apps
         </div>
-        <div class="fetching">
-            <div ng-show="fetching">
-                <span class="fa fa-refresh ab-spin"></span>
-            </div>
-        </div>
-        <div class="col-xs-12 text-center" ng-show="apps.length">
+        <div class="col-xs-12 text-center">
             <div class="form-horizontal col-md-8 col-xs-12 create-app col-md-offset-2">
                 <div class="row wrapper well test"
                      ng-submit="createApp(newAppname)">
@@ -82,42 +77,12 @@
         </div>
         
     </div>
-    <div class="get-started" ng-show="noCalls">
-        <div class="title">
-            <span>Get started now!</span>
-        </div>
-        <div class="steps">
-            <div class="col-xs-12 col-sm-4">
-                <a href="/tutorial.html" target="_blank">
-                    <div class="circle learn first">
-                        <span class="fa fa-list-ol"></span>
-                    </div>
-                </a>
-                <h2>Live Tutorial</h2>
-                <span class="desc">
-                    Build a chat app using our online tutorial in 4 steps
-                </span>
-            </div>
-            <div class="col-xs-12 col-sm-4">
-                <a href="" ng-click="firstAPICall()">
-                    <div class="circle api"><span class="fa fa-check-square-o"></span></div>
-                </a>
-                <h2>Make the first API call</h2>
-                <span class="desc">
-                    Create your first app, and make the first API call in under 5 minutes
-                </span>
-            </div>
 
-            <div class="col-xs-12 col-sm-4">
-                <a href="" ng-click="examplesModal()">
-                    <div class="circle etc"><span class="fa fa-file-code-o"></span></div>
-                </a>
-                <h2>Example Recipes</h2>
-                <span class="desc">Check out the showcase of things built with Appbase</span>
-            </div>
-        </div>
-    </div>
-    <div class="get-started" ng-hide="noCalls">
+    <!-- <div ng-show="!apps.length && !fetching" class="ng-hide">
+        <h1> Get started with Appbase </h1>
+    </div> -->
+
+    <div class="get-started">
         <div class="steps">
             <div class="col-xs-12 col-sm-4">
                 <a href="http://docs.appbase.io/#/v2.0/javascript/quick-start" target="_blank">

@@ -1,12 +1,50 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
 .directive('ngModal', NgModal)
 .directive('hideParent', HideParent)
-.directive('showParent', ShowParent);
+.directive('showParent', ShowParent)
+.directive('loadingLine', LoadingLine);
 
+function LoadingLine($rootScope){
+  return {
+    restrict: 'C',
+    scope: {
+      loading: '='
+    },
+    link: function(scope, element, attrs) {
+      var toReset;
+      var element = $(element);
+      var glow = element.next();
+
+      scope.$watch('loading', function(progress){ 
+        if(toReset) {
+          element.stop().css('width', progress + 'vw');
+          glow.stop().css('left', progress + 'vw');
+          toReset = false;
+        }
+
+        if(progress > 0) element.parent().stop(false, false).css('opacity', 1);
+
+        setWidth(progress);
+
+        if(progress >= 100) {
+          element.parent().delay(800).animate({opacity: 0});
+          toReset = true;
+        }
+          
+        function setWidth(width) {
+          width = width + 'vw';
+          element.animate({'width': width});
+          glow.animate({'left': width});
+        }
+
+      });
+    }
+  }
+}
 
 function ImgSrc(){
   return {

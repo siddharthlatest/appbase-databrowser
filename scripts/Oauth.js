@@ -1,24 +1,99 @@
 (function(){
 angular
-.module("AppbaseDashboard")
+.module('AppbaseDashboard')
 .controller('oauth', OauthCtrl)
-.factory("oauthFactory", OauthFactory);
+.factory('oauthFactory', OauthFactory)
+.factory('OauthBuild', OauthBuild);
 
-function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
-  $filter, data, session, $rootScope, $location, Apps, $routeParams){
+function OauthBuild(oauthFactory, utils, Apps, $q, Loader) {
+  var scope = {};
+
+  var retObj = {
+    build: function(appName) {
+      Loader(25);
+      var deferred = $q.defer();
+      Apps.appFromName(appName).then(function(app){
+        oauthFactory.getProviders().then(function(data){
+          var arr = [];
+          data.forEach(function(provider){
+            var url = oauthFactory.getOauthdConfig().url;
+            provider.data.logo =  url + 'providers/' + provider.data.provider + '/logo';
+            arr.push(provider.data);
+          });
+          scope.providers = arr;
+        }, sentry);
+
+        scope.app = appName;
+        scope.domains = [];
+        scope.userProviders = {};
+        
+        app.$secret().then(function(){
+          oauthFactory.getApp(app.name, app.secret).then(function(data){
+            app.oauth = data.data;
+            Loader(75);
+            processOauth(app.oauth, deferred);
+          }, deferred.reject);
+        });
+
+      });
+      
+      return deferred.promise;
+    },
+    get: function(){
+      return scope;
+    }
+  }
+  
+  function processOauth(oauth, deferred){
+    if(oauth.status) oauth = oauth.data;
+
+    oauth.domains = oauth.domains || [];
+    scope.domains = oauth.domains;
+
+    if(scope.domains.indexOf('127.0.0.1')===-1) scope.domains.push('127.0.0.1');
+    if(scope.domains.indexOf('localhost')===-1) scope.domains.push('localhost');
+    scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
+
+    oauthFactory.getKeySets(scope.app, oauth.keysets || [])
+    .then(function(data){
+      scope.userProviders = data;
+      deferred.resolve();
+    });
+
+  }
+
+  return retObj;
+}
+
+function OauthCtrl($scope, OauthBuild, $filter, oauthFactory, $timeout, Loader){
+  Loader(100);
+  var obj = OauthBuild.get();
+
+  Object.getOwnPropertyNames(obj).forEach(function(prop){
+    $scope[prop] = obj[prop];
+  });
+
+  $scope.cancel = function(){
+    $scope.editing = $scope.adding = false;
+    $scope.clientID = '';
+    $scope.clientSecret = '';
+  }
+
+  $scope.cancel();
 
   $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
-  $scope.status = "Loading...";
-  $scope.loading = $scope.loadingProv = $scope.editing = false;
+
   $scope.callbackDomain = oauthFactory.getOauthdConfig().oauthd;
   $scope.callbackURL = oauthFactory.getOauthdConfig().oauthd + oauthFactory.getOauthdConfig().authBase;
+  
   $scope.sorter = function(prov){
     return $scope.userProviders[prov.provider]? true: false;
   };
+  
   $scope.removeDomain = function(domain){
     $scope.loading = true;
     $scope.domains.splice($scope.domains.indexOf(domain), 1);
-    oauthFactory.removeDomain($scope.app, $scope.domains)
+    oauthFactory.updateDomains($scope.app, $scope.domains)
     .then(function(data){
       if(data.status !== "success") {
         sentry(data);
@@ -29,6 +104,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
       });
     }, sentry);
   };
+
   $scope.addDomain = function(domain){
     if($scope.domains.indexOf(domain) !== -1){
       $scope.domainInput = '';
@@ -38,7 +114,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
     $scope.domains.push(domain);
     if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
     if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
-    oauthFactory.addDomain($scope.app, $scope.domains)
+    oauthFactory.updateDomains($scope.app, $scope.domains)
     .then(function(data){
       if(data.status !== "success") {
         sentry(data);
@@ -50,6 +126,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
       });
     }, sentry);
   };
+
   $scope.removeProvider = function(provider){
     $scope.loadingProv = true;
     oauthFactory.removeProvider($scope.app, provider)
@@ -64,10 +141,12 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
       });
     }, sentry);
   };
+
   $scope.add = function(provider){
     $scope.provider = provider;
     $scope.editing = $scope.adding = true;
   };
+
   $scope.edit = function(provider) {
     $scope.provider = provider;
     $scope.clientID = $scope.userProviders[provider.provider].parameters.client_id;
@@ -75,6 +154,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
     $scope.editing = true;
     $scope.adding = false;
   }
+
   $scope.done = function(){
     $scope.editing = $scope.adding = false;
     if(!$scope.app || !$scope.provider.provider || !$scope.clientID || !$scope.clientSecret){
@@ -96,12 +176,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
         $scope.clientID = $scope.clientSecret = '';
       });
     }, sentry);
-  }
-  $scope.cancel = function(){
-    $scope.editing = $scope.adding = false;
-    $scope.clientID = '';
-    $scope.clientSecret = '';
-  }
+  };
 
   $scope.validate = function(time){
     var minTime = 1000*60*60, maxTime = 1000*60*60*24*60;
@@ -115,7 +190,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
       }
     }
     return false;
-  }
+  };
 
   $scope.updateExpiry = function(time){    
     if($scope.validate(time)){
@@ -133,7 +208,7 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
         });
       }, sentry);
     }
-  }
+  };
 
   $scope.readTime = function(ms){
     var seconds, minutes, hours, days, rest;
@@ -155,238 +230,158 @@ function OauthCtrl($scope, oauthFactory, utils, $routeParams, $timeout,
          + (hours ? hours + (' hour' + (hours>1?'s ':' ')) : '')
          + (minutes ? minutes + (' minute' + (minutes>1?'s ':' ')) : '')
          + (seconds ? seconds + (' second' + (seconds>1?'s ':' ')) : '');
-  }
-
-  oauthFactory.getProviders()
-  .then(function(data){
-    $scope.providers = data;
-  }, sentry);
-
-  var appName = $routeParams.app;
-  var apps = Apps.get();
-  var app = $rootScope.getAppFromName(appName, apps);
-  if(!app) {
-    $rootScope.goToApps();
-    return;
-  } else $scope.app = appName;
-
-  $rootScope.db_loading = false;
-  
-  $scope.cancel();
-  $scope.status = $scope.provStatus = "Loading...";
-  $scope.domains = [];
-  $scope.userProviders = {};
-
-  if(!app.oauth) {
-    app.$oauth().then(function(oauth){
-      processOauth(oauth);
-    });
-  } else processOauth(app.oauth);
-
-  function processOauth(oauth){
-    oauth = oauth.data;
-    $timeout(function() {
-      $scope.status = false;
-      $scope.domains = oauth.domains;
-      if($scope.domains.indexOf('127.0.0.1')===-1) $scope.domains.push('127.0.0.1');
-      if($scope.domains.indexOf('localhost')===-1) $scope.domains.push('localhost');
-      $scope.expiryTime = oauth.tokenExpiry || 1000*60*60*24*30;
-    });
-    if(oauth.keysets.length){
-      oauthFactory.getKeySets(app.name, oauth.keysets)
-      .then(function(data){
-        data.forEach(function(each) {
-          $scope.userProviders[each.provider] = each;
-        });
-        $timeout(function(){
-          $scope.keys = data;
-          $scope.provStatus = false;
-        });
-      }, sentry);
-    } else {
-      $timeout(function(){
-        $scope.provStatus = false;
-      });
-    }
-  }
+  };
 }
 
-function OauthFactory($timeout, $q){
+function OauthFactory($timeout, $q, $http){
   var oauth = {};
   var config = { 
     oauthd: "https://auth.appbase.io",
     authBase: "/",
     apiBase: "/api/"
   };
-  var url = config.oauthd + config.apiBase;
+  var base_url = config.url = config.oauthd + config.apiBase;
   var providers = [{ name: 'google'},
                    { name: 'facebook'},
                    { name: 'linkedin'},
                    { name: 'dropbox'},
                    { name: 'github'}];
 
+
   oauth.getOauthdConfig = function() {
     return config;
   }
+
+  var oauthAPI = oauth.oauthAPI = (function(){
+    var points = ['apps', 'providers'];
+    var methods = ['get', 'post', 'patch', 'put', 'delete'];
+    var retObj = {};
+
+    function req(method, point, subject, endpoint, body){
+      if(angular.isObject(endpoint)) {
+        body = endpoint;
+        endpoint = '';
+      }
+      if(!endpoint) endpoint = '';
+      if(!body) body = '';
+      return request(method, point, subject, body, endpoint);
+    }
+
+    points.forEach(function(point){
+      methods.forEach(function(method){
+        retObj[point] = retObj[point] || {};
+        retObj[point][method] = function(subject, endpoint, body){
+          return req(method, point, subject, endpoint, body);
+        };
+      });
+    });
+
+    return retObj;
+  })();
   
   oauth.createApp = function(appName, secret, domains){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps', {
+    return oauthAPI.apps.post('', '', {
       name: appName,
       domains: domains,
       secret: secret,
       tokenExpiry: 1000*60*60*24*30
-    })
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
     });
-    return deferred.promise;
   };
 
   oauth.getApp = function(appName, secret){
     var deferred = $q.defer();
-    atomic.get(url + 'apps/' + appName)
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(data){
+
+    oauthAPI.apps.get(appName).then(deferred.resolve, function(data){
       if(data.status === "error" && data.message === "Unknown key"){
         oauth.createApp(appName, secret, ['localhost', '127.0.0.1'])
-        .then(function(data){
-          deferred.resolve(data);
-        })
-        .error(function(data){
-          deferred.reject(data);
-        });
+        .then(deferred.resolve, deferred.reject);
       } else {
         deferred.reject(data);
       }
     });
+
     return deferred.promise;
   };
 
-  oauth.updateApps = function(done){
-    var apps = Apps.get();
-    var received = 0;
-    apps.forEach(function(app){
-      oauth.getApp(app.name, app.secret)
-      .then(function(data){
-        var apps_ = Apps.get();
-        apps_.forEach(function(b){
-          if(b.name === app.name){
-            b.oauth = data.data;
-          }
-        });
-        Apps.set(apps_);
-        received += 1;
-        if(received === apps.length && done) done();
-      }, sentry);
-    });
-  }
-
-  oauth.removeDomain = function(appName, domains){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps/' + appName, {domains: domains})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(data){
-      deferred.reject(data);
-    });
-    return deferred.promise;
-  };
-
-  oauth.addDomain = function(appName, domains){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps/' + appName, {domains: domains})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(data){
-      deferred.reject(data);
-    });
-    return deferred.promise;
+  oauth.updateDomains = function(appName, domains){
+    return oauthAPI.apps.post(appName, {domains: domains});
   };
 
   oauth.getProviders = function(){
-    var deferred = $q.defer();
-    var retProviders = [];
-    var providerNumber = 0;
-    providers.forEach(function(each){
-      atomic.get(url + 'providers/' + each.name)
-      .success(function(data){
-        data.data.logo = url + 'providers/' + each.name + '/logo';
-        retProviders.push(data.data);
-        providerNumber++;
-        if(providerNumber === providers.length)
-          deferred.resolve(retProviders);
-      })
-      .error(function(data){
-        deferred.reject(data);
-      });
+    var promises = [];
+    providers.forEach(function(provider){
+      promises.push(oauthAPI.providers.get(provider.name));
     });
-    return deferred.promise;
+    return $q.all(promises);
   };
 
   oauth.getKeySets = function(app, appProviders){
     var deferred = $q.defer();
-    var providerNumber = 0;
-    var retProviders = [];
-    appProviders.forEach(function(each){
-      atomic.get(url + 'apps/' + app + '/keysets/' + each)
-      .success(function(data){
-        data.data.provider = each;
-        retProviders.push(data.data);
-        providerNumber++;
-        if(providerNumber === appProviders.length)
-          deferred.resolve(retProviders);
-      })
-      .error(function(data){deferred.reject(data)});
+    var promises = [];
+    var providers = {};
+
+    appProviders.forEach(function(appProvider){
+      var promise = oauthAPI.apps.get(app, 'keysets/' + appProvider).then(function(result){
+        providers[appProvider] = result.data;
+      });
+      promises.push(promise);
     });
+
+    $q.all(promises).then(function(){
+      deferred.resolve(providers);
+    });
+
     return deferred.promise;
   };
 
   oauth.removeProvider = function(app, provider){
-    var deferred = $q.defer();
-    atomic.delete(url + 'apps/' + app + '/keysets/' + provider)
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
-    });
-    return deferred.promise;
+    return oauthAPI.apps.delete(app, 'keysets/' + provider);
   };
 
   oauth.addProvider = function(app, provider, client, secret){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps/' + app + '/keysets/' + provider,
-    {response_type: 'code', parameters: {client_id: client, client_secret: secret}})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(err){
-      deferred.reject(err);
+    return oauthAPI.apps.post(app, 'keysets/' + provider, {
+      response_type: 'code',
+      parameters: {
+        client_id: client,
+        client_secret: secret
+      }
     });
-    return deferred.promise;
   };
 
   oauth.updateTime = function(appName, time){
-    var deferred = $q.defer();
-    atomic.post(url + 'apps/' + appName, {tokenExpiry: time})
-    .success(function(data){
-      deferred.resolve(data);
-    })
-    .error(function(data){
-      deferred.reject(data);
-    });
-    return deferred.promise;
+    return oauthAPI.apps.post(appName, '', {tokenExpiry: time});
   }
 
   return oauth;
+
+  function request(req_type, app, subject, body, endpoint, try_num) {
+    var deferred = $q.defer();
+    var url = base_url + app + '/' + subject + (endpoint ? ('/' + endpoint) : '');
+    //console.log(req_type, ': ', url, ', body: ', body)
+    var promise = $http({
+      method: req_type,
+      url: url,
+      data: body || {},
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    promise.success(deferred.resolve);
+
+    promise.error(function(data, error){
+      if(error.response === ""){
+        console.log(url + ' generated empty response.');
+        if(try_num && try_num <= 5) request(req_type, app, subject, body, endpoint, try_num+1);
+        else request(req_type, app, subject, body, endpoint, 1);
+      } else deferred.reject(error);
+    });
+
+    deferred.promise.catch(sentry);
+    deferred.promise['error'] = deferred.promise['catch'];
+    deferred.promise['success'] = deferred.promise['then'];
+    return deferred.promise;
+  }
 }
 
 
