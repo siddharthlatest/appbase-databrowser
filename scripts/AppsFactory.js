@@ -1,8 +1,7 @@
 (function(){
 angular
 .module('AppbaseDashboard')
-.factory('Apps', AppsFactory)
-.run(Authenticate);
+.factory('Apps', AppsFactory);
 
 function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils, $location){
   var apps = getFromSession();
@@ -223,33 +222,6 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
   }
 
   return retObj;
-}
-
-function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps) {
-
-  auth();
-
-  document.addEventListener('logout', function() {
-    $timeout(function(){
-      $rootScope.logged = false;
-      $appbase.unauth();
-      Apps.clear();
-      session.setProfile(null);
-      $location.path('/login');
-    });
-  });
-
-  $rootScope.$watch('logged', function(logged){
-    if(logged) auth();
-  });
-
-  function auth(){
-    $rootScope.devProfile = session.getProfile();
-    if($rootScope.devProfile) {
-      Apps.refresh();
-    }
-  }
-
 }
 
 })();

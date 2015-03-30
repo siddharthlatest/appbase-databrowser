@@ -63,7 +63,7 @@ function SharingCtrl($scope, $rootScope, data, $timeout, session, $routeParams){
         $scope.owner = true;
         $scope.placeholder = 'Add new user email';
       } else {
-        $scope.placeholder = 'You need to own the app to add users';
+        $scope.placeholder = 'You must own the app to add users';
       }
       users.then(function(users){
         owners.forEach(function(owner){

@@ -1,20 +1,23 @@
 (function(){
 angular
 .module('AppbaseDashboard')
-.controller("apps",[ '$scope',
-                     'session',
-                     '$route', 
-                     'data', 
-                     '$timeout', 
-                     'utils', 
-                     '$rootScope', 
-                     'Apps',
-                     'Loader',
-                     '$location',
-                     AppsCtrl ]
+.controller('apps',
+  [
+    '$route',
+    '$location',
+    '$rootScope',
+    '$scope',
+    '$timeout',
+    'Apps',
+    'Loader',
+    'session',
+    'data',
+    'utils',
+    AppsCtrl
+  ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader, $location){
+function AppsCtrl($route, $location, $rootScope, $scope, $timeout, Apps, Loader, session, data, utils){
   $scope.apps = Apps.get();
   $scope.fetching = true;
   $scope.api = false;

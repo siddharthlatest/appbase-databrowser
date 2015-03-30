@@ -2,14 +2,13 @@
 angular.module('AppbaseDashboard', ['ngAppbase',
                                     'ngRoute',
                                     'ng-breadcrumbs',
-                                    'easypiechart',
                                     'ngAnimate',
                                     'ngDialog',
                                     'highcharts-ng',
                                     'ngClipboard'])
-  .run(FirstRun);
+  .run(Authenticate);
 
-function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $routeParams){
+function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps, $routeParams) {
 
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     Apps.clear();
@@ -18,29 +17,36 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     $location.path('/login');
   } else $rootScope.logged = true;
 
-  $rootScope.confirm = function(title, message, callback, field){
-    BootstrapDialog.show({
-        title: title,
-        message: message
-        + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
-        cssClass: 'modal-custom',
-        closable: false,
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(!field) {callback();dialog.close();}
-              else if(value) callback(value);  
-            }
-        }]
+  auth();
+
+  $rootScope.$watch('logged', function(logged){
+    if(logged) auth();
+  });
+
+  document.addEventListener('logout', logout);
+  document.addEventListener('postLogin', login);
+
+  function auth(){
+    $rootScope.devProfile = session.getProfile();
+    if($rootScope.devProfile) {
+      Apps.refresh();
+    }
+  }
+
+  function logout(){
+    $timeout(function(){
+      $rootScope.logged = false;
+      $appbase.unauth();
+      Apps.clear();
+      session.setProfile(null);
+      $location.path('/login');
+    });
+  }
+
+  function login(){
+    $timeout(function(){
+      $rootScope.logged = true;
+      $location.path('/');
     });
   }
 
@@ -50,14 +56,7 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     return here ? (path[1] === here) : path[1];
   }
 
-  document.addEventListener('postLogin', function() {
-    $timeout(function(){
-      $rootScope.logged = true;
-      $location.path('/');
-    });
-  });
-
-} 
+}
 
 })();
 

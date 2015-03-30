@@ -7,6 +7,7 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
   var appName, secret;
 
   $scope.routeParams = $routeParams;
+  $scope.where = $location.path().split('/')[2];
 
   Apps.appFromName($scope.routeParams.app).then(function(app){
     app.$secret().then(function(){
@@ -15,8 +16,6 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
       });
     });
   });
-
-  $scope.where = $location.path().split('/')[2];
 
   $scope.deleteApp = function(app){
     Loader(10);
@@ -33,10 +32,6 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
     });
   }
 
-  $scope.shareApp = function(app){
-    $scope.sharing = true;
-    $('#share-modal').modal('show');
-  }
 }
 
 })();

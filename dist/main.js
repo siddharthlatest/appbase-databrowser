@@ -2,14 +2,13 @@
 angular.module('AppbaseDashboard', ['ngAppbase',
                                     'ngRoute',
                                     'ng-breadcrumbs',
-                                    'easypiechart',
                                     'ngAnimate',
                                     'ngDialog',
                                     'highcharts-ng',
                                     'ngClipboard'])
-  .run(FirstRun);
+  .run(Authenticate);
 
-function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $routeParams){
+function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps, $routeParams) {
 
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     Apps.clear();
@@ -18,29 +17,36 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     $location.path('/login');
   } else $rootScope.logged = true;
 
-  $rootScope.confirm = function(title, message, callback, field){
-    BootstrapDialog.show({
-        title: title,
-        message: message
-        + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
-        cssClass: 'modal-custom',
-        closable: false,
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(!field) {callback();dialog.close();}
-              else if(value) callback(value);  
-            }
-        }]
+  auth();
+
+  $rootScope.$watch('logged', function(logged){
+    if(logged) auth();
+  });
+
+  document.addEventListener('logout', logout);
+  document.addEventListener('postLogin', login);
+
+  function auth(){
+    $rootScope.devProfile = session.getProfile();
+    if($rootScope.devProfile) {
+      Apps.refresh();
+    }
+  }
+
+  function logout(){
+    $timeout(function(){
+      $rootScope.logged = false;
+      $appbase.unauth();
+      Apps.clear();
+      session.setProfile(null);
+      $location.path('/login');
+    });
+  }
+
+  function login(){
+    $timeout(function(){
+      $rootScope.logged = true;
+      $location.path('/');
     });
   }
 
@@ -50,14 +56,7 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
     return here ? (path[1] === here) : path[1];
   }
 
-  document.addEventListener('postLogin', function() {
-    $timeout(function(){
-      $rootScope.logged = true;
-      $location.path('/');
-    });
-  });
-
-} 
+}
 
 })();
 
@@ -66,20 +65,23 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
 (function(){
 angular
 .module('AppbaseDashboard')
-.controller("apps",[ '$scope',
-                     'session',
-                     '$route', 
-                     'data', 
-                     '$timeout', 
-                     'utils', 
-                     '$rootScope', 
-                     'Apps',
-                     'Loader',
-                     '$location',
-                     AppsCtrl ]
+.controller('apps',
+  [
+    '$route',
+    '$location',
+    '$rootScope',
+    '$scope',
+    '$timeout',
+    'Apps',
+    'Loader',
+    'session',
+    'data',
+    'utils',
+    AppsCtrl
+  ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader, $location){
+function AppsCtrl($route, $location, $rootScope, $scope, $timeout, Apps, Loader, session, data, utils){
   $scope.apps = Apps.get();
   $scope.fetching = true;
   $scope.api = false;
@@ -149,8 +151,7 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
 (function(){
 angular
 .module('AppbaseDashboard')
-.factory('Apps', AppsFactory)
-.run(Authenticate);
+.factory('Apps', AppsFactory);
 
 function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils, $location){
   var apps = getFromSession();
@@ -371,33 +372,6 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
   }
 
   return retObj;
-}
-
-function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps) {
-
-  auth();
-
-  document.addEventListener('logout', function() {
-    $timeout(function(){
-      $rootScope.logged = false;
-      $appbase.unauth();
-      Apps.clear();
-      session.setProfile(null);
-      $location.path('/login');
-    });
-  });
-
-  $rootScope.$watch('logged', function(logged){
-    if(logged) auth();
-  });
-
-  function auth(){
-    $rootScope.devProfile = session.getProfile();
-    if($rootScope.devProfile) {
-      Apps.refresh();
-    }
-  }
-
 }
 
 })();
@@ -2752,7 +2726,7 @@ function SharingCtrl($scope, $rootScope, data, $timeout, session, $routeParams){
         $scope.owner = true;
         $scope.placeholder = 'Add new user email';
       } else {
-        $scope.placeholder = 'You need to own the app to add users';
+        $scope.placeholder = 'You must own the app to add users';
       }
       users.then(function(users){
         owners.forEach(function(owner){
@@ -2773,36 +2747,36 @@ function SharingCtrl($scope, $rootScope, data, $timeout, session, $routeParams){
 
 })();
 
-(function(){
-angular
-.module('AppbaseDashboard')
-.controller('navbar', NavbarCtrl);
+// (function(){
+// angular
+// .module('AppbaseDashboard')
+// .controller('navbar', NavbarCtrl);
 
 
-function NavbarCtrl($rootScope, $scope, session){
-  if($scope.devProfile = session.getProfile()) {
-    Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");
-    var userProfile = JSON.parse(localStorage.getItem('devProfile'));
-    var email = userProfile.email.replace('@','').replace('.','');
-    var usersNS = Appbase.ns("users");
-    var inviteNS = Appbase.ns("sentinvites");
-    var userV = usersNS.v(email);
+// function NavbarCtrl($rootScope, $scope, session){
+//   if($scope.devProfile = session.getProfile()) {
+//     Appbase.credentials("appbase_inviteafriend", "0055eb35f4217c3b4b288250e3dee753");
+//     var userProfile = JSON.parse(localStorage.getItem('devProfile'));
+//     var email = userProfile.email.replace('@','').replace('.','');
+//     var usersNS = Appbase.ns("users");
+//     var inviteNS = Appbase.ns("sentinvites");
+//     var userV = usersNS.v(email);
 
-    userV.on('properties', function (err,ref,userSnap) {
-      if(userSnap && userSnap.properties() && userSnap.properties().invites){
-        $('#user-balance').html([userSnap.properties().invites,'.1M'].join(''));
-        $rootScope.balance = (userSnap.properties().invites * 1000000) + 100000 ;
-      }
-      else{
-        $('#user-balance').html('100K');
-        $rootScope.balance = 100000;
-      }
-      $rootScope.$apply();
-    });
-  }
-}
+//     userV.on('properties', function (err,ref,userSnap) {
+//       if(userSnap && userSnap.properties() && userSnap.properties().invites){
+//         $('#user-balance').html([userSnap.properties().invites,'.1M'].join(''));
+//         $rootScope.balance = (userSnap.properties().invites * 1000000) + 100000 ;
+//       }
+//       else{
+//         $('#user-balance').html('100K');
+//         $rootScope.balance = 100000;
+//       }
+//       $rootScope.$apply();
+//     });
+//   }
+// }
 
-})();
+// })();
 (function(){
 angular
 .module('AppbaseDashboard')
@@ -2812,6 +2786,7 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
   var appName, secret;
 
   $scope.routeParams = $routeParams;
+  $scope.where = $location.path().split('/')[2];
 
   Apps.appFromName($scope.routeParams.app).then(function(app){
     app.$secret().then(function(){
@@ -2820,8 +2795,6 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
       });
     });
   });
-
-  $scope.where = $location.path().split('/')[2];
 
   $scope.deleteApp = function(app){
     Loader(10);
@@ -2838,10 +2811,6 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
     });
   }
 
-  $scope.shareApp = function(app){
-    $scope.sharing = true;
-    $('#share-modal').modal('show');
-  }
 }
 
 })();
