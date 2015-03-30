@@ -1,8 +1,8 @@
 (function(){
 angular
 .module('AppbaseDashboard')
-.factory('nodeBinding',['data', '$location',
-  'utils','$timeout','$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
+.factory('nodeBinding',['data', '$location', 'utils','$timeout',
+  '$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
 function debug(a) {
   return JSON.parse(JSON.stringify(a))
@@ -23,9 +23,12 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
   nodeBinding.bindAsRoot = function($scope) {    
     var root = {isR: true};
     root.name = utils.getBaseUrl();
+    
     root.meAsRoot = function() {
-      $rootScope.goToBrowser(utils.pathToUrl(''));
+      session.setBrowserURL(utils.pathToUrl(''));
+      $route.reload();
     }
+
     root.expand = function() {
       root.children = [];
       root.expanded = true;
@@ -36,8 +39,9 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
       var polling = setInterval(pollNamespaces, 2000);
       $scope.$on('$destroy', function(){
         clearInterval(polling);
-      })
-    }
+      });
+    };
+
     root.contract = function(){
       root.expanded = false;
       root.children = [];
@@ -174,9 +178,20 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
       return v;
     }
     var parsedPath = utils.parsePath(path);
-    var vertex = useThisVertex || {
-      ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
-    }    
+    var vertex;
+
+    try {
+      vertex = useThisVertex || {
+        ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
+      }
+    } catch(e) {
+      if(e.indexOf('Invalid arguments provided') !== -1) {
+        session.setBrowserURL('');
+        $route.reload();
+        return;
+      }
+    }
+    
     vertex.isV = true
     vertex.page = 0;
 
@@ -205,7 +220,8 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
     }
 
     vertex.meAsRoot = function() {
-      $rootScope.goToBrowser(utils.pathToUrl(path));
+      session.setBrowserURL(utils.pathToUrl(path));
+      $route.reload();
     }
 
     vertex.contract = function() {

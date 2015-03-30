@@ -92,7 +92,11 @@
                 <span class="desc">Check out the Javascript quick start guide to get started with Appbase's realtime streams and search</span>
             </div>
             <div class="col-xs-12 col-sm-4">
-                <a href="" ng-click="docsModal()">
+                <a href=""
+                   ab-modal
+                   ab-include="/include/modal-docs.html"
+                   ab-title="Docs"
+                   ab-class="modal-examples" >
                     <div class="circle learn">
                         <span class="fa fa-book"></span>
                     </div>
@@ -101,7 +105,11 @@
                 <span class="desc">Now that you have jumpstarted to Appbase, take some time to look into the docs</span>
             </div>
             <div class="col-xs-12 col-sm-4">
-                <a href="" ng-click="examplesModal()">
+                <a href=""
+                   ab-modal
+                   ab-include="/include/modal-examples.html"
+                   ab-title="Example Recipes"
+                   ab-class="modal-examples" >
                     <div class="circle etc"><span class="fa fa-file-code-o"></span></div>
                 </a>
                 <h2>Example Recipes</h2>

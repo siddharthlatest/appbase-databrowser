@@ -2,21 +2,24 @@
 angular
 .module('AppbaseDashboard')
 .controller("browser",
-             ['$scope', '$appbase', '$timeout', 'data', 'utils', 'breadcrumbs',
-             'ngDialog', 'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', BrowserCtrl]);
+             ['$scope', '$appbase', '$timeout', 'data', 'utils', 'breadcrumbs', 'ngDialog',
+             'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', '$route', BrowserCtrl]);
 
 function BrowserCtrl($scope, $appbase, $timeout, data, utils,
-  breadcrumbs, ngDialog, nodeBinding, session, $rootScope, Apps, $routeParams){
+  breadcrumbs, ngDialog, nodeBinding, session, $rootScope, Apps, $routeParams, $route){
 
+  $rootScope.$on('routeUpdate', function(){
+    console.log('update')
+  })
   var apps = Apps.get();
   $scope.status = "Loading";
-  var appName = $routeParams.app;
+  var appName = $scope.app = $routeParams.app;
   var URL, app;
 
   Apps.appFromName(appName).then(function(_app){
     app = _app;
     URL = session.getBrowserURL(apps);
-    
+
     if(!URL || utils.urlToAppname(URL) !== appName) {
       URL = utils.appToURL(appName);
       session.setBrowserURL(URL);
@@ -26,8 +29,6 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
       gotSecret(app.secret);
     });
 
-  }, function(){
-    $rootScope.goToApps();
   });
 
   function gotSecret(secret){
@@ -50,6 +51,11 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
     $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl())
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
     $scope.status = false;
+  }
+
+  $scope.goToBrowser = function(path) {
+    session.setBrowserURL(path);
+    $route.reload();
   }
   
   $scope.addEdgeInto = function(node) {

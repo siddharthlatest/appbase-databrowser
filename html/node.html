@@ -30,15 +30,19 @@
                   data-placement="top" >
             </span>
 
-            <span 
-                  ng-click="confirm('Delete', 'Are you sure you want to delete this?', node.removeSelfEdge ? node.removeSelfEdge : node.remove)"
-                  title="Delete"
+            <span title="Delete"
                   class="fa node-options"
                   ng-class="node.deleting? 'fa-cog fa-spin' : 'fa-remove'"
                   title="Remove edge"
                   data-toggle="tooltip"
                   onmouseenter="$(this).tooltip({ trigger: 'hover', container: 'body' })"
-                  data-placement="top" >
+                  data-placement="top"
+                  ab-modal
+                  ab-title="Delete"
+                  ab-message="Are you sure you want to delete this?"
+                  ab-remember="app"
+                  ab-checked="true"
+                  ab-callback="node.removeSelfEdge ? node.removeSelfEdge : node.remove" >
             </span>
 
             <span ng-show="!node.hasProps && node.properties"

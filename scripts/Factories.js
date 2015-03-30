@@ -272,7 +272,7 @@ function DataFactory($timeout, $location, $appbase, utils, $q, $http) {
 
   function request(req_type, app, subject, body, endpoint, try_num) {
     var deferred = $q.defer();
-    var url = atob(server) + app + '/' + subject + '/' + endpoint;
+    var url = atob(server) + app + (subject ? ('/' + subject) : '') + (endpoint ? ('/' + endpoint) : '');
     //console.log(req_type, ': ', url, ', body: ', body)
     var promise = $http({
       method: req_type,

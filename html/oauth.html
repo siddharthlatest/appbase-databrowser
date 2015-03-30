@@ -4,7 +4,7 @@
 		<div class="col-md-4">
 			<div class="wellp">
 			<h2>Expiry time</h2>
-			<p>Token expiration, from 60 minutes to 90 days. <span data-toggle="tooltip" data-placement="right" title="60m (60 minutes), 1d (1 day), 1w (1 week)" class="example">Example</span></p>
+			<p>Token expiration, from 60 minutes to 90 days. <span data-toggle="tooltip" ab-tooltip data-placement="right" title="60m (60 minutes), 1d (1 day), 1w (1 week)" class="example">Example</span></p>
 			<div ng-class="{overlay: loading}">
 				<form ng-submit="updateExpiry(timeInput)">
 					<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">
@@ -18,10 +18,10 @@
 			</div>
 			<div class="wellp">
 			<h2>Domains
-				<span class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.">
+				<span class="fa fa-info-circle" data-toggle="tooltip" ab-tooltip data-placement="right" title="Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.">
 				</span>
 			</h2>
-			<p>Domains allowed to make oauth requests. <span data-toggle="tooltip" data-placement="right" title="Correct: https://domain.com, http://domain.com:3254, abc.domain.com
+			<p>Domains allowed to make oauth requests. <span data-toggle="tooltip" ab-tooltip data-placement="right" title="Correct: https://domain.com, http://domain.com:3254, abc.domain.com
 			  Incorrect: domain.com/foobar/this" class="example">Example</span></p>
 			<div ng-class="{overlay: loading}">
 				<ul class="list-group oa-dom">
@@ -73,7 +73,7 @@
         </div>
 		<div class="bs-callout">
           <span class="provider-title">Authorize this domain and URL in your app's settings on <span ng-bind="provider.name"></span>.</span>
-          <span class="fa fa-info-circle" title="This will allow Appbase to interact with the provider server and retirve the access tokens for you, which will be available in the API for use." data-toggle="tooltip" data-placement="left"></span>
+          <span class="fa fa-info-circle" title="This will allow Appbase to interact with the provider server and retirve the access tokens for you, which will be available in the API for use." data-toggle="tooltip" ab-tooltip data-placement="left"></span>
           <form class="form-horizontal">
             <div class="form-group">
               <label class="col-sm-3 control-label">Callback URL</label>

@@ -81,8 +81,6 @@ function OauthCtrl($scope, OauthBuild, $filter, oauthFactory, $timeout, Loader){
 
   $scope.cancel();
 
-  $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
-
   $scope.callbackDomain = oauthFactory.getOauthdConfig().oauthd;
   $scope.callbackURL = oauthFactory.getOauthdConfig().oauthd + oauthFactory.getOauthdConfig().authBase;
   
@@ -292,7 +290,7 @@ function OauthFactory($timeout, $q, $http){
     var deferred = $q.defer();
 
     oauthAPI.apps.get(appName).then(deferred.resolve, function(data){
-      if(data.status === "error" && data.message === "Unknown key"){
+      if(data === 500){
         oauth.createApp(appName, secret, ['localhost', '127.0.0.1'])
         .then(deferred.resolve, deferred.reject);
       } else {
@@ -356,7 +354,7 @@ function OauthFactory($timeout, $q, $http){
 
   function request(req_type, app, subject, body, endpoint, try_num) {
     var deferred = $q.defer();
-    var url = base_url + app + '/' + subject + (endpoint ? ('/' + endpoint) : '');
+    var url = base_url + app + (subject ? ('/' + subject) : '') + (endpoint ? ('/' + endpoint) : '');
     //console.log(req_type, ': ', url, ', body: ', body)
     var promise = $http({
       method: req_type,
@@ -383,8 +381,6 @@ function OauthFactory($timeout, $q, $http){
     return deferred.promise;
   }
 }
-
-
 
 
 })();

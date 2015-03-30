@@ -10,10 +10,11 @@ angular
                      '$rootScope', 
                      'Apps',
                      'Loader',
+                     '$location',
                      AppsCtrl ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader){
+function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader, $location){
   $scope.apps = Apps.get();
   $scope.fetching = true;
   $scope.api = false;
@@ -46,7 +47,10 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
 
   function tutorial(){
     if(!session.getProfile()) return;
-    
+  }
+
+  $scope.goToDash = function(app) {
+    $location.path('/' + app + '/dash');
   }
 
   $scope.createApp = function (app) {
@@ -54,7 +58,9 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
     $scope.fetching = true;
     Loader(20);
     data.createApp(app).then(function(){
-      $rootScope.goToDash(app);
+      $timeout(function(){
+        $scope.goToDash(app);
+      });
     }).catch(function(){
       $scope.creating = false;
       $scope.fetching = false;  
@@ -70,38 +76,6 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
     $timeout(function(){
       app.copied = false;
     }, 1500);
-  }
-
-  $scope.firstAPICall = function() {
-    BootstrapDialog.show({
-      message: $('<div></div>').load('/include/modal-api.html'),
-      cssClass: 'modal-custom modal-examples',
-      title: "Let's get kicking"
-    });
-  }
-
-  $scope.examplesModal = function() {
-    BootstrapDialog.show({
-      message: $('<div></div>').load('/include/modal-examples.html'),
-      cssClass: 'modal-custom modal-examples',
-      title: "Example Recipes"
-    });
-  }
-
-  $scope.docsModal = function() {
-    BootstrapDialog.show({
-      message: $('<div></div>').load('/include/modal-docs.html'),
-      cssClass: 'modal-custom modal-examples',
-      title: "Docs"
-    });
-  }
-
-  $scope.share = function() {
-    BootstrapDialog.show({
-      message: 'Coming soon.',
-      cssClass: 'modal-custom modal-examples',
-      title: "Sharing"
-    });
   }
 
   $scope.appToURL = utils.appToURL;

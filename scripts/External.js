@@ -1,4 +1,6 @@
-window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+if(window.Raven) {
+	window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+}
 window.localEnv = window.location.hostname === '127.0.0.1';
 
 function sentry(error) {

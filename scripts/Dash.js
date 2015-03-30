@@ -15,24 +15,18 @@ function DashboardBuild($routeParams, $rootScope, Apps, $q, Loader){
       scopeData = {};
       Apps.appFromName(app).then(function(_app){
         scopeData.app = _app;
-        if(!scopeData.app || !scopeData.app.$metrics) {
-          deferred.reject();
-        } else {
-          scopeData.app.$metrics().then(function(){
-            Loader(65);
-            var metrics = scopeData.app.metrics;
-            scopeData.vert = metrics.edgesAndVertices.Vertices || 0;
-            scopeData.edges = metrics.edgesAndVertices.Edges || 0;
-            defaultValues(metrics, scopeData);
-            $rootScope.$watch('balance', function(val){
-              scopeData.cap = val || 100000;
-            });
-            graph(scopeData);
-            deferred.resolve();
+        scopeData.app.$metrics().then(function(){
+          Loader(65);
+          var metrics = scopeData.app.metrics;
+          scopeData.vert = metrics.edgesAndVertices.Vertices || 0;
+          scopeData.edges = metrics.edgesAndVertices.Edges || 0;
+          defaultValues(metrics, scopeData);
+          $rootScope.$watch('balance', function(val){
+            scopeData.cap = val || 100000;
           });
-        }
-      }, function(){
-        $rootScope.goToApps();
+          graph(scopeData);
+          deferred.resolve();
+        });
       });
   
       return deferred.promise;

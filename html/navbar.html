@@ -13,7 +13,7 @@
       </div>
       <div class="collapse navbar-collapse" id="main-navbar-collapse">
          <ul class="nav navbar-nav navbar-right">
-            <li><a href="/developer/apps" ng-class="['apps', 'oauth', 'dash', 'browser'].indexOf($parent.where()) !== -1 ? 'active' : ''">
+            <li><a href="/developer/apps" ng-class="$parent.where('apps') ? 'active' : ''">
                Apps
             </a></li>
             <li><a href="http://docs.appbase.io" target="_blank">

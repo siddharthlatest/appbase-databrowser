@@ -10,18 +10,7 @@ angular.module('AppbaseDashboard', ['ngAppbase',
   .run(FirstRun);
 
 function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $routeParams){
-  // changed the way sessions are stored, so to prevent errors:
-  var oldSession = sessionStorage.getItem('apps');
-  if(oldSession){
-    try {
-      oldSession = JSON.parse(oldSession);
-      if(!angular.isArray(oldSession)) clearSession();
-    } catch(e){
-      Apps.clear();
-    }
-  } else Apps.clear();
-  // end session fixing 
-  
+
   if(!localStorage.getItem('devProfile') || localStorage.getItem('devProfile') === 'null'){
     Apps.clear();
     session.setProfile(null);
@@ -30,7 +19,7 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
   } else $rootScope.logged = true;
 
   $rootScope.confirm = function(title, message, callback, field){
-    var a = new BootstrapDialog({
+    BootstrapDialog.show({
         title: title,
         message: message
         + (field ? '<div class="form-group"><input type="text" class="form-control" /></div>':''),
@@ -52,52 +41,15 @@ function FirstRun($rootScope, $location, session, $route, $timeout, Apps, $route
               else if(value) callback(value);  
             }
         }]
-    }).open();
-  }
-
-  function getSecret(apps, app){
-    if(angular.isObject(app)) {
-      return app.secret;
-    }
-
-    return apps.filter(function(each){
-      return each.name === app;
-    })[0].secret;
-  }
-
-  $rootScope.goToInvite = function() {
-    $location.path('/invite');
-  }
-
-  $rootScope.goToBilling = function() {
-    $location.path('/billing');
-  }
-  $rootScope.goToDash = function(app) {
-    if(app) {
-      $location.path('/' + app + '/dash');
-    }
-  }
-  $rootScope.goToApps = function() {
-    $timeout(function(){
-      $location.path('/apps');
     });
   }
-  $rootScope.goToBrowser = function(path) {
-    session.setBrowserURL(path);
-    $route.reload();
+
+  $rootScope.where = function(here) {
+    var path = $location.path().split('/');
+    if( ($routeParams.app || path[1] === 'apps') && here === 'apps') return true;
+    return here ? (path[1] === here) : path[1];
   }
-  $rootScope.goToStats = function(path){
-    $location.path('/' + path + '/dash/');
-  }
-  $rootScope.goToOauth = function(path){
-    $location.path('/' + path + '/oauth/');
-  }
-  $rootScope.where = function(here){
-    if($location.path() === '/' || $location.path() === '/apps') return 'apps';
-    if($location.path() === '/invite') return 'invite';
-    if($location.path() === '/billing') return 'billing';
-    return $location.path().split('/')[2];
-  }
+
   document.addEventListener('postLogin', function() {
     $timeout(function(){
       $rootScope.logged = true;
@@ -123,10 +75,11 @@ angular
                      '$rootScope', 
                      'Apps',
                      'Loader',
+                     '$location',
                      AppsCtrl ]
 );
 
-function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader){
+function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Apps, Loader, $location){
   $scope.apps = Apps.get();
   $scope.fetching = true;
   $scope.api = false;
@@ -159,7 +112,10 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
 
   function tutorial(){
     if(!session.getProfile()) return;
-    
+  }
+
+  $scope.goToDash = function(app) {
+    $location.path('/' + app + '/dash');
   }
 
   $scope.createApp = function (app) {
@@ -167,7 +123,9 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
     $scope.fetching = true;
     Loader(20);
     data.createApp(app).then(function(){
-      $rootScope.goToDash(app);
+      $timeout(function(){
+        $scope.goToDash(app);
+      });
     }).catch(function(){
       $scope.creating = false;
       $scope.fetching = false;  
@@ -185,38 +143,6 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
     }, 1500);
   }
 
-  $scope.firstAPICall = function() {
-    BootstrapDialog.show({
-      message: $('<div></div>').load('/include/modal-api.html'),
-      cssClass: 'modal-custom modal-examples',
-      title: "Let's get kicking"
-    });
-  }
-
-  $scope.examplesModal = function() {
-    BootstrapDialog.show({
-      message: $('<div></div>').load('/include/modal-examples.html'),
-      cssClass: 'modal-custom modal-examples',
-      title: "Example Recipes"
-    });
-  }
-
-  $scope.docsModal = function() {
-    BootstrapDialog.show({
-      message: $('<div></div>').load('/include/modal-docs.html'),
-      cssClass: 'modal-custom modal-examples',
-      title: "Docs"
-    });
-  }
-
-  $scope.share = function() {
-    BootstrapDialog.show({
-      message: 'Coming soon.',
-      cssClass: 'modal-custom modal-examples',
-      title: "Sharing"
-    });
-  }
-
   $scope.appToURL = utils.appToURL;
 }
 })();
@@ -224,10 +150,9 @@ function AppsCtrl($scope, session, $route, data, $timeout, utils, $rootScope, Ap
 angular
 .module('AppbaseDashboard')
 .factory('Apps', AppsFactory)
-.controller('topnav', TopNavCtrl)
 .run(Authenticate);
 
-function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils){
+function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils, $location){
   var apps = getFromSession();
   var refreshing = false;
   var callsCalc = false;
@@ -268,8 +193,14 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
         refresh().then(function(){
           var app = getApp(name);
           if(app) deferred.resolve(app);
-          else deferred.reject();
-        }, deferred.reject);
+          else {
+            deferred.reject();
+            $location.path('/apps');
+          }
+        }, function(){
+          deferred.reject();
+          $location.path('/apps');
+        });
     }
 
     return deferred.promise;
@@ -440,70 +371,6 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
   }
 
   return retObj;
-}
-
-function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, session, Loader) {
-  var appName, secret;
-  $scope.routeParams = $routeParams;
-
-  $scope.$on('$routeChangeSuccess', function(next, current){
-    if(!session.getProfile()) return;
-    Apps.appFromName(current.params.app).then(function(app){
-      app.$secret().then(function(){
-        $timeout(function(){
-          $scope.secret = secret = app.secret;
-        });
-      });
-    });
-  });
-
-  $scope.deleteApp = function(app){
-    BootstrapDialog.show({
-        title: 'Delete app',
-        message: 'Are you sure you want to delete <span class="bold">' + app +
-        '</span>?<br>Enter the app name to confirm.<br><br>'
-        + '<div class="form-group"><input type="text" class="form-control" /></div>'
-        ,
-        closable: false,
-        cssClass: 'modal-custom',
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(value === app){
-                dialog.close();
-                Loader(10);
-                Apps.appFromName(app).then(function(appObj){
-                  appObj.$secret().then(function(){
-                    data.deleteApp(app, appObj.secret).then(function(){
-                      $timeout(function(){
-                        $location.path('/apps');
-                      });
-                    }).catch(function(error){
-                      sentry(error);
-                    });
-                  });
-                });
-              } else {
-                input.addClass('has-error');
-              }
-            }
-        }]
-    });
-  }
-
-  $scope.shareApp = function(app){
-    $scope.sharing = true;
-    $('#share-modal').modal('show');
-  }
 }
 
 function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps) {
@@ -765,21 +632,24 @@ function BillingCtrl($routeParams, utils, $scope, session, $rootScope, $location
 angular
 .module('AppbaseDashboard')
 .controller("browser",
-             ['$scope', '$appbase', '$timeout', 'data', 'utils', 'breadcrumbs',
-             'ngDialog', 'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', BrowserCtrl]);
+             ['$scope', '$appbase', '$timeout', 'data', 'utils', 'breadcrumbs', 'ngDialog',
+             'nodeBinding', 'session', '$rootScope', 'Apps', '$routeParams', '$route', BrowserCtrl]);
 
 function BrowserCtrl($scope, $appbase, $timeout, data, utils,
-  breadcrumbs, ngDialog, nodeBinding, session, $rootScope, Apps, $routeParams){
+  breadcrumbs, ngDialog, nodeBinding, session, $rootScope, Apps, $routeParams, $route){
 
+  $rootScope.$on('routeUpdate', function(){
+    console.log('update')
+  })
   var apps = Apps.get();
   $scope.status = "Loading";
-  var appName = $routeParams.app;
+  var appName = $scope.app = $routeParams.app;
   var URL, app;
 
   Apps.appFromName(appName).then(function(_app){
     app = _app;
     URL = session.getBrowserURL(apps);
-    
+
     if(!URL || utils.urlToAppname(URL) !== appName) {
       URL = utils.appToURL(appName);
       session.setBrowserURL(URL);
@@ -789,8 +659,6 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
       gotSecret(app.secret);
     });
 
-  }, function(){
-    $rootScope.goToApps();
   });
 
   function gotSecret(secret){
@@ -813,6 +681,11 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
     $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl())
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
     $scope.status = false;
+  }
+
+  $scope.goToBrowser = function(path) {
+    session.setBrowserURL(path);
+    $route.reload();
   }
   
   $scope.addEdgeInto = function(node) {
@@ -910,24 +783,18 @@ function DashboardBuild($routeParams, $rootScope, Apps, $q, Loader){
       scopeData = {};
       Apps.appFromName(app).then(function(_app){
         scopeData.app = _app;
-        if(!scopeData.app || !scopeData.app.$metrics) {
-          deferred.reject();
-        } else {
-          scopeData.app.$metrics().then(function(){
-            Loader(65);
-            var metrics = scopeData.app.metrics;
-            scopeData.vert = metrics.edgesAndVertices.Vertices || 0;
-            scopeData.edges = metrics.edgesAndVertices.Edges || 0;
-            defaultValues(metrics, scopeData);
-            $rootScope.$watch('balance', function(val){
-              scopeData.cap = val || 100000;
-            });
-            graph(scopeData);
-            deferred.resolve();
+        scopeData.app.$metrics().then(function(){
+          Loader(65);
+          var metrics = scopeData.app.metrics;
+          scopeData.vert = metrics.edgesAndVertices.Vertices || 0;
+          scopeData.edges = metrics.edgesAndVertices.Edges || 0;
+          defaultValues(metrics, scopeData);
+          $rootScope.$watch('balance', function(val){
+            scopeData.cap = val || 100000;
           });
-        }
-      }, function(){
-        $rootScope.goToApps();
+          graph(scopeData);
+          deferred.resolve();
+        });
       });
   
       return deferred.promise;
@@ -1110,10 +977,120 @@ angular
 .module('AppbaseDashboard')
 .directive('imgSrc', ImgSrc)
 .directive('backgroundColor', BackgroundColor)
-.directive('ngModal', NgModal)
+.directive('abModalShow', ModalShow)
 .directive('hideParent', HideParent)
 .directive('showParent', ShowParent)
-.directive('loadingLine', LoadingLine);
+.directive('loadingLine', LoadingLine)
+.directive('abModal', Modal)
+.directive('abTooltip', Tooltip);
+
+function Tooltip(){
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs){
+      $(element).tooltip({ trigger: "hover" });
+    }
+  }
+}
+
+function Modal(){
+  var rememberCache = {};
+
+  function link(scope, element, attrs){
+    var el = $(element);
+
+    var input = '<div class="form-group text">'
+    + '<input type="text" class="form-control"/></div>';
+
+    var checkboxActive = '<div class="checkbox"><label>'
+    + '<input type="checkbox" checked class="check">'
+    + ' Remember choice </label> </div>';
+
+    var checkboxInactive = '<div class="checkbox"><label>'
+    + '<input type="checkbox" class="check">'
+    + ' Remember choice </label> </div>';
+
+    el.click(function(){
+      if(scope.abRemember && rememberCache[scope.abRemember]) {
+        scope.abCallback();
+        return;
+      }
+
+      var message = scope.abInput ? (scope.abMessage + input) : scope.abMessage;
+      message = scope.abInclude ? $('<div></div>').load(scope.abInclude) : message;
+
+      var cssClass = 'modal-custom';
+      cssClass += scope.abClass ? (' ' + scope.abClass) : '';
+
+      var title = scope.abTitle || 'Message';
+      var callback;
+      var buttons = [];
+
+      if(angular.isFunction(scope.abCallback)) {
+        if(scope.abRemember && !scope.abInclude){
+          message += scope.abChecked ? checkboxActive : checkboxInactive;
+        }
+
+        callback = function(text, remember, dialog){
+          if(scope.abRemember) rememberCache[scope.abRemember] = remember;
+          scope.abCallback(text);
+          dialog.close();
+        }
+
+        buttons = [{
+            label: 'Cancel',
+            cssClass: 'btn-no',
+            action: function(dialog) {
+              dialog.close();
+            }
+          }, {
+            label: 'Yes',
+            cssClass: 'btn-yes',
+            action: function(dialog) {
+              if(!angular.isFunction(callback)) return;
+
+              var input = scope.abInput ? dialog.getModalBody().find('.text') : '';
+              var text = input.length ? input.find('input').val() : '';
+              var remember = scope.abRemember?dialog.getModalBody().find('.check').is(':checked'):false;
+
+              if(scope.abInput && scope.abValidate) {
+                if(text === scope.abValidate) {
+                  callback(text, remember, dialog);
+                } else {
+                  input.addClass('has-error');
+                }
+              } else {
+                callback(text, remember, dialog);
+              }
+            }
+        }];
+      }
+
+      BootstrapDialog.show({
+        message: message,
+        cssClass: cssClass,
+        title: title,
+        buttons: buttons
+      });
+    });
+  }
+
+  return {
+    restrict: 'A',
+    scope: {
+      abCallback: '=',
+      abMessage: '@',
+      abTitle: '@',
+      abClass: '@',
+      abInclude: '@',
+      abInput: '=',
+      abValidate: '=',
+      abChecked: '=',
+      abRemember: '='
+    },
+    link: link
+  }
+}
 
 function LoadingLine($rootScope){
   return {
@@ -1169,19 +1146,19 @@ function ImgSrc(){
   } 
 }
 
-function NgModal($timeout) {
+function ModalShow($timeout) {
   return {
     restrict: 'A',
     scope: {
-      ngModal: '='
+      abModalShow: '='
     },
     link: function(scope, element){
-      scope.$watch('ngModal', function(bool){
+      scope.$watch('abModalShow', function(bool){
         if(bool) element.modal('show');
       });
       $(element).on('hide.bs.modal', function (e) {
         $timeout(function(){
-          scope.ngModal = false;
+          scope.abModalShow = false;
         });
       })
     }
@@ -1224,41 +1201,10 @@ function ShowParent() {
   }
 }
 
-// requires sanitize
-// function ContentEditable($sce) {
-//   return {
-//     restrict: 'A', // only activate on element attribute
-//     require: '?ngModel', // get a hold of NgModelController
-//     link: function(scope, element, attrs, ngModel) {
-//       if (!ngModel) return; // do nothing if no ng-model
-
-//       // Specify how UI should be updated
-//       ngModel.$render = function() {
-//         element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
-//       };
-
-//       // Listen for change events to enable binding
-//       element.on('blur keyup change', function() {
-//         scope.$evalAsync(read);
-//       });
-//       read(); // initialize
-
-//       // Write data to the model
-//       function read() {
-//         var html = element.html();
-//         // When we clear the content editable the browser leaves a <br> behind
-//         // If strip-br attribute is provided then we strip this out
-//         if ( attrs.stripBr && html == '<br>' ) {
-//           html = '';
-//         }
-//         ngModel.$setViewValue(html);
-//       }
-//     }
-//   }
-// }
-
 })();
-window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+if(window.Raven) {
+	window.Raven.config('https://08f51a5b99d24ba786e28143316dfe5d@app.getsentry.com/39142').install();
+}
 window.localEnv = window.location.hostname === '127.0.0.1';
 
 function sentry(error) {
@@ -1614,7 +1560,7 @@ function DataFactory($timeout, $location, $appbase, utils, $q, $http) {
 
   function request(req_type, app, subject, body, endpoint, try_num) {
     var deferred = $q.defer();
-    var url = atob(server) + app + '/' + subject + '/' + endpoint;
+    var url = atob(server) + app + (subject ? ('/' + subject) : '') + (endpoint ? ('/' + endpoint) : '');
     //console.log(req_type, ': ', url, ', body: ', body)
     var promise = $http({
       method: req_type,
@@ -1769,8 +1715,8 @@ function InviteCtrl($routeParams, utils, $scope, session, $rootScope, $location,
 (function(){
 angular
 .module('AppbaseDashboard')
-.factory('nodeBinding',['data', '$location',
-  'utils','$timeout','$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
+.factory('nodeBinding',['data', '$location', 'utils','$timeout',
+  '$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
 function debug(a) {
   return JSON.parse(JSON.stringify(a))
@@ -1791,9 +1737,12 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
   nodeBinding.bindAsRoot = function($scope) {    
     var root = {isR: true};
     root.name = utils.getBaseUrl();
+    
     root.meAsRoot = function() {
-      $rootScope.goToBrowser(utils.pathToUrl(''));
+      session.setBrowserURL(utils.pathToUrl(''));
+      $route.reload();
     }
+
     root.expand = function() {
       root.children = [];
       root.expanded = true;
@@ -1804,8 +1753,9 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
       var polling = setInterval(pollNamespaces, 2000);
       $scope.$on('$destroy', function(){
         clearInterval(polling);
-      })
-    }
+      });
+    };
+
     root.contract = function(){
       root.expanded = false;
       root.children = [];
@@ -1942,9 +1892,20 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
       return v;
     }
     var parsedPath = utils.parsePath(path);
-    var vertex = useThisVertex || {
-      ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
-    }    
+    var vertex;
+
+    try {
+      vertex = useThisVertex || {
+        ref: $appbase.ns(parsedPath.ns).v(parsedPath.v)
+      }
+    } catch(e) {
+      if(e.indexOf('Invalid arguments provided') !== -1) {
+        session.setBrowserURL('');
+        $route.reload();
+        return;
+      }
+    }
+    
     vertex.isV = true
     vertex.page = 0;
 
@@ -1973,7 +1934,8 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
     }
 
     vertex.meAsRoot = function() {
-      $rootScope.goToBrowser(utils.pathToUrl(path));
+      session.setBrowserURL(utils.pathToUrl(path));
+      $route.reload();
     }
 
     vertex.contract = function() {
@@ -2174,8 +2136,6 @@ function OauthCtrl($scope, OauthBuild, $filter, oauthFactory, $timeout, Loader){
   }
 
   $scope.cancel();
-
-  $('[data-toggle="tooltip"]').tooltip({ trigger: "hover" });
 
   $scope.callbackDomain = oauthFactory.getOauthdConfig().oauthd;
   $scope.callbackURL = oauthFactory.getOauthdConfig().oauthd + oauthFactory.getOauthdConfig().authBase;
@@ -2386,7 +2346,7 @@ function OauthFactory($timeout, $q, $http){
     var deferred = $q.defer();
 
     oauthAPI.apps.get(appName).then(deferred.resolve, function(data){
-      if(data.status === "error" && data.message === "Unknown key"){
+      if(data === 500){
         oauth.createApp(appName, secret, ['localhost', '127.0.0.1'])
         .then(deferred.resolve, deferred.reject);
       } else {
@@ -2450,7 +2410,7 @@ function OauthFactory($timeout, $q, $http){
 
   function request(req_type, app, subject, body, endpoint, try_num) {
     var deferred = $q.defer();
-    var url = base_url + app + '/' + subject + (endpoint ? ('/' + endpoint) : '');
+    var url = base_url + app + (subject ? ('/' + subject) : '') + (endpoint ? ('/' + endpoint) : '');
     //console.log(req_type, ': ', url, ', body: ', body)
     var promise = $http({
       method: req_type,
@@ -2477,8 +2437,6 @@ function OauthFactory($timeout, $q, $http){
     return deferred.promise;
   }
 }
-
-
 
 
 })();
@@ -2841,6 +2799,48 @@ function NavbarCtrl($rootScope, $scope, session){
       }
       $rootScope.$apply();
     });
+  }
+}
+
+})();
+(function(){
+angular
+.module('AppbaseDashboard')
+.controller('topnav', TopNavCtrl);
+
+function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loader) {
+  var appName, secret;
+
+  $scope.routeParams = $routeParams;
+
+  Apps.appFromName($scope.routeParams.app).then(function(app){
+    app.$secret().then(function(){
+      $timeout(function(){
+        $scope.secret = secret = app.secret;
+      });
+    });
+  });
+
+  $scope.where = $location.path().split('/')[2];
+
+  $scope.deleteApp = function(app){
+    Loader(10);
+    Apps.appFromName(app).then(function(appObj){
+      appObj.$secret().then(function(){
+        data.deleteApp(app, appObj.secret).then(function(){
+          $timeout(function(){
+            $location.path('/apps');
+          });
+        }).catch(function(error){
+          sentry(error);
+        });
+      });
+    });
+  }
+
+  $scope.shareApp = function(app){
+    $scope.sharing = true;
+    $('#share-modal').modal('show');
   }
 }
 

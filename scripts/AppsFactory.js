@@ -2,10 +2,9 @@
 angular
 .module('AppbaseDashboard')
 .factory('Apps', AppsFactory)
-.controller('topnav', TopNavCtrl)
 .run(Authenticate);
 
-function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils){
+function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, utils, $location){
   var apps = getFromSession();
   var refreshing = false;
   var callsCalc = false;
@@ -46,8 +45,14 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
         refresh().then(function(){
           var app = getApp(name);
           if(app) deferred.resolve(app);
-          else deferred.reject();
-        }, deferred.reject);
+          else {
+            deferred.reject();
+            $location.path('/apps');
+          }
+        }, function(){
+          deferred.reject();
+          $location.path('/apps');
+        });
     }
 
     return deferred.promise;
@@ -218,70 +223,6 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
   }
 
   return retObj;
-}
-
-function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, session, Loader) {
-  var appName, secret;
-  $scope.routeParams = $routeParams;
-
-  $scope.$on('$routeChangeSuccess', function(next, current){
-    if(!session.getProfile()) return;
-    Apps.appFromName(current.params.app).then(function(app){
-      app.$secret().then(function(){
-        $timeout(function(){
-          $scope.secret = secret = app.secret;
-        });
-      });
-    });
-  });
-
-  $scope.deleteApp = function(app){
-    BootstrapDialog.show({
-        title: 'Delete app',
-        message: 'Are you sure you want to delete <span class="bold">' + app +
-        '</span>?<br>Enter the app name to confirm.<br><br>'
-        + '<div class="form-group"><input type="text" class="form-control" /></div>'
-        ,
-        closable: false,
-        cssClass: 'modal-custom',
-        buttons: [{
-            label: 'Cancel',
-            cssClass: 'btn-no',
-            action: function(dialog) {
-                dialog.close();
-            }
-        }, {
-            label: 'Yes',
-            cssClass: 'btn-yes',
-            action: function(dialog) {
-              var input = dialog.getModalBody().find('.form-group');
-              var value = input.find('input').val();
-              if(value === app){
-                dialog.close();
-                Loader(10);
-                Apps.appFromName(app).then(function(appObj){
-                  appObj.$secret().then(function(){
-                    data.deleteApp(app, appObj.secret).then(function(){
-                      $timeout(function(){
-                        $location.path('/apps');
-                      });
-                    }).catch(function(error){
-                      sentry(error);
-                    });
-                  });
-                });
-              } else {
-                input.addClass('has-error');
-              }
-            }
-        }]
-    });
-  }
-
-  $scope.shareApp = function(app){
-    $scope.sharing = true;
-    $('#share-modal').modal('show');
-  }
 }
 
 function Authenticate($rootScope, session, $appbase, $timeout, $location, Apps) {

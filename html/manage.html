@@ -6,7 +6,14 @@
         Applications</a> / <span ng-bind="routeParams.app"></span>
         <div class="right-tools">
             <a href="" ng-click="share(routeParams.app)" class="delete share">Share</a>
-            <a href="" ng-click="deleteApp(routeParams.app)" class="delete">Delete</a>
+            <a href=""
+               ab-modal
+               ab-callback="deleteApp"
+               ab-title="Delete app"
+               ab-message="Are you sure you want to delete <span class='bold'>{{routeParams.app}}</span>?<br>Enter the app name to confirm.<br><br>"
+               ab-validate="routeParams.app"
+               ab-input="true"
+               class="delete">Delete</a>
         </div>
     </div>
     <nav class="navbar">
@@ -14,21 +21,21 @@
     	<ul class="nav navbar-nav navbar-left">
             <li>
                 <a ng-href="/developer/{{routeParams.app}}/dash"
-                   ng-class="{active: $parent.where()==='dash'}">
+                   ng-class="{active: where === 'dash'}">
                    Dashboard
                 </a>
             </li>
 
     		<li>
                 <a ng-href="/developer/{{routeParams.app}}/browser"
-                   ng-class="{active: $parent.where()==='browser'}">
+                   ng-class="{active: where === 'browser'}">
                     Data Browser
                 </a>
             </li>
 
     		<li>
                 <a ng-href="/developer/{{routeParams.app}}/oauth"
-                   ng-class="{active: $parent.where()==='oauth'}">
+                   ng-class="{active: where === 'oauth'}">
                     Authentication
                 </a>
             </li>
