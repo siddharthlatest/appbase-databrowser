@@ -3,8 +3,9 @@
 
     <ol ng-show="node" class="breadcrumb">
         <li>
-            <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl + '/v' + $parent.version + '_0')" class="margin-right-xs">
-                <span ng-bind="baseUrl"></span>/v<span ng-bind="$parent.version"></span>_0
+            <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl)" class="margin-right-xs" ng-switch="version">
+                <span ng-switch-when="2" ng-bind="baseUrl"></span>
+                <span ng-switch-when="3">https://v3.api.appbase.io/<text ng-bind="app"></text></span>
             </a>
         </li>
         <li ng-repeat="breadcrumb in breadcrumbs.get() track by breadcrumb.path" ng-class="{ active: $last }">

@@ -102,7 +102,7 @@ function utilsFactory(){
   };
 
   utils.appToURL = function(app) {
-    return 'https://api.appbase.io/' + app + '/v2_0/';
+    return 'https://api.appbase.io/' + app + '/v2_1/';
   };
 
   return utils;

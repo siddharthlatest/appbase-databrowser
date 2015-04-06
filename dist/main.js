@@ -665,7 +665,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
     }
     $scope.node.expand()
 
-    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl()).split('/v2_0')[0];
+    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl());
 
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
     $scope.status = false;
@@ -2833,7 +2833,7 @@ function utilsFactory(){
   };
 
   utils.appToURL = function(app) {
-    return 'https://api.appbase.io/' + app + '/v2_0/';
+    return 'https://api.appbase.io/' + app + '/v2_1/';
   };
 
   return utils;
