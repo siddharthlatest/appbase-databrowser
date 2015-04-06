@@ -194,7 +194,7 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
 
     appObj.$version = function(){
       var deferred;
-      var v3date = 1427846400000; //4/1/2015
+      var v3date = 1427147200000; //4/1/2015
 
       if(!appObj.version){
         deferred = $q.defer();
