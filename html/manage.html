@@ -5,6 +5,7 @@
         <span ng-bind="devProfile.firstname"></span><span ng-show="devProfile.firstname" class="ng-hide">'s</span>
         Applications</a> / <span ng-bind="routeParams.app"></span>
         <div class="right-tools">
+            <text ng-show="version" class="ng-hide">v</text><span ng-bind="version"></span>
             <a href="" ng-click="share(routeParams.app)" class="delete share">Share</a>
             <a href=""
                ab-modal

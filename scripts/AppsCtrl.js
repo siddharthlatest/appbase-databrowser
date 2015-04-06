@@ -80,7 +80,5 @@ function AppsCtrl($route, $location, $rootScope, $scope, $timeout, Apps, Loader,
       app.copied = false;
     }, 1500);
   }
-
-  $scope.appToURL = utils.appToURL;
 }
 })();

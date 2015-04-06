@@ -3,15 +3,21 @@ angular
 .module('AppbaseDashboard')
 .controller('topnav', TopNavCtrl);
 
-function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loader) {
+function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loader, $rootScope) {
   var appName, secret;
 
   $scope.routeParams = $routeParams;
   $scope.where = $location.path().split('/')[2];
 
   Apps.appFromName($scope.routeParams.app).then(function(app){
-    app.$secret().then(function(){
+    app.$version().then(function(){
       $timeout(function(){
+        $rootScope.version = app.version;
+      });
+    });
+
+    app.$secret().then(function(){
+      $timeout(function(){        
         $scope.secret = secret = app.secret;
       });
     });

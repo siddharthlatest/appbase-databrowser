@@ -48,7 +48,8 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
     }
     $scope.node.expand()
 
-    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl())
+    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl()).split('/v2_0')[0];
+
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
     $scope.status = false;
   }
@@ -61,7 +62,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
   $scope.addEdgeInto = function(node) {
     var namespaces = [];
     node.loadingNs = true;
-    data.getNamespaces(function(array) {
+    data.getNamespaces().then(function(array) {
       $timeout(function(){
         node.loadingNs = false;
       });

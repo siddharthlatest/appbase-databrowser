@@ -144,8 +144,6 @@ function AppsCtrl($route, $location, $rootScope, $scope, $timeout, Apps, Loader,
       app.copied = false;
     }, 1500);
   }
-
-  $scope.appToURL = utils.appToURL;
 }
 })();
 (function(){
@@ -342,16 +340,31 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
       return emptyPromise;
     };
 
-    appObj.$secret = function(){
-      if(!appObj.secret){
+    appObj.$version = function(){
+      var deferred;
+      var v3date = 1427846400000; //4/1/2015
+
+      if(!appObj.version){
+        deferred = $q.defer();
+        appObj.$secret(true).then(function(){
+          appObj.version = appObj.createdAt > v3date ? 3 : 2;
+          deferred.resolve();
+        }, deferred.reject);
+      } else return emptyPromise;
+
+      return deferred.promise;
+    };
+
+    appObj.$secret = function(created){
+      if(!appObj.secret || created){
         return data.getAppsSecret(appObj.name).then(function(data){
+          appObj.createdAt = data.created_at || 1388534400; // 1/1/2014
           appObj.secret = data.secret;
           write();
         });
       }
       return emptyPromise;
     };
-
     return appObj;
   }
 
@@ -652,7 +665,8 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
     }
     $scope.node.expand()
 
-    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl())
+    $scope.baseUrl = utils.cutLeadingTrailingSlashes(utils.getBaseUrl()).split('/v2_0')[0];
+
     $scope.breadcrumbs = (path === undefined)? undefined : breadcrumbs.generateBreadcrumbs(path)
     $scope.status = false;
   }
@@ -665,7 +679,7 @@ function BrowserCtrl($scope, $appbase, $timeout, data, utils,
   $scope.addEdgeInto = function(node) {
     var namespaces = [];
     node.loadingNs = true;
-    data.getNamespaces(function(array) {
+    data.getNamespaces().then(function(array) {
       $timeout(function(){
         node.loadingNs = false;
       });
@@ -1263,114 +1277,8 @@ function ExternalLibs($rootScope, $window, session, $location){
 (function(){
 angular
 .module('AppbaseDashboard')
-.factory('utils', utilsFactory)
 .factory('data',
   ['$timeout', '$location', '$appbase', 'utils', '$q', '$http', DataFactory]);
-
-function utilsFactory(){
-  var utils = {};
-  var baseUrl;
-
-  utils.appNamesToObj = function(_apps){
-    var retArr = [];
-    _apps.forEach(function(app){
-      retArr.push({name: app});
-    });
-    return retArr;
-  };
-
-  utils.appObjToNames = function(_apps){
-    var retArr = [];
-    _apps.forEach(function(app){
-      retArr.push(app.name);
-    });
-    return retArr;
-  };
-
-  utils.setBaseUrl = function(bUrl){
-    baseUrl = bUrl;
-  };
-
-  utils.getBaseUrl = function(bUrl){
-    return baseUrl;
-  };
-
-  utils.urlToAppname = function(url) {
-    return utils.parseURL(url).appName;
-  };
-
-  utils.urlToPath = function(url) {
-    return utils.parseURL(url).path;
-  };
-
-  utils.pathToUrl = function(path) {
-    return baseUrl + path;
-  };
-  
-  utils.parsePath = function(path) {
-    return utils.parseURL(utils.pathToUrl(path));
-  };
-
-  utils.parseURL = function(url) {
-    if(!url) return {}; //return empty object for undefined
-    var intermediate, appname, version, path, namespace, key, obj_path, v;
-    intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
-    intermediate = intermediate[1].split(/\/(.+)?/)[1].split(/\/(.+)?/);
-    appname = intermediate[0];
-    intermediate = intermediate[1].split(/\/(.+)?/);
-    version = intermediate[0];
-    path = intermediate[1];
-    if(path) {
-      intermediate = path.split(/\/(.+)?/);
-      namespace = intermediate[0];
-      v = intermediate[1];
-      key;
-      obj_path;
-      if(v) {
-        intermediate = v.split(/\/(.+)?/);
-        key = intermediate[0];
-        obj_path = intermediate[1];
-      }
-    }
-    var retObj = {
-      appName: appname,
-      ns: namespace,
-      key: key,
-      obj_path: obj_path,
-      path: path,
-      v: v
-    }
-    return retObj;
-  }
-
-  utils.cutLeadingTrailingSlashes = function(input) {
-    if(typeof input !== 'string')
-      return
-    while(input.charAt(input.length - 1) === '/') {
-      input = input.slice(0,-1);
-    }
-    while(input.charAt(0) === '/') {
-      input = input.slice(1);
-    }
-    return input;
-  };
-
-  utils.parentUrl = function(url) {
-    var parentPath = utils.parentPath(utils.urlToPath(url));
-    return utils.pathToUrl(parentPath);
-  };
-
-  utils.parentPath = function(path) {
-    var slashI;
-    return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
-  };
-
-  utils.appToURL = function(app) {
-    return "https://api.appbase.io/"+ app +"/v2_1/";
-  };
-
-  return utils;
-}
 
 function DataFactory($timeout, $location, $appbase, utils, $q, $http) {
   var data = {};
@@ -1428,19 +1336,24 @@ function DataFactory($timeout, $location, $appbase, utils, $q, $http) {
   }
 
   data.getNamespaces = function(done) {
-    accountsAPI.app.get(appName, 'namespaces').then(function(result){
+    var deferred = $q.defer();
+
+    $http({
+      method: 'GET',
+      url: 'https://v3.api.appbase.io/' + appName + '/~collections',
+      headers: {
+        'Content-Type': 'application/json',
+        'Appbase-Secret': secret
+      }
+    }).then(function(result){
       var namespaces = [];
-      result.namespaces = result.namespaces || [];
-      result.namespaces.forEach(function(namespace) {
-        namespace.name = namespace.name.slice(namespace.name.indexOf('.') + 1);
-        if(namespace.name !== 'system.indexes' && namespace.name !== 'indexes') {
-          namespaces.push(namespace);
-        }
-        if(done) {
-          done(namespaces);
-        }
+      result.data.forEach(function(ns){
+        namespaces.push({name: ns});
       });
+      deferred.resolve(namespaces);
     });
+
+    return deferred.promise;
   };
 
   data.deleteNamespace = function(namespace, done) {
@@ -1692,10 +1605,6 @@ angular
 .factory('nodeBinding',['data', '$location', 'utils','$timeout',
   '$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
-function debug(a) {
-  return JSON.parse(JSON.stringify(a))
-}
-
 function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, session, ngDialog, $route) {
   var nodeBinding = {};
   nodeBinding.creating = [];
@@ -1736,7 +1645,7 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
     }
     var initialPoll = true;
     function pollNamespaces(cb){
-      data.getNamespaces(function(namespaceObjs){
+      data.getNamespaces().then(function(namespaceObjs){
         $timeout(function() {
           // removes old ones. saves the indexes to avoid modifying looping array
           var toRemove = [];
@@ -2782,15 +2691,21 @@ angular
 .module('AppbaseDashboard')
 .controller('topnav', TopNavCtrl);
 
-function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loader) {
+function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loader, $rootScope) {
   var appName, secret;
 
   $scope.routeParams = $routeParams;
   $scope.where = $location.path().split('/')[2];
 
   Apps.appFromName($scope.routeParams.app).then(function(app){
-    app.$secret().then(function(){
+    app.$version().then(function(){
       $timeout(function(){
+        $rootScope.version = app.version;
+      });
+    });
+
+    app.$secret().then(function(){
+      $timeout(function(){        
         $scope.secret = secret = app.secret;
       });
     });
@@ -2811,6 +2726,117 @@ function TopNavCtrl($scope, $routeParams, Apps, $timeout, data, $location, Loade
     });
   }
 
+}
+
+})();
+(function(){
+angular
+.module('AppbaseDashboard')
+.factory('utils', utilsFactory);
+
+function utilsFactory(){
+  var utils = {};
+  var baseUrl;
+
+  utils.appNamesToObj = function(_apps){
+    var retArr = [];
+    _apps.forEach(function(app){
+      retArr.push({name: app});
+    });
+    return retArr;
+  };
+
+  utils.appObjToNames = function(_apps){
+    var retArr = [];
+    _apps.forEach(function(app){
+      retArr.push(app.name);
+    });
+    return retArr;
+  };
+
+  utils.setBaseUrl = function(bUrl){
+    baseUrl = bUrl;
+  };
+
+  utils.getBaseUrl = function(bUrl){
+    return baseUrl;
+  };
+
+  utils.urlToAppname = function(url) {
+    return utils.parseURL(url).appName;
+  };
+
+  utils.urlToPath = function(url) {
+    return utils.parseURL(url).path;
+  };
+
+  utils.pathToUrl = function(path) {
+    return baseUrl + path;
+  };
+  
+  utils.parsePath = function(path) {
+    return utils.parseURL(utils.pathToUrl(path));
+  };
+
+  utils.parseURL = function(url) {
+    if(!url) return {}; //return empty object for undefined
+    var intermediate, appname, version, path, namespace, key, obj_path, v;
+    intermediate = url.split(/\/\/(.+)?/)[1].split(/\.(.+)?/);
+    intermediate = intermediate[1].split(/\/(.+)?/)[1].split(/\/(.+)?/);
+    appname = intermediate[0];
+    intermediate = intermediate[1].split(/\/(.+)?/);
+    version = intermediate[0];
+    path = intermediate[1];
+    if(path) {
+      intermediate = path.split(/\/(.+)?/);
+      namespace = intermediate[0];
+      v = intermediate[1];
+      key;
+      obj_path;
+      if(v) {
+        intermediate = v.split(/\/(.+)?/);
+        key = intermediate[0];
+        obj_path = intermediate[1];
+      }
+    }
+    var retObj = {
+      appName: appname,
+      ns: namespace,
+      key: key,
+      obj_path: obj_path,
+      path: path,
+      v: v
+    }
+    return retObj;
+  }
+
+  utils.cutLeadingTrailingSlashes = function(input) {
+    if(typeof input !== 'string')
+      return
+    while(input.charAt(input.length - 1) === '/') {
+      input = input.slice(0,-1);
+    }
+    while(input.charAt(0) === '/') {
+      input = input.slice(1);
+    }
+    return input;
+  };
+
+  utils.parentUrl = function(url) {
+    var parentPath = utils.parentPath(utils.urlToPath(url));
+    return utils.pathToUrl(parentPath);
+  };
+
+  utils.parentPath = function(path) {
+    var slashI;
+    return path === undefined? '': path.slice(0, (slashI = path.lastIndexOf('/')) === -1? 0: slashI);
+  };
+
+  utils.appToURL = function(app) {
+    return 'https://api.appbase.io/' + app + '/v2_0/';
+  };
+
+  return utils;
 }
 
 })();

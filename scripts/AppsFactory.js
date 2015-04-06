@@ -192,16 +192,31 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
       return emptyPromise;
     };
 
-    appObj.$secret = function(){
-      if(!appObj.secret){
+    appObj.$version = function(){
+      var deferred;
+      var v3date = 1427846400000; //4/1/2015
+
+      if(!appObj.version){
+        deferred = $q.defer();
+        appObj.$secret(true).then(function(){
+          appObj.version = appObj.createdAt > v3date ? 3 : 2;
+          deferred.resolve();
+        }, deferred.reject);
+      } else return emptyPromise;
+
+      return deferred.promise;
+    };
+
+    appObj.$secret = function(created){
+      if(!appObj.secret || created){
         return data.getAppsSecret(appObj.name).then(function(data){
+          appObj.createdAt = data.created_at || 1388534400; // 1/1/2014
           appObj.secret = data.secret;
           write();
         });
       }
       return emptyPromise;
     };
-
     return appObj;
   }
 

@@ -4,10 +4,6 @@ angular
 .factory('nodeBinding',['data', '$location', 'utils','$timeout',
   '$appbase','$rootScope','session','ngDialog', '$route', NodeBinding]);
 
-function debug(a) {
-  return JSON.parse(JSON.stringify(a))
-}
-
 function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, session, ngDialog, $route) {
   var nodeBinding = {};
   nodeBinding.creating = [];
@@ -48,7 +44,7 @@ function NodeBinding(data, $location, utils, $timeout, $appbase, $rootScope, ses
     }
     var initialPoll = true;
     function pollNamespaces(cb){
-      data.getNamespaces(function(namespaceObjs){
+      data.getNamespaces().then(function(namespaceObjs){
         $timeout(function() {
           // removes old ones. saves the indexes to avoid modifying looping array
           var toRemove = [];

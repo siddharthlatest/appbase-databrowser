@@ -613,6 +613,11 @@ body {
   #manage .right-tools {
     position: inline;
     float: right; }
+  #manage .right-tools span {
+    margin-right: 10px;
+    color: #777;
+    font-size: 0.9em;
+    cursor: default; }
   #manage .navbar {
     position: absolute;
     width: 100%;

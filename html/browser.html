@@ -3,7 +3,9 @@
 
     <ol ng-show="node" class="breadcrumb">
         <li>
-            <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl)" ng-bind="baseUrl" class="margin-right-xs"></a>
+            <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl + '/v' + $parent.version + '_0')" class="margin-right-xs">
+                <span ng-bind="baseUrl"></span>/v<span ng-bind="$parent.version"></span>_0
+            </a>
         </li>
         <li ng-repeat="breadcrumb in breadcrumbs.get() track by breadcrumb.path" ng-class="{ active: $last }">
             <a ng-if="!$last" href="" ng-click="goToBrowser(baseUrl + breadcrumb.path)" ng-bind="breadcrumb.label" class="margin-right-xs"></a>

@@ -46,11 +46,23 @@
 		<div class="col-xs-12 col-md-4 push">
 			<div class="wellp usage">
 				<div class="plan">
-					<div><h3>Vertices</h3>
-					<span ng-bind="commas(data.vert)"></span></div>
+					<div>
+						<h3 ng-switch="version">
+							<text ng-switch-when="3">Documents</text>
+							<text ng-switch-when="2">Vertices</text>
+						</h3>
+						<span ng-bind="commas(data.vert)"></span>
+						<span ng-show="!data.vert" class="ng-hide">0</span>
+					</div>
 					
-					<div><h3>Edges</h3>
-					<span ng-bind="commas(data.edges)"></span></div>
+					<div>
+						<h3 ng-switch="version">
+							<text ng-switch-when="3">Objects</text>
+							<text ng-switch-when="2">Edges</text>
+						</h3>
+						<span ng-bind="commas(data.edges)"></span>
+						<span ng-show="!data.edges" class="ng-hide">0</span>
+					</div>
 				
 				</div>
 			</div>

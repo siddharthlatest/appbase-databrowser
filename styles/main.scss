@@ -568,6 +568,13 @@ body {
 		float: right;
 	}
 
+	.right-tools span {
+		margin-right: 10px;
+		color: #777;
+		font-size: 0.9em;
+		cursor: default;
+	}
+
 	.navbar {
 		position: absolute;
 		width: 100%;
