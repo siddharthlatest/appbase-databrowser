@@ -1,0 +1,127 @@
+/*-------------------------------Navigation-------------------------------*/
+a:hover{
+	color: rgb(41, 120, 176);
+}
+a:focus{
+	color: rgb(88, 87, 89);
+}
+a:active{
+	color: rgb(41, 120, 176);
+}
+#topnav{
+	opacity: 0.9;
+	width: 100.1%;
+	background: white;
+}
+.navbar .container{
+	width: 100%;
+	padding: 0px;
+	display: table;
+}
+.navbar-header{
+	display: table;
+	width: 100%;
+}
+
+.navbar-header > div{
+	display: table-cell;
+	vertical-align: middle;
+}
+.navbar-header, .navbar-brand{
+	padding: 0.1em 0em	!important;
+	margin: 0px !important;
+}
+.navbar-brand img{
+	padding-top: 5px;
+	padding-bottom:5px;
+}
+.navbar button{
+	margin: 0px;
+}
+.navbar .nav > li > a {
+	padding: 8px 10px 8px;
+	float: none;
+	text-decoration: none;
+	text-shadow: none;
+	font-size:0.97em;
+	font-wight:bold;
+	text-transform:uppercase;
+}
+.navbar .nav > li:last-child > a{
+	padding: 0px 10px;
+}
+.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
+	color: rgb(41,120,176) !important;
+	background: none;
+	border-bottom: 1px solid rgb(41,120,176);
+}
+#collapse-list{
+	width: 80%;
+	padding-right: 30px !important;
+}
+@media screen and (min-width: 768px){
+	.navbar-brand img{
+		padding-left: 15px;
+	}
+	#collapse-list{
+		display: table-cell !important;
+		vertical-align: middle;
+		padding-right: 15px;
+	}
+	.container{
+		display: block;
+	}
+	.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
+		color: rgb(41, 120, 176) !important;
+		background: none;
+		border-bottom: 1px solid rgb(41,120,176);
+	}
+}
+@media screen and (max-width: 991px){
+	.navbar .nav > li > a {
+		padding: 8px 5px 8px;
+		font-size: 0.85em;
+	}
+	#collapse-list{
+		width: 70%;
+	}
+}
+@media screen and (max-width: 767px){
+	.navbar .nav > li > a{
+		padding: 20px 7px 15px;
+	}
+	#collapse-list{
+		width: 100%;
+		margin: 0px;
+	}	
+	#landing h1{
+		font-size: 1.5em;
+	}
+	#landing{
+		font-size: 1.8em !important;
+	}
+	input[type="button"]{
+		display: none;
+	}
+}
+#developer-access-icon{
+	margin-left: 5%;
+	width: 3.1em;
+	height: 2.5em;	
+	background: #1aa871;
+	margin-bottom: 3%;
+}
+#keySvg{
+	position: absolute;
+	top: 0.25em;
+	left: 0.55em;
+	height: 1.9em;
+	width: 1.9em !important;
+}
+@media screen and (max-width: 375px){
+	.navbar-header > div:first-child{
+		width: 60%;
+	}
+	
+}
+/*-------------------------------Navigation-------------------------------*/

@@ -1,37 +1,18 @@
-<div id="landing">
-    <div class="row" id="alertdiv">
-        <div ng-hide="devProfile" class="alert alert-warning fade in" role="alert">
-            <p>Login to continue</p>
-            <p>
-              <button ng-click="loginPopup('google')" class="btn btn-success">Login with Google</button>
-              <button ng-click="loginPopup('github')" class="btn btn-success">Login with Github</button>
-            </p>
+<div class="container-fluid ng-hide" id="applications" ng-show="!db_loading">
+    <div class="row">
+        <div class="col-xs-12 main-title">
+            <span ng-bind="devProfile.name">
+            </span><span ng-show="devProfile.name" class="ng-hide">'s</span>
+            <span ng-show="!devProfile.name" class="ng-hide">Your</span>
+            Apps
         </div>
-    </div>
-    <div ng-show="devProfile" class="container-fluid" id="userapps">
-        <div class="row">
-            <div class="col-md-12 main-title">
-                <span ng-bind="devProfile.name"></span>'s Apps
-                <button ng-click="logout()" type="button" class="btn btn-danger logout">
-                    Logout
-                </button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-1 col-md-offset-11 text-left" style="padding-left:0px">
-                <div class="onoffswitch hidden">
-                    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" ng-model="api" checked>
-                    <label class="onoffswitch-label" for="myonoffswitch">
-                        <span class="onoffswitch-inner"></span>
-                        <span class="onoffswitch-switch"></span>
-                    </label>
-                </div>
-            </div>
-            <div class="form-horizontal col-md-6">
-                <div class="row wrapper well" ng-submit="createApp(newAppname); newAppname ='' ;">
+        <div class="col-xs-12 text-center">
+            <div class="form-horizontal col-md-8 col-xs-12 create-app col-md-offset-2">
+                <div class="row wrapper well test"
+                     ng-submit="createApp(newAppname)">
                     <form>
                         <div class="form-group new-app input-line">
-                            <div class="col-sm-12">
+                            <div class="col-xs-12">
                                 <input type="text"
                                        pattern="^[a-z0-9_]*$"
                                        ng-required="true"
@@ -41,133 +22,99 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-sm-12">
+                            <div class="col-xs-12">
                                 <button class="form-control btn btn-success"
-                                        type="submit" id="createuserapp">
+                                        type="submit"
+                                        id="createuserapp" >
                                     Create App
                                 </button>
                             </div>
                         </div>
                         
-                        <div class="col-sm-12 tip">
+                        <div class="col-xs-12 tip">
                             <span class="text-info">
-                                Please use only lowercase letters (a-z), numbers, and underscore.
+                                Use only lowercase letters (a-z), numbers, and underscores.
                             </span>
                         </div>
                     </form>
-                </div>
-            </div>
-            <div class="form-horizontal col-md-6" ng-show="fetching">
-                <div class="wrapper well">
-                    <span class="loading">loading...</span>
-                </div>
-            </div>
-            <div class="form-horizontal col-md-6" ng-repeat="(app, obj) in apps">
-                <div class="row wrapper well">
-                    <div class="form-group input-line">
-                        <label class="col-sm-3 control-label">App name</label>
-                        <div class="col-sm-9">
-                            <input type="text"
-                                   class="form-control"
-                                   placeholder="App name"
-                                   readonly ng-value="app">
-                        </div>
-                    </div>
-                    <div class="form-group input-line">
-                        <label for="inputAppsecret" class="col-sm-3 control-label">App Secret</label>
-                        <div class="col-sm-9">
-                            <input type="text"
-                                   class="form-control"
-                                   placeholder="App Secret"
-                                   readonly ng-value="obj.secret" />
-                        </div>
-                    </div>
-                    <div class="input-line">
-                        <div class="col-sm-10 url">
-                            <div>
-                                <a ng-click="goToBrowser(appToURL(app, api));$rootScope.currentApp=app;" ng-bind="appToURL(app, api)"></a>
-                            </div>
-                        </div>
-                        <div class="col-sm-1 analytics">
-                            <a class="glyphicon glyphicon-lock" ng-click="goToOauth(app)"></a>
-                        </div>
-                        <div class="col-sm-1 analytics">
-                            <a class="glyphicon glyphicon-stats" ng-click="goToStats(app)"></a>
-                        </div>
-                    </div>
+                    <table class="table table-hover" ng-show="apps.length">
+                        <tr>
+                            <th class="name">Name</th>
+                            <th>Total records</th>
+                            <th>Total calls</th>
+                            <th class="copy text-center">Secret</th>
+                        </tr>
+                        <tr ng-repeat="app in apps"
+                            ng-class="fetching ? 'grayed':''"
+                            ng-show="deleting !== app.name" >
+
+                            <td ng-click="goToDash(app.name)" ng-bind="app.name" class="name"></td>
+                            <td ng-click="goToDash(app.name)">
+                                <span ng-bind="app.stats.records"
+                                      ng-class="!app.stats.records && app.stats.records !== 0 ? 'fa fa-circle-o-notch fa-spin' : ''">
+                                </span>
+                            </td>
+                            <td ng-click="goToDash(app.name)">
+                                <span ng-bind="app.stats.calls"
+                                      ng-class="!app.stats.calls && app.stats.calls !== 0 ? 'fa fa-circle-o-notch fa-spin' : ''">
+                                </span>
+                            </td>
+                            <td class="copy">
+                                <a class="fa copy-board text-center"
+                                   ng-class="app.secret ? (app.copied ? 'fa-check' : 'fa-clipboard') : 'fa-ellipsis-h'"
+                                   clip-copy="app.secret"
+                                   clip-click="copy(app)"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Tooltip on top">
+                                </a>
+                            </td>
+
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
+        
     </div>
-    <div class="row started-title">
-        Steps to getting started with Appbase
-    </div>
-    <div class="row getting-started">
-        <div class=" col-xs-2 ">
-            <div class="circle">1</div>
-        </div>
-        <div class=" col-xs-9 getting-started-text ">
-            Add Appbase library to your codebase and set the app credentials as they appear here.<pre><code class="language-markup">&lt;script src="https://cdn.appbase.io/2.0/appbase.js">&lt;/script></code>
-<code id="usercredentials" class="language-javascript">&lt;script>
-    Appbase.credentials("aphrodite", "4d8d0072580912343cd74aa0015cd217")
-&lt;/script></code></pre>
-        </div>
-    </div>
-    <div class="row getting-started">
-        <div class=" col-xs-2 ">
-            <div class="circle">2</div>
-        </div>
-        <div class=" col-xs-9 getting-started-text ">
-            Now let's create two Appbase references under namespaces "user" and "tweets".<pre><code class="language-javascript">var userRef = Appbase.ns("user").v("andy");
-var tweetRef = Appbase.ns("tweet").v(Appbase.uuid());</code></pre>As seen here, one can optionally specify the reference name.
-        </div>
-    </div>
-    <div class="row getting-started">
-        <div class=" col-xs-2 ">
-            <div class="circle">3</div>
-        </div>
-        <div class=" col-xs-9 getting-started-text ">
-            Now we will set some data on these references.<pre><code class="language-javascript">userRef.setData({
-    status: "sudo",
-    location: "Belo Horizonte, Brazil"
-});
-tweetRef.setData({
-    message: "Remember Red, hope is a good thing."
-});</code></pre>
-        </div>
-    </div>
-    <div class="row getting-started">
-        <div class=" col-xs-2">
-            <div class="circle">4</div>
-        </div>
-        <div class=" col-xs-9 getting-started-text ">
-            Now let's add the tweet as an edge to our user reference.<pre><code class="language-javascript">userRef.setEdge(tweetRef, 'tweeted')</code></pre>
-        </div>
-    </div>
-    <div class="row getting-started">
-        <div class=" col-xs-2 ">
-            <div class="circle">5</div>
-        </div>
-        <div class=" col-xs-9 getting-started-text ">
-            Go real-time! Listen to the changes on the user reference data properties and edges, to see the changes we have made so far. <pre><code class="language-javascript">userRef.on('properties', function(error, ref, userSnap) {
-    console.log(userSnap.properties().status);
-    console.log(userSnap.properties().location);
-});
-userRef.on('edge_added', function(error, edgeRef, eSnap) {
-    edgeRef.on('properties', function(error, ref, tweetSnap) {
-        console.log(tweetSnap.properties().message);
-    });
-});</code></pre>
-        </div>
-    </div>
-    <div class="row getting-started">
-        <div class=" col-xs-2 ">
-            <div class="circle">6</div>
-        </div>
-        <div class=" col-xs-9 getting-started-text " style='text-align: left;'>
-            Full-text smart search in two simple steps. <ol><li>Enable the search by toggling the (eye) switch in your <a href="//appbase.io/developer/#/browser"> app's</a> preferred namespace. If search is enabled, you should see an <span class='glyphicon glyphicon-eye-open'></span> icon next to the namespace.</li><li>Second and final step, use this code snippet on the enabled namespace and have a full-text search widget.</li></ol><pre><code class="language-javascript">Appbase.ns('tweet').search({text:'hello', properties: ['message']}, function(error, array) {
-    console.log(array);
-})</code></pre>
+
+    <!-- <div ng-show="!apps.length && !fetching" class="ng-hide">
+        <h1> Get started with Appbase </h1>
+    </div> -->
+
+    <div class="get-started">
+        <div class="steps">
+            <div class="col-xs-12 col-sm-4">
+                <a href="http://docs.appbase.io/#/v2.0/javascript/quick-start" target="_blank">
+                    <div class="circle api first"><span class="fa fa-rocket"></span></div>
+                </a>
+                <h2>Quick start</h2>
+                <span class="desc">Check out the Javascript quick start guide to get started with Appbase's realtime streams and search</span>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <a href=""
+                   ab-modal
+                   ab-include="/include/modal-docs.html"
+                   ab-title="Docs"
+                   ab-class="modal-examples" >
+                    <div class="circle learn">
+                        <span class="fa fa-book"></span>
+                    </div>
+                </a>
+                <h2>Docs</h2>
+                <span class="desc">Now that you have jumpstarted to Appbase, take some time to look into the docs</span>
+            </div>
+            <div class="col-xs-12 col-sm-4">
+                <a href=""
+                   ab-modal
+                   ab-include="/include/modal-examples.html"
+                   ab-title="Example Recipes"
+                   ab-class="modal-examples" >
+                    <div class="circle etc"><span class="fa fa-file-code-o"></span></div>
+                </a>
+                <h2>Example Recipes</h2>
+                <span class="desc">Check out the showcase of things built with Appbase</span>
+            </div>
         </div>
     </div>
 </div>

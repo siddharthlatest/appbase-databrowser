@@ -1,0 +1,30 @@
+<div id="share-modal" class="modal modal bootstrap-dialog modal-custom modal-examples type-primary fade size-normal" tabindex="-1" role="dialog" aria-hidden="true" ab-modal-show="$parent.sharing">
+
+	<div ng-controller="sharingCtrl" class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<div class="bootstrap-dialog-header"><div class="bootstrap-dialog-close-button" style="display: none;"><button class="close">×</button></div><div class="bootstrap-dialog-title" id="25aeb424-3c11-4dc0-8bb8-90e2ea4ae0ec_title">Collaboration</div></div>
+			</div>
+			<div class="modal-body">
+				<span ng-hide="!loading">Loading...</span>
+				<ul class="list-group" ng-show="!loading" ng-class="refreshing ? 'grayed' : ''">
+				  <li ng-repeat="user in users" class="list-group-item" ng-class="user === email ? 'disabled' : ''">
+				    <a class="badge btn-danger"
+				       ng-show="owner && user !== email"
+				       ng-click="delete(user)">&times;</a>
+				    <span ng-bind="user"></span>
+				  </li>
+				  <li class="list-group-item">
+				  	<form ng-submit="addUser()">
+				  		<input type="text"
+				  			   class="form-control"
+				  			   placeholder="{{placeholder}}"
+				  			   ng-disabled="!owner || refreshing"
+				  			   ng-model="input"/>
+				  	</form>
+				  </li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,98 @@
+<html ng-app="abDataBrowser">
+<head>
+    <title>Dashboard - Appbase.io</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="dist/old-style.css">
+</head>
+<body data-spy="scroll" data-target=".navbar">
+
+<nav id="topnav"  class="navbar navbar-fixed-top navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <div>
+                <a class="navbar-brand" href="/index.html"><img src="/developer/images/appbase.png" style="width:60px;padding-left:15px;"></a>
+            </div>
+            <div>
+                <a class="navbar-brand" href="/index.html"><img src="/developer/images/logoblue.png" style="position;padding-left:0px;"></a>
+            </div>
+            <div style="padding-right: 15px">
+                <button type="button" class="navbar-toggle" id="developer-access-icon" data-toggle="modal" data-target="#mainModal">
+                    <img src="/developer/images/key.svg" id="keySvg">
+                </button>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse" id="collapse-list">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                <li><a href="/tutorial.html"><span class="glyphicon glyphicon-cog"></span> Tutorial</a></li>
+                <li><a href="/docs/"><span class="glyphicon glyphicon-book"></span> Learn</a></li>
+                <li class="active"><a href="/developer.html"><span class="glyphicon glyphicon-log-in"></span> Developers</a></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="spacer"></div>
+<div class="page-wrapper" ng-controller="sidebar">
+    <div class="sidebar">
+        <ul class="nav nav-pills nav-stacked">
+            <li class="title">Developer Console</li>
+            <li ng-click="goToApps()" ng-class="{'active': currentScope === 'apps'}"><a href="">My Apps</a></li>
+            <li ng-click="goToBrowser()" ng-class="{'active': currentScope === 'browser'}"><a href="">Data Browser</a></li>
+            <li ng-click="goToStats()" ng-class="{'active': currentScope === 'stats'}"><a href="">Analytics</a></li>
+            <li ng-click="goToOauth()" ng-class="{'active': currentScope === 'oauthd'}"><a href="">Authentication</a></li>
+            <li ng-show="logged" class="balance">Balance</li>
+            <li ng-show="logged" class="balance-value" >
+                <div><a class="tooltipbal">
+                    <b ng-bind="code"></b>
+                    <span>
+                        Your API usage is free for now, you will be using your credits after we finalize the API pricing plan
+                    </span>
+                </a></div>
+            </li>
+            <li ng-show="(logged && affiliate)">
+                You are a partner
+            </li>
+        </ul>
+    </div>
+
+    <div class="page-content-wrapper">
+        <div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div ng-view></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="dist/vendor.min.js"></script>
+<script src="https://cdn.appbase.io/2.0/appbase.min.js"></script>
+<script src="https://cdn.appbase.io/2.0/ng-appbase.js"></script>
+<script src="dist/main.js"></script>
+
+<!-- <script type="text/javascript" src="/developer/js/jquery.js"></script>
+<script src="./js/lib/angular.min.js" type="application/javascript" ></script>
+<script src="./js/lib/angular-animate.min.js" type="application/javascript"></script>
+<script src="./js/lib/angular-route.min.js" type="application/javascript"></script>
+<script src="./js/lib/atomic.js"></script>
+<script src="./js/lib/ng-breadcrumbs.js"></script>
+<script src="./js/lib/ngDialog.min.js"></script>
+<script src="/developer/js/bootstrap.min.js"></script>
+<script src="https://cdn.appbase.io/2.0/appbase.min.js"></script>
+<script src="https://cdn.appbase.io/2.0/ng-appbase.js"></script>
+<script src="./js/dist/main.js"></script>
+<script type="text/javascript" src="/developer/js/prism.js"></script>
+<script src="/developer/js/raphael-min.js"></script>
+<script src="/developer/js/morris.min.js"></script>
+<script src="/developer/js/angular.easypiechart.min.js"></script> -->
+
+</body>
+</html>

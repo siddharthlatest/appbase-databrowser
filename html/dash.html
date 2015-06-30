@@ -1,0 +1,71 @@
+<ng-include src="'/developer/html/manage.html'"></ng-include>
+<div class="col-xs-12" id="stats">
+	<div ng-show="data.noData" class="no-data">
+		<div class="sad">:(</div>
+		<span>No data to display.</span>
+	</div>
+	<div ng-show="!data.noData">
+		<div class="col-xs-12 col-md-8 wellp">
+			<h2 class="graph-title">Usage</h2>
+			<ul class="nav-tab">
+			  <li>
+			  	<a ng-click="!(data.strike.week || data.strike.month || data.graphActive === 'week') && graph('week')"
+			  	   ng-class="{'active': data.graphActive === 'week', 'strike': data.strike.week || data.strike.month}">
+					Week
+			  	</a></li>
+			  <li>
+			  	<a ng-click="!(data.strike.month || data.graphActive === 'month') && graph('month')"
+			  	   ng-class="{'active': data.graphActive === 'month', 'strike': data.strike.month}"> Month
+			  	</a></li>
+			  <li><a ng-click="(data.graphActive !== 'all') && graph('all')"
+			         ng-class="{'active': data.graphActive === 'all'}"> All
+			  </a></li>
+			</ul>
+			<div class="graph">
+				<highchart id="chart1" config="data.chartConfig"></highchart>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-4">
+			<div class="wellp usage">
+				<div class="plan">
+					<h3>API Calls</h3>
+					<span>
+						<text ng-bind="commas(data.chart.month)"></text>
+						/
+						<text ng-bind="commas(data.cap)"></text>
+					</span>
+					<div class="progress">
+					  <div class="progress-bar"
+					  	   role="progressbar"
+					  	   ng-style="{width: (data.chart.month*100/data.cap) + '%' }">
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xs-12 col-md-4 push">
+			<div class="wellp usage">
+				<div class="plan">
+					<div>
+						<h3 ng-switch="version">
+							<text ng-switch-when="3">Documents</text>
+							<text ng-switch-when="2">Vertices</text>
+						</h3>
+						<span ng-bind="commas(data.vert)"></span>
+						<span ng-show="!data.vert" class="ng-hide">0</span>
+					</div>
+					
+					<div>
+						<h3 ng-switch="version">
+							<text ng-switch-when="3">References</text>
+							<text ng-switch-when="2">Edges</text>
+						</h3>
+						<span ng-bind="commas(data.edges)"></span>
+						<span ng-show="!data.edges" class="ng-hide">0</span>
+					</div>
+				
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

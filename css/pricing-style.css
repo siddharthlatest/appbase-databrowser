@@ -1,0 +1,127 @@
+.container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+   	margin-bottom: 100px;
+}
+
+.pr-container{
+	font-family: sanspro;
+	text-align: center;
+}
+
+.pr-boxes{
+	width: 100%;
+	margin: 80px 0 40px;
+	text-align: center;
+}
+
+.pr-boxes>div{
+	display: inline-block;
+}
+
+.pr-rectangle{
+	width: 250px;
+	float:left;
+	border-bottom: 1px solid #ccc;
+	border-top:5px solid rgb(41, 120, 176);
+	font-size:0.8em;
+}
+
+.pr-rectangle ul {
+	padding: 0;
+}
+
+.pr-rectangle ul li{
+	list-style: none;
+}
+
+.pr-rectangle ul li b{
+	font-family: corbert;
+	font-size: 1.1em;
+}
+
+.pr-rectangle .price{
+	font-size: 1.6em;
+	font-family: corbert;
+	font-weight: bold;
+}
+
+
+
+.price-mo:after{
+	font-size: 0.6em;
+	font-family: sanspro;
+	content:'/mo';
+}
+
+.pr-rectangle .pr-best-value{
+	margin-bottom: 10px;
+	font-size:1em;
+	font-style: italic;
+}
+
+.pr-best{
+	border: 1px solid #ccc;
+	border-top:8px solid #2AD37A;
+	margin-top:-40px;
+	padding:30px 10px;
+	font-size: 0.85em;
+}
+
+.pr-first div{
+	border-left:1px solid #ccc;
+	height: 100%;
+	padding: 10px;
+	width: 100%;
+}
+
+.pr-after div{
+	border-right:1px solid #ccc;
+	height: 100%;
+	padding: 10px;
+	width: 100%;
+}
+
+.pr-title{
+	font-size: 1.6em;
+}
+.pr-sub{
+	font-size: 1.100em;
+}
+
+.pr-text{
+	font-size: 0.9em;
+	text-align: center;
+	padding: 0 10vw;
+}
+.pr-text p{
+	text-align: justify;
+	padding-top:20px;
+}
+
+.pr-text p br{
+	content:" ";
+	display: block;
+	margin:15px 0;
+}
+.pr-text span{
+	font-size: 1.2em;
+}
+.pr-text .i{
+	font-style: italic;
+}
+
+.pr-beg{
+	margin-top: 100px;
+	margin-bottom: 20px;
+}
+
+
+.pr-info{
+	background-image: url(/images/info.png);
+	background-size:100% auto;
+	height: 87vw;
+	margin:60px 0;
+}

@@ -1,0 +1,88 @@
+/*-------------------------------Navigation-------------------------------*/
+a:hover{
+	color: rgb(41, 120, 176) !important;
+}
+a:focus{
+	color: rgb(88, 87, 89) !important;
+}
+a:active{
+	color: rgb(41, 120, 176) !important;
+}
+#topnav{
+	opacity: 0.9;
+}
+.navbar .container{
+	width: 97%;
+	padding: 0px;
+	display: table;
+}
+.navbar-header{
+	display: table;
+	width: 100%;
+}
+
+.navbar-header > div{
+	display: table-cell;
+	vertical-align: middle;
+}
+.navbar-header, .navbar-brand{
+	padding: 0px !important;
+	margin: 0px !important;
+}
+.navbar button{
+	margin: 0px;
+}
+
+.navbar {
+	border-bottom: 1em solid rgb(41, 120, 176);
+}
+.navbar .nav > li > a {
+	padding: 5px 10px 5px;
+	float: none;
+	text-decoration: none;
+	text-shadow: none;
+	font-size:14px;p
+	font-wight:bold;
+	text-transform:uppercase;
+}
+.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
+	color: rgb(41, 120, 176) !important;
+	background: none;
+	border-top: 1px solid rgb(41,120,176);
+}
+
+@media screen and (min-width: 768px){
+	#collapse-list{
+		display: table-cell !important;
+		vertical-align: middle;
+		padding-right: 15px;
+	}
+	.container{
+		display: block;
+	}
+}
+@media screen and (max-width: 991px){
+	.navbar .nav > li > a {
+		padding: 5px 7px 5px;
+		font-size: 0.95em;
+	}
+	#collapse-list{
+		width: 70%;
+	}
+}
+@media screen and (max-width: 768px){
+	.navbar .nav > li > a{
+		padding: 20px 7px 15px;
+	}
+	#collapse-list{
+		width: 100%;
+		margin: 0px;
+	}	
+	#landing h1{
+		font-size: 1.5em;
+	}
+	#landing{
+		font-size: 1.8em !important;
+	}
+}
+/*-------------------------------Navigation-------------------------------*/

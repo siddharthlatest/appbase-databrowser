@@ -1,0 +1,61 @@
+<div id="manage" ng-controller="topnav" class="man-show">
+  <div class="container-fluid">
+    <div class="title">
+        <a ng-href="/developer/apps">
+        <span ng-bind="devProfile.firstname"></span><span ng-show="devProfile.firstname" class="ng-hide">'s</span>
+        Applications</a> / <span ng-bind="routeParams.app"></span>
+        <div class="right-tools">
+            <text ng-show="version" class="ng-hide">v</text><span ng-bind="version"></span>
+            <a href="" ng-click="share(routeParams.app)" class="delete share">Share</a>
+            <a href=""
+               ab-modal
+               ab-callback="deleteApp"
+               ab-title="Delete app"
+               ab-message="Are you sure you want to delete <span class='bold'>{{routeParams.app}}</span>?<br>Enter the app name to confirm.<br><br>"
+               ab-validate="routeParams.app"
+               ab-input="true"
+               class="delete">Delete</a>
+        </div>
+    </div>
+    <nav class="navbar">
+
+    	<ul class="nav navbar-nav navbar-left">
+            <li>
+                <a ng-href="/developer/{{routeParams.app}}/dash"
+                   ng-class="{active: where === 'dash'}">
+                   Dashboard
+                </a>
+            </li>
+
+    		<li>
+                <a ng-href="/developer/{{routeParams.app}}/browser"
+                   ng-class="{active: where === 'browser'}">
+                    Data Browser
+                </a>
+            </li>
+
+    		<li>
+                <a ng-href="/developer/{{routeParams.app}}/oauth"
+                   ng-class="{active: where === 'oauth'}">
+                    Authentication
+                </a>
+            </li>
+    	</ul>
+        <ul class="nav navbar-right">
+            <li>
+                <span class="fa fa-lock"></span> Secret:
+                <span class="secret" ng-show="!secretShown" ng-click="secretShown = true">
+                    <span ng-click="secretShown = true">
+                    <span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span><span class="fa fa-circle"></span>
+                    </span>
+                </span>
+                <span class="secret" ng-show="secretShown">
+                    <span ng-bind="secret" ng-click="secretShown = false"></span>
+                    <a href="" clip-copy="secret">Copy</a>
+                    </span>
+                </span>
+            </li>
+        </ul>
+    </div>
+  </div>
+</div>

@@ -1,31 +1,36 @@
-<div class="col-md-12 st-tab">
-	<ul class="nav nav-tabs" role="tablist">
-		<li ng-repeat="(name, obj) in apps | orderBy : name" ng-class="{'active': name===app}" repeat-end="app">
-			<a href="" ng-bind="name" ng-click="switch(name)"></a>
-		</li>
-	</ul>
-</div>
-<div class="col-md-12 oa-tab">
+<ng-include src="'/developer/html/manage.html'"></ng-include>
+<div class="col-xs-12 oa-tab" id="oauth">
 	<div class="list">
 		<div class="col-md-4">
-			<h4>Authorized domains</h4>
-			<p>Only the domains listed here are allowed to make an oauth request on behalf of this app. You should add a domain here if you are planning to use it for user requests.</p>
-			<p>Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.</p>
-			<p>
-			  <u>Correct examples:</u>
-			  <br>https://domain.com, http://domain.com:3254, abc.domain.com
-			  <br><u>Incorrect Examples:</u>
-			  <br>domain.com/foobar/this
-			</p>
-			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
-			<div ng-hide="status" ng-class="{overlay: loading}">
+			<div class="wellp">
+			<h2>Expiry time</h2>
+			<p>Token expiration, from 60 minutes to 90 days. <span data-toggle="tooltip" ab-tooltip data-placement="right" title="60m (60 minutes), 1d (1 day), 1w (1 week)" class="example">Example</span></p>
+			<div ng-class="{overlay: loading}">
+				<form ng-submit="updateExpiry(timeInput)">
+					<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">
+						<input type="text" class="form-control" placeholder="Current value: {{readTime(expiryTime)}}" ng-model="timeInput"/>
+					</div>
+					<div class="oa-dom-input-btn oa-expiry " ng-show="timeInput">
+						<button type="submit" class="form-control btn btn-success" ng-disabled="!validate(timeInput)"><span></span></button>
+					</div>
+				</form>
+			</div>
+			</div>
+			<div class="wellp">
+			<h2>Domains
+				<span class="fa fa-info-circle" data-toggle="tooltip" ab-tooltip data-placement="right" title="Domains 'localhost' and '127.0.0.1' enabled by default for local development and testing, you don't need to add them.">
+				</span>
+			</h2>
+			<p>Domains allowed to make oauth requests. <span data-toggle="tooltip" ab-tooltip data-placement="right" title="Correct: https://domain.com, http://domain.com:3254, abc.domain.com
+			  Incorrect: domain.com/foobar/this" class="example">Example</span></p>
+			<div ng-class="{overlay: loading}">
 				<ul class="list-group oa-dom">
 				<form ng-submit="addDomain(domainInput)">
-					<li ng-repeat="domain in domains" class="list-group-item oa-dom-item">
+					<li ng-repeat="domain in domains | filter:'!'+'127.0.0.1' | filter:'!'+'localhost'" class="list-group-item oa-dom-item">
 						<span class="badge btn-danger" ng-click="removeDomain(domain)">&times;</span>
 						<div class="domain"><span ng-bind="domain"></span></div>
 					</li>
-					<li ng-if="!domains.length" class="list-group-item empty-list"><i>No domains added</i></li>
+					<li ng-if="domains.length<=2" class="list-group-item empty-list"><i>No domains added</i></li>
 					<li class="list-group-item oa-dom-input form-inline">
 						<div class="oa-dom-input-inpt" ng-class="{exp:domainInput.length}">
 							<input type="text" class="form-control" placeholder="Add domain..." ng-model="domainInput"/>
@@ -37,39 +42,15 @@
 				</form>
 				</ul>
 			</div>
-			<div>
-			<h4>Expiry time</h4>
-			<p>Choose a value from 60 minutes to 90 days.</p>
-			<p>
-				<u>Examples:</u>
-				<br>60m (60 minutes), 1d (1 day), 1w (1 week)
-			</p>
 			</div>
-			<div ng-bind="status" class="oa-dom" ng-show="status"></div>
-			<div ng-hide="status" ng-class="{overlay: loading}">
-				<ul class="list-group oa-dom">
-				<form ng-submit="updateExpiry(timeInput)">
-					<li class="list-group-item empty-list"><i>Current value: <span ng-bind="readTime(expiryTime)"></span></i></li>
-					<li class="list-group-item oa-dom-input form-inline">
-						<div class="oa-dom-input-inpt" ng-class="{exp:timeInput.length, 'has-error':(timeInput.length && !validate(timeInput)), 'has-success':(timeInput.length && validate(timeInput))}">
-							<input type="text" class="form-control" placeholder="Expiry time..." ng-model="timeInput"/>
-						</div>
-						<div class="oa-dom-input-btn oa-expiry" ng-show="timeInput">
-							<button type="submit" class="form-control btn btn-success" ng-disabled="!validate(timeInput)"><span></span></button>
-						</div>
-					</li>
-				</form>
-				</ul>
-			</div>
-			<br>
 		</div>
-		<div class="col-md-8">
-		  <h4>Provider settings</h4>
+		<div class="col-md-8 wellp" id="provider">
+		  <h2>Provider settings</h2>
 			<div ng-bind="provStatus" class="oa-dom" ng-show="provStatus"></div>
 			<div ng-hide="provStatus || editing" ng-class="{overlay: loadingProv}">
 				<ul class="list-group oa-dom">
 					<li class="list-group-item oa-prov" ng-repeat="provider in providers | orderBy:sorter:true">
-						<img ng-src="{{provider.logo}}" style="width: auto"/>
+						<img ng-src="{{provider.logo}}" />
 						<span ng-bind="provider.name"></span>
 						<button ng-hide="userProviders[provider.provider]" ng-click="add(provider)" class="btn btn-success">Add</button>
 						<button ng-show="userProviders[provider.provider]" ng-click="removeProvider(provider.provider)" class="btn btn-danger">Remove</button>
@@ -80,49 +61,47 @@
 			<div ng-show="editing && !provStatus" ng-class="{overlay: loadingProv}" class="oa-ed-prov">
   			<div class="oa-edit-btn">
           <ul class="list-inline">
-            <li><img ng-src="{{provider.logo}}" style="width: auto"/></li>
+            <li><img ng-src="{{provider.logo}}"/></li>
             <li><h3 ng-bind="provider.name"> </h3></li>
+			<li>
+				<a ng-href="{{provider.href.apps}}" class="label label-danger">Applications</a>
+				<a ng-href="{{provider.href.docs}}" class="label label-info">Documentation</a>
+			</li>
             <li class="pull-right"><button class="btn btn-warning" ng-click="cancel()">Cancel</button></li>
             <li class="pull-right"><button class="btn btn-success" ng-click="done()">Done</button></li>
           </ul>
         </div>
-				<div>
-					<p>Find your applications on <span ng-bind="provider.name"></span> <a ng-href="{{provider.href.apps}}">here</a>.</p>
-					<p>Find <span ng-bind="provider.name"></span>'s documentation <a ng-href="{{provider.href.docs}}">here</a>.</p>
-				</div>
-				<hr>
-				<div class="bs-callout">
-          <h4>Authorize the following domain and the callback in your app's settings on <span ng-bind="provider.name"></span>.</h4>
-          <p>This will allow Appbase to interact with the provider server and retirve the 
-          access tokens for you, which will be available in the API for use.</p>
+		<div class="bs-callout">
+          <span class="provider-title">Authorize this domain and URL in your app's settings on <span ng-bind="provider.name"></span>.</span>
+          <span class="fa fa-info-circle" title="This will allow Appbase to interact with the provider server and retirve the access tokens for you, which will be available in the API for use." data-toggle="tooltip" ab-tooltip data-placement="left"></span>
           <form class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-2 control-label" style="font-size: 1em">Callback URL: </label>
-              <div class="col-sm-10">
-                <label class="control-label" style="font-size: 1.1em" ng-bind="callbackURL" />
+              <label class="col-sm-3 control-label">Callback URL</label>
+              <div class="col-sm-9">
+                <label class="control-label" ng-bind="callbackURL" />
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-2 control-label" style="font-size: 1em">Domain: </label>
-              <div class="col-sm-10">
-                <label class="control-label" style="font-size: 1.1em" ng-bind="callbackDomain"/>
+              <label class="col-sm-3 control-label" >Domain</label>
+              <div class="col-sm-9">
+                <label class="control-label" ng-bind="callbackDomain"/>
               </div>
             </div>
           </form>
         </div>
         <hr>
         <div class="bs-callout">
-          <h4>Enter your application's keys.</h4>
+          <span class="provider-title">Enter your application's keys.</span>
           <form class="form-horizontal">
             <div class="form-group">
-              <label class="col-sm-2 control-label" style="font-size: 1em">Client ID</label>
-              <div class="col-sm-10">
+              <label class="col-sm-3 control-label" >Client ID</label>
+              <div class="col-sm-9">
                 <input type="text" class="form-control" placeholder="Enter your client ID" ng-model="clientID">
               </div>
             </div>
             <div class="form-group">
-              <label class="col-sm-2 control-label" style="font-size: 1em">Client Secret</label>
-              <div class="col-sm-10">
+              <label class="col-sm-3 control-label" >Client Secret</label>
+              <div class="col-sm-9">
                 <input type="text" class="form-control" placeholder="Enter your client secret" ng-model="clientSecret">
               </div>
             </div>

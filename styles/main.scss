@@ -1,0 +1,1527 @@
+@import "../../styles/variables.scss";
+
+/************************
+* Colors for the browser icons
+************************/
+$db-add: darken($green, 5%);
+$db-add-hover: lighten($db-add, 6%);
+
+$db-remove: #ff4136;
+$db-remove-hover: lighten($db-remove, 10%);
+
+$db-search-on: $db-add; 
+$db-search-on-hover: $db-add-hover;
+
+$db-search-off: $db-remove;
+$db-search-off-hover: $db-remove-hover;
+
+$db-search-cog: #ff851b;
+$red: lighten(#d9534f, 3%); 
+
+$perfect-orange: #f47c3c;
+$rip-good-orange: #aaa;
+
+$navbar-height: 60px;
+$logo-height: 35px;
+
+$apps-bg: #f3f3f3;
+$manage-height: 108px;
+
+body {
+	background-color: $apps-bg;
+	color: #555;
+}
+
+#intercom-container .intercom-launcher-button {
+	// background-color: #bbb!important;
+	// border-color: #bbb!important;
+	opacity: 0.3!important;
+	transition: opacity 0.2s ease!important;
+	&:hover {
+		opacity: 1!important;
+	}
+}
+
+.intercom-powered-by-container {
+	visibility: hidden;
+}
+
+#intercom-container .intercom-powered-by-enabled .intercom-composer {
+	bottom: 20px!important;
+}
+#intercom-container .intercom-sheet-content-container {
+	padding-bottom: 130px!important;
+}
+
+@keyframes copied {
+	0% {
+		color: $green
+	}
+	100% {
+		color: #428bca
+	}
+}
+@keyframes slideOutLeft {
+	100% {
+		display: none;
+	}
+	to {
+		opacity: 0;
+	}
+}
+@keyframes slideInRight {
+	from 	{ opacity: 0.5; }
+	to 		{ opacity: 1; }
+}
+@keyframes slideIn {
+	from 	{ transform:translateX(50%); }
+	to 		{ transform: translateX(0); }
+}
+@keyframes slideOut {
+	from 	{ transform:translateX(0); }
+	to 		{ transform: translateX(50%); }
+}
+
+@keyframes added {
+	0% 	{ color: $blue; }
+	50% { color: darken($green, 20%); }
+	100% {color: $blue; }
+}
+
+@keyframes removed {
+	0% 	{ color: $blue; }
+	50% { color: red }
+	100% {color: $blue; }
+}
+
+@keyframes mod {
+	0% 	{ color: $blue; }
+	50% { color: $perfect-orange }
+	100% {color: $blue; }
+}
+
+@keyframes propModify {
+	0% 	{ background-color: $rip-good-orange }
+	50% { background-color: $perfect-orange }
+	100% { background-color: $rip-good-orange }
+}
+
+@keyframes propModifyB {
+	0% 	{ border-color: $rip-good-orange }
+	50% { border-color: $perfect-orange }
+	100% { border-color: $rip-good-orange }
+}
+
+@media screen and (min-width: 1800px){
+	.col-hg-4 {
+		width: 33.3333333%;
+		padding:0;
+	}
+	.col-hg-4.one {
+		width: 50%;
+	}
+	#applications .well .bar a{
+		padding:0;
+	}
+}
+
+.load-wrap{
+	position: fixed;
+	width: 100vw;
+	z-index: 10;
+}
+.loading-line {
+	position: relative;
+	height: 3px;
+	background: $dark-blue;
+	width: 0;
+}
+.loading-tip {
+	position: relative;
+	left: -50px;
+	top: -15px;
+	width: 40px;
+	height: 3px;
+	color: transparent;
+	content: 'a';
+	background: $dark-blue;
+	box-shadow: $blue 4px 0 6px 1px;
+	display: inline-block;
+}
+
+.ng-enter {
+	animation: slideInRight 0.3s both ease-out;
+}
+
+.ng-leave {
+	animation: none;
+} 
+
+#nav.ng-enter, #nav.ng-leave,
+.footer.ng-enter, .footer.ng-leave,
+#oauth.ng-leave,  #stats.ng-leave,
+#sidebar.ng-enter,  #sidebar.ng-leave,
+#browser.ng-enter,  #browser.ng-leave{
+	animation: none;
+}
+
+#manage {
+	position: absolute;
+	width: 100%;
+}
+
+#manage.man-hide {
+	top: -200vh;
+}
+
+.man-show {
+	top: 0;
+}
+
+.view-wrapper, body {
+	height: 100%;
+}
+
+.view-wrapper {
+	$others: $navbar-height + $footer-height;
+	min-height: calc(100vh - 170px);
+}
+#nav {
+	position: fixed;
+	width: 100%;
+	top: 0;
+	z-index: 10;
+}
+
+.footer {
+	position: relative;
+	z-index: 2;
+}
+
+body {
+	padding-top: ($navbar-height) - 2px;
+}
+
+#sidebar {
+	font-family: $font-regular;
+	font-size: 1.2em;
+	padding: 0;
+	background-color: #eee;
+	height: 100%;
+	position: fixed;
+	left:0;
+	z-index: 0;
+	padding-top: 10vh;
+	ul {
+		li {
+			text-align: center;
+			a {
+				color: white;
+				&:hover {
+					background-color: transparent;
+					text-shadow: 0px 0px 1px rgba(255,255,255,0.6);
+				}
+				&.active {
+					background-color: #666;
+				}
+				&:not(.active) {
+					color: #666;
+				}
+			}
+			&.balance {
+				text-align: center;
+				width: 100%;
+				color: white;
+				position: absolute;
+				bottom: $footer-height*2;
+
+				.title {
+					font-family: $font-light;
+					letter-spacing: 2px;
+					font-size: 0.85em;
+				}
+
+				.value {
+					font-family: $font-extra-light;
+					font-size: 2.5em;
+				}
+			}
+		}
+	}
+}
+
+#view {
+	padding-left: 0;
+	padding-right: 0;
+	div[ng-view] {
+		margin-top: $manage-height;
+		//min-height: calc(100vh - #{$navbar-height + $footer-height + $manage-height + 30px});
+	}
+}
+
+.grayed {
+	opacity: 0.5;
+}
+
+#applications {
+	margin-top: -$manage-height;
+	font-family: $font-extra-light;
+	margin-bottom: 50px;
+	.main-title {
+		text-align: center;
+		font-family: $font-extra-light;
+		font-size: 2.8em;
+		color: #666;
+		padding: 30px 0 15px;
+	}
+
+	.loading {
+		line-height: 100px;
+		text-align: center;
+	}
+
+	.fetching {
+		position: absolute;
+		left: 50%;
+		top: 40px;
+		width: 100px;
+		height: 100px;
+		line-height: 100px;
+		color: #ddd;
+		font-size: 2em;
+		.ab-spin {
+			animation: fa-spin 1s infinite ease-in-out;
+		}
+	}
+
+	.create-app {
+		transition: margin-left 0.3s ease;
+	}
+
+	.desc {
+		font-size: 1.2em;
+	}
+
+	.well {
+		.copy-board {
+			font-size: 1em;
+			color: #777;
+
+		}
+		.copy-board.fa-check {
+			color: $green;
+			font-size: 1.2em;
+			transition: all 0.5s ease-out;
+		}
+
+		table th {
+			font-family: $font-semi-bold;
+			cursor: default;
+			text-align: center;
+		}
+
+		table th.name {
+			text-align: left;
+		}
+
+		table tr td{
+			user-select: none;
+			cursor: pointer;
+		}
+
+		table tr td.name{
+			text-align: left!important;
+		}
+
+		table tr:first-child:hover {
+			&>td, &>th {
+				background-color: white;
+			}
+		}
+
+		td {
+			.popover {
+			  position: relative;
+			  display: block;
+			  margin: 20px;
+			}
+		}
+
+		background-color: #fdfdfd;
+		box-shadow: 1px 1px 1px #dedede;
+		border:none;
+		margin: 30px;
+		padding: 25px 30px 15px;
+		border-radius: 5px;
+		color: #000;
+		min-height: 170px;
+		.tip {
+			text-align: center;
+			line-height: 30px;
+			height: 30px;
+			.text-info {
+				color: #888;
+			}
+		}
+		label.empty {
+			background-color: #ccc;
+			height: 15px;
+
+			margin: 10px 0;
+		}
+
+		@media screen and (min-width: 992px) and (max-width: 1190px) {
+		    margin: 10px 3px;
+		    padding: 25px 20px 15px;
+		    .tip {
+		    	font-size: 0.8em;
+		    }
+		}
+
+		@media screen and (min-width: 1190px) and (max-width: 1285px) {
+		    margin: 10px 3px;
+		    padding: 25px 20px 15px;
+		}
+
+		// @media screen (max-width: 1190px) {
+		//     margin: 10px;
+		//     padding: 20px 
+		// }
+
+		input {
+			border: none;
+			&:not([readonly]){
+				text-align: center;
+			}
+			&[readonly] {
+				background-color: #e5e5e5;
+				cursor: default;
+			}
+		}
+
+		.bar {
+			margin-top: -4px;
+			$bar_blue: #50BAEF;
+			$bar_light: lighten($bar_blue, 9%);
+			&>a {
+				transition: color 0.2s ease-out;
+				display: block;
+				height: 51px;
+				&>div {
+					margin: -30px auto 0;
+				}
+				&:hover {
+					cursor: pointer;
+					color: $bar_blue;
+					svg .icon {
+						fill: $bar_light;
+					}
+				}
+			}
+			.empty {
+				background-color: $blue;
+				width: 50px;
+				height: 10px;
+				margin-top: -25px;
+				&.auth, &.dbrowser{
+					width: 70px;
+				}
+			}
+			// temporary fix
+			svg {
+				position: relative;
+				.icon {
+					fill: $bar_blue;
+					transition: fill 0.2s ease-out;
+				}
+			}
+			.dbrowser { top:  0px; left: -1px }
+			.share    { top: -4px; left: 1px  }
+			.auth     { top: -5px; left: -1px }
+			.analytic { top: -3px; left: -4px }
+
+
+		}
+
+		button, a {
+			&#createuserapp {
+				background-color: $green;
+				border: none;
+				box-shadow: none;
+				&:hover {
+					background-color: lighten($green, 5%);
+				}
+				&:active {
+					background-color: darken($green, 5%);
+				}
+			}
+
+			&.manage, &.delete {
+				color: white;
+				font-family: $font-light;
+				text-transform: uppercase;
+			}
+
+			&.manage {
+				background-color: $blue;
+				&:hover {
+					background-color: lighten($blue, 5%);
+				}
+				&:active {
+					background-color: darken($blue, 10%);
+				}
+			}
+
+			&.delete {
+				background-color: $red;
+				&:hover {
+					background-color: lighten($red, 5%);
+				}
+				&:active {
+					background-color: darken($red, 10%);
+				}
+			}
+		}
+
+		.manage-button {
+			text-align: right;
+		}
+	}
+
+	.create-app [ng-model="newAppname"] {
+		background-color: #f3f3f3;
+	}
+
+	.get-started {
+		font-family: $font-extra-light;
+		.title {
+			text-align: center;
+			font-size: 2em;
+			color: #666;
+			margin-top: 20px;
+		}
+		.steps {
+			$circle-size: 150px;
+			$circle-color: #aaa;
+			// fa-book
+			// fa-check-square-o
+			// fa-ellipsis-h
+			div {
+				text-align: center;
+				margin-top: 30px;
+				.circle {
+					transition: all 0.3s ease;
+					line-height: $circle-size;
+					background-color:#fbfbfb;
+					margin: 0 auto;
+					width: $circle-size;
+					height: $circle-size;
+					border-radius: $circle-size/2;
+					border: 1px solid lighten($circle-color, 15%);
+					color: $circle-color;
+					font-size: $circle-size/2.2;
+					&:not(.first):after {
+						position: absolute;
+						top: $circle-size/8;
+						left: 0;
+						font: normal normal normal 14px/1 FontAwesome;
+						font-size: 1.5em;
+						content:'\f105';
+						color: lighten($circle-color, 20%);
+					}
+					&:hover {
+						color: white;
+					}
+					&:hover.learn {
+						background-color: $db-remove;
+						border-color: darken($db-remove, 10%);
+					}
+					&:hover.api {
+						background-color: $db-add;
+						border-color: darken($db-add, 10%);
+					}
+					&:hover.etc {
+						background-color: $db-search-cog;
+						border-color: darken($db-search-cog, 10%);
+					}
+
+				}
+  			}
+		}
+		
+	}
+}
+
+#manage {
+	font-family: $font-regular;
+	font-size: 1.1em;
+	height: $manage-height;
+	background-color: $apps-bg;
+
+	.title {
+		margin-left: 30px;
+		position: inline;
+		line-height: 50px;
+	}
+	.right-tools {
+		position: inline;
+		float: right;
+	}
+
+	.right-tools span {
+		margin-right: 10px;
+		color: #777;
+		font-size: 0.9em;
+		cursor: default;
+	}
+
+	.navbar {
+		position: absolute;
+		width: 100%;
+		margin:0 -15px;
+		border-radius: 0;
+		border: 0;
+		border-top: 1px solid #ddd;
+		border-bottom: 1px solid #ddd;
+		background: white;
+	}
+	.delete {
+		color: red;
+		text-decoration: underline;
+		font-size: 1em;
+		&:hover {color: lighten(red, 25%)}
+	}
+
+	.share {
+		color: $dark-blue;
+		margin-right: 10px;
+		&:hover {color: $blue}
+	}
+
+	.secret {
+		color: $blue;
+		display: inline-block;
+		font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+		font-size: 15px;
+		min-width: 350px;
+		span span {font-size: 10px; margin-left: 3px; opacity: 0.6; color: darken($blue, 17%)}
+		a { font-family: $font-regular; text-decoration: underline; color: $blue }
+		a:active, a:focus, a:hover, a:visited { border:0; outline: 0; color: $blue }
+		a.zeroclipboard-is-active { color: darken($green, 2%)!important }
+		a:not(.zeroclipboard-is-active) { transition: color 1.5s ease }
+		span { cursor: pointer; }
+	}
+
+	.navbar-left {
+		margin-left: 30px;
+	}
+	.navbar-left a{
+		padding: 9px 11px;
+		margin: 9px;
+		border-radius: 4px;
+		color: #555;
+
+		&.active, &:hover {
+			color: white;
+			background: #555;
+		}
+	}
+	.navbar-right {
+		color: #999;
+		line-height: 56px;
+		font-family: $font-light;
+	}
+}
+
+#browser {
+	background-color: white;
+	padding: 0 15px;
+	min-height: calc(100vh - 200px);
+	.node {
+		.status {
+			color: #666;
+		}
+		a.node-name {
+			transition: color 0.5s;
+			//color: lighten(#428bca, 15%);
+			color: lighten($dark-blue, 10%);
+			&.added {
+				animation: added 1s ease;
+			}
+			&.removed {
+				animation: removed 1s ease;
+			}
+			&.mod {
+				animation: mod 1s ease;
+			}
+			&.expanded {
+				color: darken(#428bca, 15%);
+			}
+		}
+		.node-options-list {
+
+			display:inline;
+			.node-options {
+				transition: opacity 0.5s;
+				cursor: pointer;
+				margin: 0 4px;
+				color: #888;
+				opacity: 0.5;
+				&:hover {
+					color: #222;
+					opacity: 1;
+				}
+				&.fa-plus{
+					color: $db-add;
+				}
+				&.fa-remove{
+					color: $db-remove;
+				}
+				&.fa-eye{
+					transition: color 0.2s ease-in-out;
+					color: $db-search-on;
+				}
+				&.fa-eye-slash{
+					transition: color 0.2s ease-in-out;
+					color: $db-search-off;
+				}
+				&.fa-cog {
+					transition: color 0.2s ease-in-out;
+					color: $db-search-cog;
+				}
+				&.fa-pencil-square-o {
+					position: relative;
+					top: 2px;
+					color: $db-add;
+				}
+			}
+			padding-left: 10px;
+			.label {
+				position: relative;
+				top: -1px;
+				cursor: default;
+				user-select: none;
+				padding: 0 2px 1px 3px; //top right bottom left
+				border: 0.2em solid #f0ad4e;
+				border-radius: 15px;
+				color: white;
+				font-family: $font-regular;
+				transition: color 0.2s;
+				&:hover {
+					color: #f0ad4e;
+					background: white;
+					font-family: $font-bold;
+					border: 0.2em solid #f0ad4e;
+				}
+			}
+		}
+		.expand {
+			position: relative;
+			top:3px;
+			margin-right: 2px;
+			color: #666;
+			font-size: 1.5em;
+			cursor: pointer;
+			transition: transform 0.2s ease-in-out;
+		}
+		.contract {
+			transform: rotate(90deg);
+			margin-right: 7px;
+		}
+		.fa {
+			position: relative;
+			top: 1px;
+			&.fa-plus {
+				margin-right: 4px;
+			}
+		}
+	}
+	.propertiesBox {
+		margin-top:7px;
+		width: 65%;
+		.panel.mod{
+			animation: propModifyB 1s ease;
+			.panel-heading {
+				animation: propModify 1s ease;
+			}
+		}
+
+		.panel {
+			border-color: $rip-good-orange;
+			.panel-heading {
+				background: $rip-good-orange;
+				padding: 5px 15px;
+				.panel-title {
+					font-family: $font-bold;
+					font-size: 0.8em;
+					color: white;
+					text-transform: uppercase;
+					.fa {
+						cursor: pointer;
+						position: relative;
+						left: 5px;
+						top:0;
+						font-size: 0.9em;
+						&:hover {
+							opacity: 0.85;
+						}
+					}
+				}
+			}
+			.panel-body {
+				color: #aaa;
+				font-size: 0.9em;
+				padding: 5px 15px;
+				input {
+					font-family: $font-regular;
+					color: black;
+					min-width: 10px;
+					width: auto;
+					border:none;
+				}
+				.fa {
+					cursor: pointer;
+					transition: color 0.2s ease;
+					margin-right: 10px;
+					&.fa-cog {
+						color: $db-search-cog;
+						margin-right: 9px;
+					}
+					&.fa-remove {
+						&:hover {
+							color: $db-remove;
+						}
+					}
+					&.fa-pencil {
+						&:hover {
+							color: $db-search-cog;
+						}
+					}
+				}
+				span {
+					font-family: $font-regular;
+					color: black;
+				}
+			}
+		}
+	}
+	.breadcrumb {
+		background-color: #ccc;
+		border-radius: 0;
+		color: #222;
+		margin-bottom: 0;
+		margin-left: -15px;
+		margin-right: -15px;
+		.active {
+			color: white;
+		}
+		&> li + li:before{
+			color: #eee;
+		}
+		li {
+			a {
+				color: white;
+				&:hover {
+					color: white;
+				}
+			}
+		}
+	}
+	font-family: $font-light;
+	font-size: 1.22em;
+
+	.propertiesBox {
+		form {
+			position: relative;
+			.form-group {
+				width: 100%;
+				button[type="submit"]{
+					border: 0;
+					background: transparent
+					span {
+						font-size:1em;
+						color: limegreen;
+					}
+				}
+			}
+		}
+	}
+
+	ul {
+		list-style: none;
+		padding-left:30px;
+		li {
+			padding: 3px 0;
+		}
+	}
+	.tree>.node>ul {
+		padding: 15px 20px;
+	}
+
+	.glyphicon {
+		cursor: pointer;
+	}
+	.glyphicon-plus-sign {
+		color: darken($green, 10%);
+		font-weight: bolder; 
+	}
+	.glyphicon-minus-sign {
+		color: coral;
+	}
+	.tooltipbal {
+		font-size: 1em;
+	}
+	.glyphicon-remove {
+		color: red;font-weight: bolder;
+	}
+ 	.show-parent {
+ 		display: none;
+ 		margin-left: -3px;
+ 		.expand {
+ 			font-size: 1em;
+ 		}
+ 		.node-name {
+ 			position: relative;
+ 			left: -1px;
+ 			top: 1px;
+ 			font-size: 1em;
+ 		}
+ 	}
+}
+
+.wellp {
+	margin-top: 10px;
+	padding: 15px 15px 10px;
+	background: white;
+	border-radius: 3px;	
+	box-shadow: 1px 1px 1px #dedede;
+	h2 {
+		text-align: left;
+		font-size: 2.0em;
+		margin-left: 20px;
+	}
+}
+
+.strike, a.strike, a.strike:hover {
+	text-decoration: line-through;
+	cursor: default;
+}
+
+text[style="cursor:pointer;color:#909090;font-size:9px;fill:#909090;"] {
+	display: none;
+}
+
+#stats {
+	font-family: $font-extra-light;
+	padding: 0 15px;
+	margin-top: 15px;
+	background-color: $apps-bg;
+	.st-sum {
+		font-size: 1.2em;
+		margin-top: 10px;
+	}
+	.no-data { 
+		padding-top: 20vh;
+		width: 100%;
+		text-align: center;
+		font-size: 2em;
+		color: #666;
+		.sad {
+			font-family: $font-bold;
+			font-size: 4em;
+			color: #999;
+		}
+	}
+
+	.chart {
+		font-size: 1.2em;
+		position: relative;
+		display: inline-block;
+		width: 110px;
+		height: 110px;
+		margin:10px 0;
+		text-align: center;
+	}
+	.chart canvas {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+	.percent {
+		display: inline-block;
+		line-height: 110px;
+		z-index: 2;
+	}
+	.highcharts-background {fill: white}
+	.graph .wellp{
+		width: 90%;
+	}
+	.push {
+		margin-top: 20px;
+	}
+	h2.graph-title {
+		margin-bottom: 5px;
+	}
+	.nav-tab {
+		text-align: left;
+		ul, li {
+			display: inline-block;
+		}
+		li:first-child {
+			margin-left: -20px;
+		}
+		li {
+			margin: 0 20px 20px;
+		}
+		a {
+			font-size: 1.2em;
+			color: #555;
+			padding: 0 3px;
+		}
+		a:not(.strike){
+			cursor: pointer;
+		}
+		a.active {
+			border-bottom: 2px solid #666;
+		}
+	}
+	h3 {
+		display: inline-block;
+		margin-right: 10px;
+	}
+	.progress-bar {
+		background-color: darken($blue, 5%);
+	}
+	.plan {
+		text-align: left;
+		padding: 0 20px 20px;
+		font-size: 1.2em;
+		span {
+			float: right;
+			position: relative;
+			top: 1.4em;
+			right: 2px;
+		}
+	}
+}
+
+.inner-loading {
+	position: absolute;
+	width: 90%;
+	height:90%;
+	text-align: center;
+	line-height: 65vh;
+	color: #bbb;
+}
+
+.bro-loading {
+	margin: 0 12px;
+	position: relative;
+}
+
+#oauth {
+	font-family: $font-light;
+	font-size: 1.1em;
+	.wellp {
+		padding: 10px 30px 25px;
+		margin-top: 15px;
+		h2 {
+			margin-left: 0;
+		}
+		ul {
+			margin-bottom: 0;
+		}
+	}
+	h4 {
+		font-family: $font-extra-light;
+		font-size: 2em;
+	}
+	.fa-info-circle {
+		font-size: 0.55em;
+		margin-left:5px;
+		display: inline-block;
+		color: #bbb;
+		&:hover {
+			color: #666;
+		}
+	}
+	.example {
+		border-bottom: 1px dotted black;
+		color: #888;
+		&:hover {
+			color: #222;
+		}
+	}
+	.tooltip-inner {
+		font-family: $font-regular;
+	}
+
+	.oa-tab .list div .title{
+		text-align:center;
+	}
+
+	.oa-tab{
+		height: 100%;
+	}
+
+
+	.oa-dom-item .badge{
+		font-family: sans-serif;
+		line-height: 15px;
+		color:#fff;
+		background-color:#d9534f;
+		border-color:#d43f3a;
+		cursor:pointer;
+		-webkit-user-select:none;
+		&:hover {
+			background-color: lighten(#d9534f, 6%);
+		}
+		&:active {
+			background-color: darken(#d9534f, 5%);
+		}
+	}
+
+	.oa-dom{
+		padding-top: 1px;
+		font-family: $font-light;
+	}
+
+	.oa-dom .domain{
+		-webkit-user-select:none;
+		cursor: default;
+		text-overflow:ellipsis;
+		overflow: hidden;
+		width: 80%;
+	}
+
+	.oa-dom-input{
+		padding:3px 5px;
+	}
+
+	.oa-dom-input-inpt input{
+		position: relative;
+		margin:0;
+		height: 40px;
+		width: 100%;
+		background-color:white;
+		z-index: 2;
+	}
+
+	.oa-dom-input-inpt{
+		width: 100%;
+		transition:all ease 0.3s;
+	}
+
+	.oa-dom-input-btn button{
+		height: 40px;
+		line-height:20px;
+		width: 100%;
+		margin-left:2%;
+		text-align: center;
+	}
+
+	.oa-dom-input-btn button span::after{
+		content:'+'; 
+	}
+
+	.oa-expiry button span::after{
+		content:'+'!important;
+	}
+
+	.oa-dom-input-btn{
+		float:right;
+		width: 10%;
+	    transition:all ease 0.3s 0.1s;
+	    position: relative;
+		top: -40px;
+	}
+
+	.oa-dom-input-btn.ng-hide{
+		opacity: 0;
+	}
+
+	.oa-dom-input-btn.ng-hide-remove {
+		display:block!important;
+	}
+	.exp{
+		width: 88%;
+	}
+	.overlay{
+		opacity: 0.7;
+	}
+
+	@media (min-width:768px) {
+		.oa-dom-input-btn button span::after{
+			content:'Add'; 
+		}
+		.oa-expiry button span::after{
+			content:'Save'!important;
+		}
+		.oa-dom-input-btn{
+			width: 18%;
+		}
+		.exp{
+			width: 80%;
+		}
+	}
+
+	.oa-prov img{
+		width: 32px;
+		height: 32px;
+		margin-right: 6px;
+		margin-top: -4px;
+	}
+
+	.oa-prov button{
+		float:right;
+		padding:0 10px;
+		height: 30px;
+		margin:9px 3px;
+		border-radius: 4px;
+	}
+
+	.oa-prov{
+		overflow: hidden;
+		padding:0 10px;
+		line-height: 48px;
+		height: 50px;
+		font-family: $font-light;
+	}
+
+	.oa-dom-input>div{
+		//display:inline-block;
+	}
+
+	.oa-ed-prov{
+		font-family: $font-light;
+		border:1px solid #ddd;
+		border-radius: 4px;
+		padding:0 10px;
+		margin-top: 20px;
+		padding-bottom: 10px;
+		margin-bottom: 60px;
+	}
+
+	.oa-ed-prov label{
+		line-height: 35px;
+	}
+
+	.oa-ed-prov img{
+		width: 80%;
+		margin:20px 10%;
+	}
+
+	.oa-edit-btn {
+		ul {
+			img {
+				position: relative;
+				top: -5px;
+			}
+			.label {
+				position: relative;
+				top: -2px;
+				margin:0 5px;
+			}
+			.pull-right {
+				position: relative;
+				top: 15px;
+			}
+		}
+
+	}
+
+	.oa-edit-btn ul{
+		//text-align: right;
+	}
+
+	#provider {
+		font-size:1.1em;
+		&>h4{
+			margin-bottom: 12px;
+		}
+		.provider-title {
+			font-size: 1.3em;
+		}
+		ul {
+			margin-bottom: 0;
+		}
+		.fa {
+			font-size: 1.1em;
+		}
+		label {
+			font-size: 0.9em;
+		}
+		input {
+			position:relative;
+			top: 10px;
+		}
+	}
+}
+
+#not-logged {
+	display:table;
+	text-align: center;
+	min-height: calc(100vh - 270px);
+	&>div{
+		display: table-cell;
+		vertical-align:middle;
+		h1 {
+			padding: 5vh 10vw;
+			color: #888;
+		}
+		button {
+			font-size: 2em;
+			margin-top: 2%;
+			margin: 2%;
+			padding-left: 50px;
+			padding-right: 50px;
+			border: 2px solid $green;
+			border-radius: 10px;
+			color: $green;
+			background-color: white;
+			&:hover {
+				background-color: $green;
+				color: white;
+			}
+		}
+	}
+}
+
+#loading {
+	position: fixed;
+	font-family: $font-light;
+	font-size: 2em;
+	color: #aaa;
+	text-align: center;
+	margin: 0 auto;
+	height: 100%;
+	width: 100%;
+	top: 40vh;
+	z-index: 1000;
+}
+
+#invite {
+	font-family: $font-extra-light;
+	.main-title {
+		h1 {
+			text-align: center;
+			font-family: $font-extra-light;
+			font-size: 3.5em;
+			color: #888;
+			padding: 50px 0 30px;
+		}
+	}
+
+	form ul {
+		margin-top:5px;
+	}
+	
+	.well {
+		background-color: #F2F2F2;
+		box-shadow: none;
+		border:none;
+		margin: 30px;
+		padding: 25px 30px 15px;
+		border-radius: 15px;
+		color: #888;
+		min-height:480px;
+
+		@media screen and (min-width: 992px) and (max-width: 1190px) {
+		    margin: 10px 3px;
+		    padding: 25px 20px 15px;
+		}
+
+		@media screen and (min-width: 1190px) and (max-width: 1285px) {
+		    margin: 10px 3px;
+		    padding: 25px 20px 15px;
+		}
+
+		input,textarea {
+			border: none;
+		}
+		textarea {
+			margin-top:5px;
+		}
+
+		#invited-users {
+			height:240px;
+			list-style:none;
+			padding:15px; 
+			background-color:white;
+			border-radius: 15px;
+			overflow:scroll;
+
+		}
+		#invited-users li {
+			border-bottom:0.2em solid #F2F2F2;
+			padding-bottom:10px;
+			font-family: "Source Sans Pro Light";
+		}
+
+		button {
+			background-color:#7DD3F4;
+			border-color:#7DD3F4;
+			font-family: "Source Sans Pro Light";
+			margin-top:10px;
+		}
+
+		h2 {
+			font-size:1.9em;
+		}
+
+		label {
+			font-size:1.3em;
+		}
+
+	}
+	
+}
+
+#billing {
+	min-height:530px;
+	font-family: $font-extra-light;
+	.main-title {
+		h1 {
+			text-align: center;
+			font-family: $font-extra-light;
+			font-size: 3.5em;
+			color: #888;
+			padding: 50px 0 30px;
+		}
+	}
+	z-index:99999; 
+	.row {
+		padding:30px;
+	}
+}
+
+.modal-custom {
+	.bold {
+		font-family: $font-semi-bold; 
+	}
+	.modal-content {
+		border-radius: 0;
+		font-family: $font-light;
+		font-size: 1.2em;
+		.btn {
+			color: white;
+			text-transform: uppercase;
+		}
+		.btn-yes {
+			background: darken($red, 5%);
+			&:hover {
+				background: $red;
+			}
+			&:active {
+				background: darken($red, 10%);
+			}
+		}
+		.btn-no{
+			background: #888;
+			&:hover {
+				background: #999;
+			}
+			&:active {
+				background: #777;
+			}
+		}
+		.modal-footer {
+			border:0;
+		}
+	}
+	.modal-header {
+		background: darken($red, 5%);
+		padding: 15px 15px;
+		.bootstrap-dialog-title {
+			font-family: $font-bold;
+			font-size: 1.2em;
+			color: white;
+			text-transform: uppercase;
+		}
+	}
+	&.modal-examples { 
+		a {
+			&:focus  {
+				outline: none;
+				text-decoration: none;
+			}
+		}
+		.content-block {
+			overflow: hidden;
+			text-align: center;
+			margin-bottom: 20px; 
+			.icon {
+				overflow: hidden;
+				width: 50px;
+				height: 50px;
+				transition: background 0.3s ease-out;
+				margin: auto;
+			}
+			.docs {
+				width: 80px;
+				height: 80px;
+			}
+		}
+
+		$url_docs: "http://docs.appbase.io/images/logos/dh_rest.svg";
+		$url_graph: "http://docs.appbase.io/images/logos/dh_graph.svg";
+		$url_auth: "http://docs.appbase.io/images/logos/dh_auth.svg";
+		$url_providers: "http://docs.appbase.io/images/logos/dh_auth_providers.svg";
+		$url_angular: "http://docs.appbase.io/images/logos/dh_angular.svg";
+		$url_js: "http://docs.appbase.io/images/logos/dh_js.svg";
+
+		.docs { background: url($url_docs) no-repeat center/contain }
+		.graph { background: url($url_graph) no-repeat center/contain }
+		.auth { background: url($url_auth) no-repeat center/contain }
+		.auth_providers { background: url($url_providers) no-repeat center/contain }
+		.angular { background: url($url_angular) no-repeat center/contain }
+		.js { background: url($url_js) no-repeat center/contain }
+		.fa-search { font-size: 2em; padding-top: 10px }
+
+		.modal-header {
+			background: $dark-blue;
+		}
+		ul {
+			list-style: square;
+		}
+	}
+}
+
+#payment_modal {   
+	.modal-title {
+		text-align:center;
+	}
+	.modal-sm {
+		width:312px;
+	}
+    .modal-body{
+        text-align: left;
+       
+        .well {
+			background-color: #F2F2F2;
+			box-shadow: none;
+			border:none;
+			padding: 25px 10px 15px;
+			border-radius: 15px;
+			color: #888;
+
+			button {
+				background-color: $light-blue;
+				border-color: $light-blue;
+				font-family: "Source Sans Pro Light";
+				margin-top:10px;
+			}
+
+			h2 {
+				font-size:1.9em;
+			}
+			i {
+				font-size:2em;
+			}
+		}
+    }
+}
+
+.nav > li > a:focus {
+	background-color: transparent;
+}
