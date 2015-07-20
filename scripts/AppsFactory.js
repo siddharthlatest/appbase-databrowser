@@ -37,7 +37,7 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
   function appFromName(name){
     var deferred = $q.defer();
 
-    if (apps && apps.length) {
+    if (apps) {
       var app = getApp(name);
       if(app) deferred.resolve(app);
       else
@@ -79,12 +79,12 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
       var indexOrder = order.indexOf(app);
       if(indexOrder !== -1) order.splice(indexOrder, 1);
       order.unshift(app);
-      
+
       var indexSession = apps.indexOf(appObj);
       if(indexSession !== -1) apps.splice(indexSession, 1);
       apps.unshift(appObj);
       write();
-      
+
       localStorage.setItem(profile.uid + 'order', JSON.stringify(order));
     }
   }
@@ -152,7 +152,7 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
             $rootScope.$broadcast('intercomStats', { calls: 0, apps: 0 });
           }
         }
-        
+
         deferred.resolve(apps);
       });
     }).catch(function(err){
@@ -178,7 +178,7 @@ function AppsFactory(session, data, $q, $timeout, $rootScope, $routeParams, util
     var deferred = $q.defer();
     deferred.resolve();
     var emptyPromise = deferred.promise;
-    
+
     appObj.$metrics = function(){
       if(!appObj.metrics){
         return data.accountsAPI.app.get(appObj.name, 'metrics').then(function(data){
